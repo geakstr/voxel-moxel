@@ -26,6 +26,10 @@ public class Runner {
             Window.fps();
             Window.before_render();
             Game.update();
+            if (Window.was_resize) {
+                Window.was_resize = false;
+                Window.setup_aspect_ratio();
+            }
             Game.render();
             Window.after_render();
         }

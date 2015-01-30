@@ -2,9 +2,11 @@ package me.geakstr.voxel.core;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
+import org.lwjgl.util.glu.GLU;
 
 import java.nio.ByteBuffer;
 
@@ -26,6 +28,9 @@ public class Window {
 
     private static GLFWErrorCallback errorCallback;
     private static GLFWKeyCallback keyCallback;
+    private static GLFWWindowSizeCallback resizeCallback;
+
+    public static boolean was_resize = false;
 
     public static void init(int width, int height, boolean vsync) {
         Window.width = width;
@@ -51,15 +56,6 @@ public class Window {
             throw new RuntimeException("Failed to create the GLFW window");
         }
 
-        glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
-            @Override
-            public void invoke(long window, int key, int scancode, int action, int mods) {
-                if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-                    glfwSetWindowShouldClose(window, GL11.GL_TRUE);
-                }
-            }
-        });
-
         ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwSetWindowPos(window, (GLFWvidmode.width(vidmode) - Window.width) / 2, (GLFWvidmode.height(vidmode) - Window.height) / 2);
         glfwMakeContextCurrent(window);
@@ -80,6 +76,28 @@ public class Window {
         glShadeModel(GL_SMOOTH);
         glClearDepth(1.0);
         glDepthFunc(GL_LEQUAL);
+
+        glViewport(0, 0, Math.max(width, height), Math.max(width, height));
+
+        glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
+            @Override
+            public void invoke(long window, int key, int scancode, int action, int mods) {
+                if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+                    glfwSetWindowShouldClose(window, GL11.GL_TRUE);
+                }
+            }
+        });
+
+        glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallback() {
+            @Override
+            public void invoke(long window, int width, int height) {
+                if (Window.width != width || Window.height != height) {
+                    Window.width = width;
+                    Window.height = height;
+                    Window.was_resize = true;
+                }
+            }
+        });
     }
 
     public static void destroy() {
@@ -103,6 +121,11 @@ public class Window {
     public static void after_render() {
         glfwSwapBuffers(window);
         glfwPollEvents();
+    }
+
+    public static void setup_aspect_ratio() {
+        int size = Math.max(Window.width, Window.height);
+        glViewport(0, 0, size, size);
     }
 
     public static boolean fps() {
