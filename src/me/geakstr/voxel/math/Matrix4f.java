@@ -134,26 +134,6 @@ public class Matrix4f {
         return res;
     }
 
-    public Matrix4f store(FloatBuffer buf) {
-        buf.put(m[0][0]);
-        buf.put(m[0][1]);
-        buf.put(m[0][2]);
-        buf.put(m[0][3]);
-        buf.put(m[1][0]);
-        buf.put(m[1][1]);
-        buf.put(m[1][2]);
-        buf.put(m[1][3]);
-        buf.put(m[2][0]);
-        buf.put(m[2][1]);
-        buf.put(m[2][2]);
-        buf.put(m[2][3]);
-        buf.put(m[3][0]);
-        buf.put(m[3][1]);
-        buf.put(m[3][2]);
-        buf.put(m[3][3]);
-        return this;
-    }
-
     public float[][] getM() {
         float[][] res = new float[4][4];
         for (int i = 0; i < 4; i++) {

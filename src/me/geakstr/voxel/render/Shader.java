@@ -1,8 +1,8 @@
-package me.geakstr.voxel.core;
+package me.geakstr.voxel.render;
 
 import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.math.Vector3f;
-import me.geakstr.voxel.util.MatrixUtil;
+import me.geakstr.voxel.util.RenderUtil;
 import me.geakstr.voxel.util.ResourceUtil;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
@@ -13,7 +13,7 @@ public class Shader {
     private static int vertex_shader;
     private static int fragment_shader;
 
-    public static void init() {
+    public static void create() {
         program = glCreateProgram();
     }
 
@@ -47,7 +47,7 @@ public class Shader {
         glAttachShader(program, fragment_shader);
     }
 
-    public static void link() {
+    public static void compile() {
         glLinkProgram(program);
 
         if (glGetProgrami(program, GL_LINK_STATUS) == GL_FALSE) {
@@ -78,7 +78,7 @@ public class Shader {
     }
 
     public static void set_uniform(String name, Matrix4f value) {
-        glUniformMatrix4(glGetUniformLocation(program, name), false, MatrixUtil.toFloatBuffer(value));
+        glUniformMatrix4(glGetUniformLocation(program, name), true, RenderUtil.create_flipped_buffer(value));
     }
 
     public static void set_uniform(String name, Vector3f value) {

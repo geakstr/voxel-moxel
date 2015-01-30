@@ -3,6 +3,10 @@ package me.geakstr.voxel.math;
 public class Vector3f {
     public float x, y, z;
 
+    public static final Vector3f x_axis = new Vector3f(1, 0, 0);
+    public static final Vector3f y_axis = new Vector3f(0, 1, 0);
+    public static final Vector3f z_axis = new Vector3f(0, 0, 1);
+
     public Vector3f(float x, float y, float z) {
         this.x = x;
         this.y = y;

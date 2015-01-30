@@ -2,7 +2,13 @@
 
 attribute vec3 position;
 
+varying vec4 color;
+
+uniform float uniform_color;
+uniform mat4 uniform_transform;
+
 void main()
 {
-    gl_Position = vec4(0.25 * position, 1.0);
+    color = vec4(clamp(position, 0.0, uniform_color), 1.0);
+    gl_Position = uniform_transform * vec4(position, 1.0);
 }

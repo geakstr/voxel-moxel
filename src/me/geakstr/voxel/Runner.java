@@ -17,7 +17,7 @@ public class Runner {
     }
 
     private void init() {
-        Window.init(800, 800, false);
+        Window.init(800, 800, true);
         Game.init();
     }
 
@@ -25,6 +25,7 @@ public class Runner {
         while (!Window.should_close()) {
             Window.fps();
             Window.before_render();
+            Game.update();
             Game.render();
             Window.after_render();
         }
