@@ -18,14 +18,7 @@ public class Runner {
 
     private void init() {
         Window.init(800, 800, false);
-    }
-
-    private void destroy() {
-        Window.destroy();
-    }
-
-    private void terminate() {
-        Window.terminate();
+        Game.init();
     }
 
     private void loop() {
@@ -35,6 +28,14 @@ public class Runner {
             Game.render();
             Window.after_render();
         }
+    }
+
+    private void destroy() {
+        Window.destroy();
+    }
+
+    private void terminate() {
+        Window.terminate();
     }
 
     public static void main(String[] args) {

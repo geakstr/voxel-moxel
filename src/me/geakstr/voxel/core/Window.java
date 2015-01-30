@@ -5,7 +5,6 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
-import org.lwjgl.util.glu.GLU;
 
 import java.nio.ByteBuffer;
 
@@ -16,9 +15,9 @@ import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER_SRGB;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
-    public static int WIDTH = 800;
-    public static int HEIGHT = 800;
-    public static boolean VSYNC = false;
+    public static int width = 800;
+    public static int height = 800;
+    public static boolean vsync = false;
 
     private static double last_time;
     private static int fps;
@@ -29,12 +28,12 @@ public class Window {
     private static GLFWKeyCallback keyCallback;
 
     public static void init(int width, int height, boolean vsync) {
-        WIDTH = width;
-        HEIGHT = height;
-        VSYNC = vsync;
+        Window.width = width;
+        Window.height = height;
+        Window.vsync = vsync;
 
-        last_time = glfwGetTime();
-        fps = 0;
+        Window.last_time = glfwGetTime();
+        Window.fps = 0;
 
         glfwSetErrorCallback(errorCallback = errorCallbackPrint(System.err));
 
@@ -47,7 +46,7 @@ public class Window {
         glfwWindowHint(GLFW_RESIZABLE, GL11.GL_TRUE);
         glfwWindowHint(GLFW_REFRESH_RATE, 100);
 
-        window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(Window.width, Window.height, "Hello World!", NULL, NULL);
         if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
@@ -62,31 +61,25 @@ public class Window {
         });
 
         ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowPos(window, (GLFWvidmode.width(vidmode) - WIDTH) / 2, (GLFWvidmode.height(vidmode) - HEIGHT) / 2);
+        glfwSetWindowPos(window, (GLFWvidmode.width(vidmode) - Window.width) / 2, (GLFWvidmode.height(vidmode) - Window.height) / 2);
         glfwMakeContextCurrent(window);
-        glfwSwapInterval(VSYNC ? 1 : 0);
+        glfwSwapInterval(Window.vsync ? 1 : 0);
         glfwShowWindow(window);
 
         GLContext.createFromCurrent();
 
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
         glFrontFace(GL_CW);
-        glCullFace(GL_BACK);
+        glCullFace(GL_FRONT_FACE);
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FRAMEBUFFER_SRGB);
+
         glEnable(GL_TEXTURE_2D);
         glShadeModel(GL_SMOOTH);
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClearDepth(1.0);
-        glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        GLU.gluPerspective(45.0f, WIDTH / HEIGHT, 0.1f, 1000.0f);
-
-        glMatrixMode(GL_MODELVIEW);
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     }
 
     public static void destroy() {
@@ -103,13 +96,13 @@ public class Window {
         return glfwWindowShouldClose(window) == GL11.GL_TRUE;
     }
 
+    public static void before_render() {
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    }
+
     public static void after_render() {
         glfwSwapBuffers(window);
         glfwPollEvents();
-    }
-
-    public static void before_render() {
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     }
 
     public static boolean fps() {
