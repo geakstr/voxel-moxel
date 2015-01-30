@@ -154,3 +154,6 @@ crashlytics-build.properties
 
 .classpath
 .project
+
+lib/lwjgl/doc
+!lib/lwjgl/*.jar
