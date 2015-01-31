@@ -1,6 +1,7 @@
 package me.geakstr.voxel.core;
 
-import me.geakstr.voxel.math.Vec2f;
+
+import me.geakstr.voxel.math.Vector2f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.DoubleBuffer;
@@ -53,14 +54,14 @@ public class Input {
         return !getMouse(mouseButton) && lastMouse[mouseButton];
     }
 
-    public static Vec2f getMousePosition() {
+    public static Vector2f getMousePosition() {
         DoubleBuffer x = BufferUtils.createDoubleBuffer(1), y = BufferUtils.createDoubleBuffer(1);
         glfwGetCursorPos(window, x, y);
-        return new Vec2f((float) x.get(0), (float) y.get(0));
+        return new Vector2f((float) x.get(0), (float) y.get(0));
     }
 
-    public static void setMousePosition(Vec2f pos) {
-        glfwSetCursorPos(window, pos.getX(), pos.getY());
+    public static void setMousePosition(Vector2f pos) {
+        glfwSetCursorPos(window, pos.x, pos.y);
     }
 
 }

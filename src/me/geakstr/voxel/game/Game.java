@@ -1,33 +1,39 @@
 package me.geakstr.voxel.game;
 
-import me.geakstr.voxel.render.Render;
-
-import static org.lwjgl.opengl.GL11.*;
+import me.geakstr.voxel.model.Cube;
+import me.geakstr.voxel.model.Mesh;
+import me.geakstr.voxel.render.Shader;
+import me.geakstr.voxel.render.Transform;
 
 public class Game {
-    private static float offset = 0;
+    private static Mesh mesh;
+    private static Transform transform;
+    private static Shader simple_shader;
+
+    public static void init() {
+        simple_shader = new Shader("simple.vs", "simple.fs");
+        simple_shader.compile();
+
+        transform = new Transform();
+        transform.rotate(15, -7, 0);
+        transform.scale(0.33f, 0.33f, 0.33f);
+
+        mesh = new Mesh();
+        mesh.add_verts(Cube.vertices, Cube.indices);
+    }
+
+    static float temp = 0.0f;
+
+    public static void update() {
+        temp += 0.01;
+        transform.translate((float) Math.sin(temp), 0, 0);
+
+        simple_shader.set_uniform("uniform_color", 1);
+        simple_shader.set_uniform("uniform_transform", transform.get_transform());
+    }
 
     public static void render() {
-        glLoadIdentity();
-        glTranslatef(-25, -15, -100);
-        glRotatef(45f + offset, 0.4f, 1.0f, 0.1f);
-        glColor3f(1, 0, 0);
-
-        offset += 5;
-
-        for (int x = 0; x < 20; x++) {
-            for (int y = 0; y < 20; y++) {
-                for (int z = 0; z < 20; z++) {
-                    Render.cube();
-                    glTranslatef(0f, 0.0f, 2f);
-                }
-                glTranslatef(0f, 2f, -40f);
-            }
-            glTranslatef(2f, -40f, 0);
-        }
-
-        if (offset >= 360) {
-            offset = 0;
-        }
+        simple_shader.bind();
+        mesh.draw();
     }
 }
