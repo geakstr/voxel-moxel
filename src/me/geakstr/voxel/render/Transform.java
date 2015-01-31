@@ -9,13 +9,13 @@ public class Transform {
     private Matrix4f scale;
 
     public Transform() {
-        translation = new Matrix4f().init_identity();
-        rotation = new Matrix4f().init_identity();
-        scale = new Matrix4f().init_identity();
+        translation = new Matrix4f();
+        rotation = new Matrix4f();
+        scale = new Matrix4f();
     }
 
     public void translate(Vector3f translation) {
-        this.translation = new Matrix4f().init_translation(translation.x, translation.y, translation.z);
+        Matrix4f.translate(translation, this.translation, this.translation);
     }
 
     public void translate(float x, float y, float z) {
@@ -27,18 +27,20 @@ public class Transform {
     }
 
     public void rotate(float x, float y, float z) {
-        this.rotation = new Matrix4f().init_rotation(x, y, z);
+        Matrix4f.rotate((float) Math.toRadians(x), Vector3f.xAxis, rotation, rotation);
+        Matrix4f.rotate((float) Math.toRadians(y), Vector3f.yAxis, rotation, rotation);
+        Matrix4f.rotate((float) Math.toRadians(z), Vector3f.zAxis, rotation, rotation);
     }
 
     public void scale(Vector3f scale) {
-        this.scale = new Matrix4f().init_scale(scale.x, scale.y, scale.z);
+        Matrix4f.scale(scale, this.scale, this.scale);
     }
 
     public void scale(float x, float y, float z) {
         scale(new Vector3f(x, y, z));
     }
 
-    public Matrix4f get_transform() {
-        return translation.mul(rotation.mul(scale));
+    public Matrix4f getTransform() {
+        return Matrix4f.mul(translation, Matrix4f.mul(rotation, scale, null), null);
     }
 }

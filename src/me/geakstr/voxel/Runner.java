@@ -4,9 +4,6 @@ import me.geakstr.voxel.core.Input;
 import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.game.Game;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
-
 public class Runner {
     private Runner() {}
 
@@ -22,8 +19,8 @@ public class Runner {
 
     private void init() {
         Window.init(800, 800, true);
+        Input.init();
         Game.init();
-        Input.init(Window.getWindow());
     }
 
     private void loop() {
@@ -37,12 +34,6 @@ public class Runner {
             Game.update();
             Game.render();
             Window.after_render();
-            if (Input.getKey(GLFW_KEY_W)) {
-                System.out.println("W");
-            }
-            if (Input.getMouse(GLFW_MOUSE_BUTTON_1)) {
-                System.out.println("Click at " + Input.getMousePosition());
-            }
         }
     }
 

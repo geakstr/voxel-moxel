@@ -50,7 +50,7 @@ public class Shader {
     }
 
     public void set_uniform(String name, Matrix4f value) {
-        glUniformMatrix4(glGetUniformLocation(program, name), true, RenderUtil.create_flipped_buffer(value));
+        glUniformMatrix4(glGetUniformLocation(program, name), false, RenderUtil.create_flipped_buffer(value));
     }
 
     public void set_uniform(String name, Vector3f value) {

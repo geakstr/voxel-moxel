@@ -13,12 +13,10 @@ public class Input {
     public static final int NUM_KEYCODES = 348;
     public static final int NUM_MOUSEBUTTONS = 7;
 
-    private static long window;
     private static boolean[] lastKeys = new boolean[NUM_KEYCODES];
     private static boolean[] lastMouse = new boolean[NUM_MOUSEBUTTONS];
 
-    public static void init(long window) {
-        Input.window = window;
+    public static void init() {
         glfwPollEvents();
     }
 
@@ -31,7 +29,7 @@ public class Input {
     }
 
     public static boolean getKey(int keyCode) {
-        return glfwGetKey(window, keyCode) == 1;
+        return glfwGetKey(Window.window, keyCode) == 1;
     }
 
     public static boolean getKeyDown(int keyCode) {
@@ -43,7 +41,7 @@ public class Input {
     }
 
     public static boolean getMouse(int mouseButton) {
-        return glfwGetMouseButton(window, mouseButton) == 1;
+        return glfwGetMouseButton(Window.window, mouseButton) == 1;
     }
 
     public static boolean getMouseDown(int mouseButton) {
@@ -56,12 +54,12 @@ public class Input {
 
     public static Vector2f getMousePosition() {
         DoubleBuffer x = BufferUtils.createDoubleBuffer(1), y = BufferUtils.createDoubleBuffer(1);
-        glfwGetCursorPos(window, x, y);
+        glfwGetCursorPos(Window.window, x, y);
         return new Vector2f((float) x.get(0), (float) y.get(0));
     }
 
     public static void setMousePosition(Vector2f pos) {
-        glfwSetCursorPos(window, pos.x, pos.y);
+        glfwSetCursorPos(Window.window, pos.x, pos.y);
     }
 
 }

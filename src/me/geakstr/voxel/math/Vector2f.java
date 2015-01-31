@@ -1,19 +1,11 @@
 package me.geakstr.voxel.math;
 
-public class Vector2f {
-    public float x, y;
+public class Vector2f extends org.lwjgl.util.vector.Vector2f {
+
+    private static final long serialVersionUID = 1L;
 
     public Vector2f(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public float length() {
-        return (float) Math.sqrt(x * x + y * y);
-    }
-
-    public float max() {
-        return Math.max(x, y);
+        super(x, y);
     }
 
     public float dot(Vector2f r) {
@@ -24,14 +16,6 @@ public class Vector2f {
         float length = length();
 
         return new Vector2f(x / length, y / length);
-    }
-
-    public float cross(Vector2f r) {
-        return x * r.y - y * r.x;
-    }
-
-    public Vector2f lerp(Vector2f dest, float lerpFactor) {
-        return dest.sub(this).mul(lerpFactor).add(this);
     }
 
     public Vector2f rotate(float angle) {
@@ -74,26 +58,4 @@ public class Vector2f {
         return new Vector2f(x / r, y / r);
     }
 
-    public Vector2f abs() {
-        return new Vector2f(Math.abs(x), Math.abs(y));
-    }
-
-    public Vector2f set(float x, float y) {
-        this.x = x;
-        this.y = y;
-        return this;
-    }
-
-    public Vector2f set(Vector2f r) {
-        set(r.x, r.y);
-        return this;
-    }
-
-    public boolean equals(Vector2f r) {
-        return x == r.x && y == r.y;
-    }
-
-    public String toString() {
-        return "(" + x + " " + y + ")";
-    }
 }

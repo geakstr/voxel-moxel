@@ -20,10 +20,10 @@ public class Window {
     public static int height = 800;
     public static boolean vsync = false;
 
+    public static long window;
+
     private static double last_time;
     private static int fps;
-
-    private static long window;
 
     private static GLFWErrorCallback errorCallback;
     private static GLFWKeyCallback keyCallback;
@@ -48,7 +48,6 @@ public class Window {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GL11.GL_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GL11.GL_TRUE);
-        glfwWindowHint(GLFW_REFRESH_RATE, 100);
 
         window = glfwCreateWindow(Window.width, Window.height, "Hello World!", NULL, NULL);
         if (window == NULL) {
@@ -57,6 +56,7 @@ public class Window {
 
         ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwSetWindowPos(window, (GLFWvidmode.width(vidmode) - Window.width) / 2, (GLFWvidmode.height(vidmode) - Window.height) / 2);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwMakeContextCurrent(window);
         glfwSwapInterval(Window.vsync ? 1 : 0);
         glfwShowWindow(window);
@@ -71,7 +71,7 @@ public class Window {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FRAMEBUFFER_SRGB);
 
-        glViewport(0, 0, Math.max(width, height), Math.max(width, height));
+        glViewport(0, 0, Math.max(Window.width, Window.height), Math.max(Window.width, Window.height));
 
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override

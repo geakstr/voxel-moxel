@@ -26,14 +26,10 @@ public class RenderUtil {
         return ret;
     }
 
-    public static FloatBuffer create_flipped_buffer(Matrix4f value) {
-        FloatBuffer ret = BufferUtils.createFloatBuffer(16);
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                ret.put(value.get(i, j));
-            }
-        }
-        ret.flip();
-        return ret;
+    public static FloatBuffer create_flipped_buffer(Matrix4f mat) {
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+        mat.store(buffer);
+        buffer.flip();
+        return buffer;
     }
 }

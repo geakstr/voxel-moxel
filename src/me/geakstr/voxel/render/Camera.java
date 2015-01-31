@@ -1,9 +1,12 @@
 package me.geakstr.voxel.render;
 
+import me.geakstr.voxel.core.Input;
 import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.math.Vector3f;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class Camera {
     private float fov;
@@ -19,9 +22,9 @@ public class Camera {
 
     private float pitch = 0.0f;
 
-    public static final float MOVE_SPEED = 8.0f;
+    public static final float MOVE_SPEED = 5f;
     public static final float STRAFE_SPEED = MOVE_SPEED / 1.2f;
-    public static final float SENSITIVITY_X = 0.3f;
+    public static final float SENSITIVITY_X = 0.33f;
     public static final float SENSITIVITY_Y = SENSITIVITY_X * 1.0f;
     public static final float ROT_SPEED_X = 70.0f;
 
@@ -35,8 +38,8 @@ public class Camera {
         this.zNear = zNear;
         this.zFar = zFar;
 
-        projection = new Matrix4f().init_perspective(fov, aspect, zNear, zFar);
-        view = new Matrix4f().init_identity();
+        projection = Matrix4f.createPerspectiveProjection(fov, aspect, zNear, zFar);
+        view = Matrix4f.createIdentityMatrix();
 
         position = new Vector3f(0, 0, 0);
         rotation = new Vector3f(0, 0, 0);
@@ -48,51 +51,62 @@ public class Camera {
     public boolean input() {
         boolean wasInput = false;
 
-        //if (mouseLocked) {
-        Vector2f deltaPos = null;//Input.getMousePosition().sub(centerPosition);
+        Vector2f deltaPos = Input.getMousePosition().sub(centerPosition);
 
-        boolean rotX = deltaPos.x != 0;
-        boolean rotY = deltaPos.y != 0;
+        boolean rotX = deltaPos.y != 0;
+        boolean rotY = deltaPos.x != 0;
 
-        if (rotY) yaw(deltaPos.y);
-        if (rotX) pitch(-deltaPos.x);
-        if (rotY || rotX) return false; //Input.setMousePosition(centerPosition);
+        if (rotY) {
+            yaw(deltaPos.x * SENSITIVITY_X);
+        }
+        if (rotX) {
+            pitch(deltaPos.y * SENSITIVITY_Y);
+        }
+        if (rotY || rotX) {
+            Input.setMousePosition(centerPosition);
+        }
 
         wasInput = true;
         //}
 
-//        if (isKeyDown(KEY_W)) {
-//            forward(MOVE_SPEED * (float) Timing.getDelta());
-//            wasInput = true;
-//        }
-//        if (isKeyDown(KEY_S)) {
-//            forward(-MOVE_SPEED * (float) Timing.getDelta());
-//            wasInput = true;
-//        }
-//        if (isKeyDown(KEY_A)) {
-//            sideward(STRAFE_SPEED * (float) Timing.getDelta());
-//            wasInput = true;
-//        }
-//        if (isKeyDown(KEY_D)) {
-//            sideward(-STRAFE_SPEED * (float) Timing.getDelta());
-//            wasInput = true;
-//        }
-//        if (isKeyDown(KEY_SPACE)) {
-//            upward(-MOVE_SPEED * (float) Timing.getDelta());
-//            wasInput = true;
-//        }
-//        if (isKeyDown(KEY_LSHIFT)) {
-//            upward(MOVE_SPEED * (float) Timing.getDelta());
-//            wasInput = true;
-//        }
+        if (Input.getKeyDown(GLFW_KEY_W)) {
+            forward(MOVE_SPEED * 0.01f);
+            wasInput = true;
+        }
+        if (Input.getKeyDown(GLFW_KEY_S)) {
+            forward(-MOVE_SPEED * 0.01f);
+            wasInput = true;
+        }
+        if (Input.getKeyDown(GLFW_KEY_A)) {
+            sideward(STRAFE_SPEED * 0.01f);
+            wasInput = true;
+        }
+        if (Input.getKeyDown(GLFW_KEY_D)) {
+            sideward(-STRAFE_SPEED * 0.01f);
+            wasInput = true;
+        }
+        if (Input.getKeyDown(GLFW_KEY_SPACE)) {
+            upward(-MOVE_SPEED * 0.01f);
+            wasInput = true;
+        }
+        if (Input.getKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+            upward(MOVE_SPEED * 0.01f);
+            wasInput = true;
+        }
 
         return wasInput;
     }
 
     public void apply() {
-        view = new Matrix4f().init_identity();
-        view = new Matrix4f().init_rotation(rotation);
-        view = new Matrix4f().init_translation(position);
+        view.setIdentity();
+
+        // Rotate the view
+        Matrix4f.rotate((float) Math.toRadians(rotation.x), Vector3f.xAxis, view, view);
+        Matrix4f.rotate((float) Math.toRadians(rotation.y), Vector3f.yAxis, view, view);
+        Matrix4f.rotate((float) Math.toRadians(rotation.z), Vector3f.zAxis, view, view);
+
+        // Move the camera
+        Matrix4f.translate(position, view, view);
     }
 
     public void pitch(float angle) {
