@@ -1,6 +1,5 @@
 package me.geakstr.voxel.core;
 
-
 import me.geakstr.voxel.math.Vector2f;
 import org.lwjgl.BufferUtils;
 
@@ -19,7 +18,6 @@ public class Input {
 
     public static void init(long window) {
         Input.window = window;
-        glfwPollEvents();
     }
 
     public static void update() {
@@ -62,6 +60,14 @@ public class Input {
 
     public static void setMousePosition(Vector2f pos) {
         glfwSetCursorPos(window, pos.x, pos.y);
+    }
+
+    public static void setCursor(boolean enabled) {
+        if (enabled) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        } else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        }
     }
 
 }

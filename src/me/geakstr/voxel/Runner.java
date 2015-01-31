@@ -21,7 +21,7 @@ public class Runner {
     }
 
     private void init() {
-        Window.init(800, 800, true);
+        Window.init(650, 650, true);
         Game.init();
         Input.init(Window.getWindow());
     }
