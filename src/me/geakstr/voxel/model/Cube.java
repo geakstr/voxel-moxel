@@ -14,6 +14,7 @@ public class Cube {
             new Vertex(new Vector3f(-1.0f,  1.0f,  1.0f))
     };
 
+    // TODO may by can reorganized
     public static final int[] indices = new int[] {
             0, 4, 7, 0, 7, 3,
             5, 7, 4, 6, 7, 5 ,

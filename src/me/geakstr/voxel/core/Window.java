@@ -49,23 +49,23 @@ public class Window {
         glfwWindowHint(GLFW_VISIBLE, GL11.GL_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GL11.GL_TRUE);
 
-        window = glfwCreateWindow(Window.width, Window.height, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(Window.width, Window.height, "Voxel Engine (0 fps)", NULL, NULL);
         if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
 
         ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwSetWindowPos(window, (GLFWvidmode.width(vidmode) - Window.width) / 2, (GLFWvidmode.height(vidmode) - Window.height) / 2);
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwMakeContextCurrent(window);
         glfwSwapInterval(Window.vsync ? 1 : 0);
         glfwShowWindow(window);
+
+        Input.setCursorDisabled(true);
 
         GLContext.createFromCurrent();
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-        glFrontFace(GL_CW);
         glCullFace(GL_FRONT_FACE);
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
@@ -76,9 +76,7 @@ public class Window {
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
-                if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-                    glfwSetWindowShouldClose(window, GL11.GL_TRUE);
-                }
+
             }
         });
 
@@ -126,16 +124,11 @@ public class Window {
         double current_time = glfwGetTime();
         fps++;
         if (current_time - last_time >= 1.0) {
-            System.out.println(fps + " FPS");
+            glfwSetWindowTitle(window, "Voxel Engine (" + fps + " fps)");
             fps = 0;
             last_time++;
             return true;
         }
         return false;
     }
-
-    public static long getWindow() {
-        return window;
-    }
-
 }

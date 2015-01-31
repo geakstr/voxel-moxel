@@ -1,6 +1,5 @@
 package me.geakstr.voxel.core;
 
-
 import me.geakstr.voxel.math.Vector2f;
 import org.lwjgl.BufferUtils;
 
@@ -21,11 +20,12 @@ public class Input {
     }
 
     public static void update() {
-        for (int i = 0; i < NUM_KEYCODES; i++)
+        for (int i = 0; i < NUM_KEYCODES; i++) {
             lastKeys[i] = getKey(i);
-
-        for (int i = 0; i < NUM_MOUSEBUTTONS; i++)
+        }
+        for (int i = 0; i < NUM_MOUSEBUTTONS; i++) {
             lastMouse[i] = getMouse(i);
+        }
     }
 
     public static boolean getKey(int keyCode) {
@@ -60,6 +60,24 @@ public class Input {
 
     public static void setMousePosition(Vector2f pos) {
         glfwSetCursorPos(Window.window, pos.x, pos.y);
+    }
+
+    public static void setCursorVisible(boolean visible) {
+        if (visible) {
+            glfwSetInputMode(Window.window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            setCursorDisabled(false);
+        } else {
+            glfwSetInputMode(Window.window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            setCursorDisabled(true);
+        }
+    }
+
+    public static void setCursorDisabled(boolean disabled) {
+        if (disabled) {
+            glfwSetInputMode(Window.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        } else {
+            glfwSetInputMode(Window.window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
     }
 
 }

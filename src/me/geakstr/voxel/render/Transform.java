@@ -14,8 +14,8 @@ public class Transform {
         scale = new Matrix4f();
     }
 
-    public void translate(Vector3f translation) {
-        Matrix4f.translate(translation, this.translation, this.translation);
+    public void translate(Vector3f vec) {
+        Matrix4f.translate(vec, translation, translation);
     }
 
     public void translate(float x, float y, float z) {
@@ -32,8 +32,8 @@ public class Transform {
         Matrix4f.rotate((float) Math.toRadians(z), Vector3f.zAxis, rotation, rotation);
     }
 
-    public void scale(Vector3f scale) {
-        Matrix4f.scale(scale, this.scale, this.scale);
+    public void scale(Vector3f vec) {
+        Matrix4f.scale(vec, scale, scale);
     }
 
     public void scale(float x, float y, float z) {

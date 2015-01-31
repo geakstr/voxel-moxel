@@ -1,15 +1,11 @@
 package me.geakstr.voxel.game;
 
-import me.geakstr.voxel.core.Input;
 import me.geakstr.voxel.core.Window;
-import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.model.Cube;
 import me.geakstr.voxel.model.Mesh;
 import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Shader;
 import me.geakstr.voxel.render.Transform;
-
-import static org.lwjgl.opengl.GL11.*;
 
 public class Game {
     private static Mesh mesh;
@@ -22,8 +18,7 @@ public class Game {
         simple_shader.compile();
 
         transform = new Transform();
-
-        camera = new Camera(100, (float) Window.width / (float) Window.height, 0.1f, 70f);
+        camera = new Camera(70, (float) Window.width / (float) Window.height, 0.1f, 70f);
 
         mesh = new Mesh();
         mesh.add_verts(Cube.vertices, Cube.indices);

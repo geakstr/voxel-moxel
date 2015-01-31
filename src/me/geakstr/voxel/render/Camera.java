@@ -11,14 +11,15 @@ import static org.lwjgl.glfw.GLFW.*;
 public class Camera {
     private float fov;
     private float aspect;
-    private float zNear;
-    private float zFar;
+    private float z_near;
+    private float z_far;
 
     private Matrix4f projection, view;
     private Vector3f position, rotation;
 
-    private boolean mouseLocked;
-    private Vector2f centerPosition;
+    private boolean mouse_locked;
+    private Vector2f center;
+    private boolean was_iter = false;
 
     private float pitch = 0.0f;
 
@@ -32,92 +33,83 @@ public class Camera {
         this(70, (float) Window.width / (float) Window.height, 0.1f, 70f);
     }
 
-    public Camera(float fov, float aspect, float zNear, float zFar) {
+    public Camera(float fov, float aspect, float z_near, float z_far) {
         this.fov = fov;
         this.aspect = aspect;
-        this.zNear = zNear;
-        this.zFar = zFar;
+        this.z_near = z_near;
+        this.z_far = z_far;
 
-        projection = Matrix4f.createPerspectiveProjection(fov, aspect, zNear, zFar);
+        projection = Matrix4f.createPerspectiveProjection(fov, aspect, z_near, z_far);
         view = Matrix4f.createIdentityMatrix();
 
         position = new Vector3f(0, 0, 0);
         rotation = new Vector3f(0, 0, 0);
 
-        mouseLocked = false;
-        centerPosition = new Vector2f(Window.width / 2, Window.height / 2);
+        mouse_locked = false;
+        center = new Vector2f(Window.width / 2, Window.height / 2);
     }
 
     public boolean input() {
-        boolean wasInput = false;
+        boolean was_input = false;
 
-        Vector2f deltaPos = Input.getMousePosition().sub(centerPosition);
+        Vector2f delta = Vector2f.sub(Input.getMousePosition(), center, null);
 
-        boolean rotX = deltaPos.y != 0;
-        boolean rotY = deltaPos.x != 0;
+        boolean rot_x = delta.y != 0;
+        boolean rot_y = delta.x != 0;
 
-        if (rotY) {
-            yaw(deltaPos.x * SENSITIVITY_X);
+        if (rot_y && was_iter) {
+            yaw(delta.x * SENSITIVITY_X);
         }
-        if (rotX) {
-            pitch(deltaPos.y * SENSITIVITY_Y);
+        if (rot_x && was_iter) {
+            pitch(delta.y * SENSITIVITY_Y);
         }
-        if (rotY || rotX) {
-            Input.setMousePosition(centerPosition);
+        if (rot_y || rot_x || !was_iter) {
+            Input.setMousePosition(center);
         }
 
-        wasInput = true;
-        //}
+        was_iter = true;
+
+        was_input = true;
 
         if (Input.getKeyDown(GLFW_KEY_W)) {
             forward(MOVE_SPEED * 0.01f);
-            wasInput = true;
+            was_input = true;
         }
         if (Input.getKeyDown(GLFW_KEY_S)) {
             forward(-MOVE_SPEED * 0.01f);
-            wasInput = true;
+            was_input = true;
         }
         if (Input.getKeyDown(GLFW_KEY_A)) {
             sideward(STRAFE_SPEED * 0.01f);
-            wasInput = true;
+            was_input = true;
         }
         if (Input.getKeyDown(GLFW_KEY_D)) {
             sideward(-STRAFE_SPEED * 0.01f);
-            wasInput = true;
+            was_input = true;
         }
         if (Input.getKeyDown(GLFW_KEY_SPACE)) {
             upward(-MOVE_SPEED * 0.01f);
-            wasInput = true;
+            was_input = true;
         }
         if (Input.getKeyDown(GLFW_KEY_LEFT_SHIFT)) {
             upward(MOVE_SPEED * 0.01f);
-            wasInput = true;
+            was_input = true;
         }
 
-        return wasInput;
+        return was_input;
     }
 
     public void apply() {
         view.setIdentity();
 
-        // Rotate the view
         Matrix4f.rotate((float) Math.toRadians(rotation.x), Vector3f.xAxis, view, view);
         Matrix4f.rotate((float) Math.toRadians(rotation.y), Vector3f.yAxis, view, view);
         Matrix4f.rotate((float) Math.toRadians(rotation.z), Vector3f.zAxis, view, view);
 
-        // Move the camera
         Matrix4f.translate(position, view, view);
     }
 
     public void pitch(float angle) {
-        pitch -= angle;
-        if (pitch > 90) {
-            pitch = 90;
-            return;
-        } else if (pitch < -90) {
-            pitch = -90;
-            return;
-        }
         addRotation(angle, 0, 0);
     }
 
@@ -183,11 +175,11 @@ public class Camera {
     }
 
     public float getNearPlane() {
-        return zNear;
+        return z_near;
     }
 
     public float getFarPlane() {
-        return zFar;
+        return z_far;
     }
 
     public Matrix4f getProjectionMatrix() {
