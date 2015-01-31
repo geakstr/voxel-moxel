@@ -123,4 +123,9 @@ public class Window {
         }
         return false;
     }
+
+    public static long getWindow() {
+        return window;
+    }
+
 }
