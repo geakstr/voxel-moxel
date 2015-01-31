@@ -6,7 +6,6 @@ import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
-import org.lwjgl.util.glu.GLU;
 
 import java.nio.ByteBuffer;
 
@@ -71,11 +70,6 @@ public class Window {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FRAMEBUFFER_SRGB);
-
-        glEnable(GL_TEXTURE_2D);
-        glShadeModel(GL_SMOOTH);
-        glClearDepth(1.0);
-        glDepthFunc(GL_LEQUAL);
 
         glViewport(0, 0, Math.max(width, height), Math.max(width, height));
 

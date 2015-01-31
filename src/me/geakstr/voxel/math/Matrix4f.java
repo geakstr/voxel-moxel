@@ -27,6 +27,10 @@ public class Matrix4f {
         return this;
     }
 
+    public Matrix4f init_translation(Vector3f pos) {
+        return init_translation(pos.x, pos.y, pos.z);
+    }
+
     public Matrix4f init_scale(float x, float y, float z) {
         m[0][0] = x;    m[0][1] = 0;    m[0][2] = 0;    m[0][3] = 0;
         m[1][0] = 0;    m[1][1] = y;    m[1][2] = 0;    m[1][3] = 0;
@@ -113,6 +117,10 @@ public class Matrix4f {
         m[3][0] = 0;      m[3][1] = 0;      m[3][2] = 0;      m[3][3] = 1;
 
         return this;
+    }
+
+    public Matrix4f init_rotation(Vector3f rot) {
+        return init_rotation(rot.x, rot.y, rot.z);
     }
 
     public Vector3f transform(Vector3f r) {
