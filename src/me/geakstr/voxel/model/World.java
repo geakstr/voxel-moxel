@@ -12,13 +12,13 @@ public class World {
 
     public Chunk[][] chunks;
 
-    public World(int world_size, int _chunk_height, int _chunk_width, int _chunk_length) {
+    public World(int world_size, int _chunk_width, int _chunk_length, int _chunk_height) {
         this.world_size = world_size;
         this.chunks = new Chunk[world_size][world_size];
 
-        chunk_height = _chunk_height;
         chunk_width = _chunk_width;
         chunk_length = _chunk_length;
+        chunk_height = _chunk_height;
         chunk_volume = _chunk_height * _chunk_width * _chunk_length;
 
         for (int x = 0; x < world_size; x++) {
@@ -35,10 +35,10 @@ public class World {
                 Chunk chunk = chunks[i][j];
                 chunk.gen_buffers();
 
-                for (int z = 0; z < World.chunk_height; z++) {
+                for (int y = 0; y < World.chunk_length; y++) {
                     for (int x = 0; x < World.chunk_width; x++) {
-                        for (int y = 0; y < World.chunk_length; y++) {
-                            chunk.cubes[z][x][y] = rnd.nextInt(2);
+                        for (int z = 0; z < World.chunk_height; z++) {
+                            chunk.cubes[x][y][z] = 1;
                         }
                     }
                 }

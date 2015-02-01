@@ -19,7 +19,7 @@ public class Game {
 
         camera = new Camera(70, (float) Window.width / (float) Window.height, 0.1f, 70f);
 
-        world = new World(4, 8, 8, 8).gen();
+        world = new World(1, 1, 1, 16).gen();
     }
 
     public static void update() {
