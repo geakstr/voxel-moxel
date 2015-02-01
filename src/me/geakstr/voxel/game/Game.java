@@ -1,46 +1,43 @@
 package me.geakstr.voxel.game;
 
 import me.geakstr.voxel.core.Window;
-import me.geakstr.voxel.model.Cube;
-import me.geakstr.voxel.model.Mesh;
+import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Shader;
 import me.geakstr.voxel.render.Transform;
 
 public class Game {
-    private static Mesh mesh;
     private static Transform transform;
-    private static Shader simple_shader;
+    private static Shader shader;
     private static Camera camera;
+    private static World world;
 
     public static void init() {
-        simple_shader = new Shader("simple.vs", "simple.fs");
-        simple_shader.compile();
+        shader = new Shader("simple.vs", "simple.fs").compile();
 
         transform = new Transform();
+
         camera = new Camera(70, (float) Window.width / (float) Window.height, 0.1f, 70f);
 
-        mesh = new Mesh();
-        mesh.add_verts(Cube.vertices, Cube.indices);
+        world = new World(4, 8, 8, 8).gen();
     }
 
-    static float temp = 0.0f;
-
     public static void update() {
-        temp += 0.01;
-        //transform.translate((float) Math.sin(temp), 0, 0);
         camera.input();
     }
 
     public static void render() {
         camera.apply();
 
-        simple_shader.set_uniform("uniform_color", 1);
-        simple_shader.set_uniform("uniform_transform", transform.getTransform());
-        simple_shader.set_uniform("uniform_camera_projection", camera.getProjectionMatrix());
-        simple_shader.set_uniform("uniform_camera_view", camera.getViewMatrix());
+        shader.bind();
 
-        simple_shader.bind();
-        mesh.draw();
+        shader.set_uniform("uniform_color", 1);
+        shader.set_uniform("uniform_transform", transform.getTransform());
+        shader.set_uniform("uniform_camera_projection", camera.getProjectionMatrix());
+        shader.set_uniform("uniform_camera_view", camera.getViewMatrix());
+
+        world.render();
+
+        shader.unbind();
     }
 }

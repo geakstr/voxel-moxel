@@ -2,8 +2,9 @@ package me.geakstr.voxel.render;
 
 import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.math.Vector3f;
-import me.geakstr.voxel.util.RenderUtil;
+import me.geakstr.voxel.util.ExtendedBufferUtil;
 import me.geakstr.voxel.util.ResourceUtil;
+import sun.security.provider.SHA;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL20.*;
@@ -19,7 +20,7 @@ public class Shader {
         attach_fragment_shader(fragment_shader_name);
     }
 
-    public void compile() {
+    public Shader compile() {
         glLinkProgram(program);
 
         if (glGetProgrami(program, GL_LINK_STATUS) == GL_FALSE) {
@@ -27,6 +28,8 @@ public class Shader {
             System.err.println(glGetProgramInfoLog(program, glGetShaderi(fragment_shader, GL_INFO_LOG_LENGTH)));
             dispose();
         }
+
+        return this;
     }
 
     public void bind() {
@@ -50,7 +53,7 @@ public class Shader {
     }
 
     public void set_uniform(String name, Matrix4f value) {
-        glUniformMatrix4(glGetUniformLocation(program, name), false, RenderUtil.create_flipped_buffer(value));
+        glUniformMatrix4(glGetUniformLocation(program, name), false, ExtendedBufferUtil.create_flipped_buffer(value));
     }
 
     public void set_uniform(String name, Vector3f value) {

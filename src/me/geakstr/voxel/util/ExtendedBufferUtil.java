@@ -7,7 +7,7 @@ import org.lwjgl.BufferUtils;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class RenderUtil {
+public class ExtendedBufferUtil {
     public static FloatBuffer create_flipped_buffer(Vertex[] vertices) {
         FloatBuffer ret = BufferUtils.createFloatBuffer(vertices.length * Vertex.SIZE);
         for (Vertex v : vertices) {
@@ -15,6 +15,13 @@ public class RenderUtil {
             ret.put(v.coord.y);
             ret.put(v.coord.z);
         }
+        ret.flip();
+        return ret;
+    }
+
+    public static FloatBuffer create_flipped_buffer(float[] values) {
+        FloatBuffer ret = BufferUtils.createFloatBuffer(values.length);
+        ret.put(values);
         ret.flip();
         return ret;
     }

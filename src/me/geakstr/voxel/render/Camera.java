@@ -19,11 +19,10 @@ public class Camera {
 
     private boolean mouse_locked;
     private Vector2f center;
-    private boolean was_iter = false;
 
     private float pitch = 0.0f;
 
-    public static final float MOVE_SPEED = 5f;
+    public static final float MOVE_SPEED = 10f;
     public static final float STRAFE_SPEED = MOVE_SPEED / 1.2f;
     public static final float SENSITIVITY_X = 0.33f;
     public static final float SENSITIVITY_Y = SENSITIVITY_X * 1.0f;
@@ -57,17 +56,15 @@ public class Camera {
         boolean rot_x = delta.y != 0;
         boolean rot_y = delta.x != 0;
 
-        if (rot_y && was_iter) {
+        if (rot_y) {
             yaw(delta.x * SENSITIVITY_X);
         }
-        if (rot_x && was_iter) {
+        if (rot_x) {
             pitch(delta.y * SENSITIVITY_Y);
         }
-        if (rot_y || rot_x || !was_iter) {
+        if (rot_y || rot_x) {
             Input.setMousePosition(center);
         }
-
-        was_iter = true;
 
         was_input = true;
 
@@ -110,6 +107,13 @@ public class Camera {
     }
 
     public void pitch(float angle) {
+        if (rotation.x - angle > 90.0f) {
+            rotation.x = 89.0f;
+            return;
+        } else if (rotation.x - angle < -90.0f) {
+            rotation.x = -89.0f;
+            return;
+        }
         addRotation(angle, 0, 0);
     }
 
