@@ -25,24 +25,20 @@ public class Mesh {
 //        this.indices_size = indices.length;
     }
 
-    public Mesh gen_buffers() {
+    public void gen_buffers() {
         this.vbo = glGenBuffers();
 //        this.ibo = glGenBuffers();
-
-        return this;
     }
 
-    public Mesh fill_buffers() {
+    public void fill_buffers() {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(vertices), GL_STATIC_DRAW);
 
 //        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 //        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(indices), GL_STATIC_DRAW);
-
-        return this;
     }
 
-    public Mesh render() {
+    public void render() {
         glEnableVertexAttribArray(0);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -53,7 +49,5 @@ public class Mesh {
 //        glDrawElements(GL_TRIANGLES, indices_size, GL_UNSIGNED_INT, 0);
 
         glDisableVertexAttribArray(0);
-
-        return this;
     }
 }

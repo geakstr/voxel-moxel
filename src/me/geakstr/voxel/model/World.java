@@ -3,18 +3,18 @@ package me.geakstr.voxel.model;
 import java.util.Random;
 
 public class World {
-    public int world_size; // world_size * world_size chunks
+    public static int world_size; // world_size * world_size chunks
 
     public static int chunk_height; // z axis size
     public static int chunk_width; // x axis size
     public static int chunk_length; // y axis size
     public static int chunk_volume; // height * width * length
 
-    public Chunk[][] chunks;
+    public static Chunk[][] chunks;
 
-    public World(int world_size, int _chunk_width, int _chunk_length, int _chunk_height) {
-        this.world_size = world_size;
-        this.chunks = new Chunk[world_size][world_size];
+    public static void init(int _world_size, int _chunk_width, int _chunk_length, int _chunk_height) {
+        world_size = _world_size;
+        chunks = new Chunk[world_size][world_size];
 
         chunk_width = _chunk_width;
         chunk_length = _chunk_length;
@@ -23,12 +23,12 @@ public class World {
 
         for (int x = 0; x < world_size; x++) {
             for (int y = 0; y < world_size; y++) {
-                chunks[x][y] = new Chunk(x * chunk_width, y * chunk_length);
+                chunks[x][y] = new Chunk(x, y);
             }
         }
     }
 
-    public World gen() {
+    public static void gen() {
         Random rnd = new Random();
         for (int i = 0; i < world_size; i++) {
             for (int j = 0; j < world_size; j++) {
@@ -38,16 +38,15 @@ public class World {
                 for (int y = 0; y < World.chunk_length; y++) {
                     for (int x = 0; x < World.chunk_width; x++) {
                         for (int z = 0; z < World.chunk_height; z++) {
-                            chunk.cubes[x][y][z] = 1;
+                            chunk.cubes[x][y][z] = Cube.pack_type(0, rnd.nextInt(2));
                         }
                     }
                 }
             }
         }
-        return this;
     }
 
-    public void render() {
+    public static void render() {
         for (int x = 0; x < world_size; x++) {
             for (int y = 0; y < world_size; y++) {
                 chunks[x][y].render();

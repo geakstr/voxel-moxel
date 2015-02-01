@@ -10,7 +10,6 @@ public class Game {
     private static Transform transform;
     private static Shader shader;
     private static Camera camera;
-    private static World world;
 
     public static void init() {
         shader = new Shader("simple.vs", "simple.fs").compile();
@@ -19,7 +18,8 @@ public class Game {
 
         camera = new Camera(70, (float) Window.width / (float) Window.height, 0.1f, 70f);
 
-        world = new World(1, 1, 1, 16).gen();
+        World.init(1, 32, 32, 32);
+        World.gen();
     }
 
     public static void update() {
@@ -36,7 +36,7 @@ public class Game {
         shader.set_uniform("uniform_camera_projection", camera.getProjectionMatrix());
         shader.set_uniform("uniform_camera_view", camera.getViewMatrix());
 
-        world.render();
+        World.render();
 
         shader.unbind();
     }
