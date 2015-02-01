@@ -1,5 +1,7 @@
 package me.geakstr.voxel.model;
 
+import me.geakstr.voxel.game.Game;
+
 import java.util.Random;
 
 public class World {
@@ -11,6 +13,8 @@ public class World {
     public static int chunk_volume; // height * width * length
 
     public static Chunk[][] chunks;
+
+    public static int chunks_in_frame = 0;
 
     public static void init(int _world_size, int _chunk_width, int _chunk_length, int _chunk_height) {
         world_size = _world_size;
@@ -47,9 +51,13 @@ public class World {
     }
 
     public static void render() {
+        chunks_in_frame = 0;
         for (int x = 0; x < world_size; x++) {
             for (int y = 0; y < world_size; y++) {
-                chunks[x][y].render();
+                if (Game.frustum.chunkInFrustum(x, y)) {
+                    chunks_in_frame++;
+                    chunks[x][y].render();
+                }
             }
         }
     }

@@ -57,7 +57,7 @@ public class Chunk extends Mesh {
         }
 
         vertices = Arrays.copyOfRange(vertices, 0, vertices_offset);
-        vertices_size = vertices.length;
+        vertices_size = vertices_offset;
 
         fill_buffers();
     }

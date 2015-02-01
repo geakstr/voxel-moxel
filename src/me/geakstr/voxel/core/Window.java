@@ -1,5 +1,6 @@
 package me.geakstr.voxel.core;
 
+import me.geakstr.voxel.model.World;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
@@ -124,7 +125,7 @@ public class Window {
         double current_time = glfwGetTime();
         fps++;
         if (current_time - last_time >= 1.0) {
-            glfwSetWindowTitle(window, "Voxel Engine (" + fps + " fps)");
+            glfwSetWindowTitle(window, "Voxel Engine (" + fps + " fps; chunks in frame: " + World.chunks_in_frame + ")");
             fps = 0;
             last_time++;
             return true;
