@@ -50,7 +50,7 @@ public class Window {
         glfwWindowHint(GLFW_VISIBLE, GL11.GL_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GL11.GL_TRUE);
 
-        window = glfwCreateWindow(Window.width, Window.height, "Voxel Engine (0 fps)", NULL, NULL);
+        window = glfwCreateWindow(Window.width, Window.height, "Voxel Moxel", NULL, NULL);
         if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
@@ -119,11 +119,14 @@ public class Window {
         glViewport(0, 0, size, size);
     }
 
-    public static boolean fps() {
+    public static boolean set_title() {
         double current_time = glfwGetTime();
         fps++;
         if (current_time - last_time >= 1.0) {
-            glfwSetWindowTitle(window, "Voxel Engine (" + fps + " fps; chunks in frame: " + World.chunks_in_frame + ")");
+            glfwSetWindowTitle(window,
+                    "Voxel Moxel | " +
+                            fps + " fps; " +
+                            World.chunks_in_frame + "/" + (World.world_size * World.world_size) + " chunks");
             fps = 0;
             last_time++;
             return true;

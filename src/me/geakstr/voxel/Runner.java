@@ -25,14 +25,15 @@ public class Runner {
 
     private void loop() {
         while (!Window.should_close()) {
-            Window.fps();
+            Window.set_title();
             Window.before_render();
             if (Window.was_resize) {
                 Window.was_resize = false;
                 Window.setup_aspect_ratio();
             }
-            Game.update();
+            Game.before_render();
             Game.render();
+            Game.after_render();
             Window.after_render();
         }
     }

@@ -24,12 +24,8 @@ public class Game {
         World.gen();
     }
 
-    public static void update() {
+    public static void before_render() {
         camera.input();
-
-    }
-
-    public static void render() {
         camera.apply();
         frustum.update(camera.getProjectionMatrix(), camera.getViewMatrix());
 
@@ -39,9 +35,13 @@ public class Game {
         shader.set_uniform("uniform_transform", transform.getTransform());
         shader.set_uniform("uniform_camera_projection", camera.getProjectionMatrix());
         shader.set_uniform("uniform_camera_view", camera.getViewMatrix());
+    }
 
+    public static void render() {
         World.render();
+    }
 
+    public static void after_render() {
         shader.unbind();
     }
 }
