@@ -15,10 +15,17 @@ public class CubeManager {
         return side;
     }
 	
-	public static float[] get_side(int side_idx, int x0, int y0, int x1, int y1) {
+	public static float[] get_side(int side_idx, int x0, int y0, int x1, int y1, int z) {
 		float[] side = get_side(side_idx);
 		
-		
+		for (int i = 0; i < cube_side_vertices_size; i += 6) {
+			side[i] += x0;
+			side[i + 1] += z;
+			side[i + 2] += y0;
+			side[i + 3] += x1;
+			side[i + 4] += z;
+			side[i + 5] += y1;
+		}
 		
 		return side;
 	}

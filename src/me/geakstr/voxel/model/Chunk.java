@@ -99,14 +99,14 @@ public class Chunk extends Mesh {
                         }
                     }    
                     
-                  boolean[] sides = renderable_sides(x, y, z);
-                  for (int side = 0; side < 6; side++) {
-                      if (sides[side]) {
-                          float[] side_vertices = CubeManager.get_side(side, x_offset + x, z, y + y_offset/*, vertices_offset*/);
-                          System.arraycopy(side_vertices, 0, vertices, vertices_offset, CubeManager.cube_side_vertices_size);
-                          vertices_offset += CubeManager.cube_side_vertices_size;
-                      }
-                  }
+//                  boolean[] sides = renderable_sides(x, y, z);
+//                  for (int side = 0; side < 6; side++) {
+//                      if (sides[side]) {
+//                          float[] side_vertices = CubeManager.get_side(side, x_offset + x, z, y + y_offset/*, vertices_offset*/);
+//                          System.arraycopy(side_vertices, 0, vertices, vertices_offset, CubeManager.cube_side_vertices_size);
+//                          vertices_offset += CubeManager.cube_side_vertices_size;
+//                      }
+//                  }
                 }
             }
             
@@ -114,9 +114,19 @@ public class Chunk extends Mesh {
             	System.err.println(e.getKey() + " " + Arrays.toString(e.getValue()));
             	
             	int[] coords = e.getValue();
-            	int x0 = coords[0], y0 = coords[1], x1 = coords[2], y1 = coords[3];
+            	int x0 = x_offset + coords[0], y0 = y_offset + coords[1];
+            	int x1 = x_offset + coords[2], y1 = y_offset + coords[3];
             	
-            	System.err.println(Arrays.toString(CubeManager.get_side(0, x0, y0, x1, y1)));
+            	for (int i = 0; i < 6; i++) {
+            		float[] side = CubeManager.get_side(i, x0, y0, x1, y1, z);
+            		
+            		System.err.println(Arrays.toString(side));
+            		
+            		System.arraycopy(side, 0, vertices, vertices_offset, CubeManager.cube_side_vertices_size);
+                    vertices_offset += CubeManager.cube_side_vertices_size;
+            	}
+            	
+            	
             }
 
             
