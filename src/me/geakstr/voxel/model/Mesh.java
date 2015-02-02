@@ -43,7 +43,7 @@ public class Mesh {
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-        glDrawArrays(GL_LINE_LOOP, 0, vertices_size);
+        glDrawArrays(GL_TRIANGLES, 0, vertices_size);
 
 //        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 //        glDrawElements(GL_TRIANGLES, indices_size, GL_UNSIGNED_INT, 0);
