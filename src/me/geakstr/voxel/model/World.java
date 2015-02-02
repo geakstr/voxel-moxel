@@ -42,7 +42,7 @@ public class World {
                 for (int y = 0; y < World.chunk_length; y++) {
                     for (int x = 0; x < World.chunk_width; x++) {
                         for (int z = 0; z < World.chunk_height; z++) {
-                            chunk.cubes[x][y][z] = Cube.pack_type(0, rnd.nextInt(2));
+                            chunk.cubes[x][y][z] = CubeManager.pack_type(0, 1);
                         }
                     }
                 }
