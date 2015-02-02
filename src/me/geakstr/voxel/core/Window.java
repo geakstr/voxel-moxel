@@ -67,8 +67,6 @@ public class Window {
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FRAMEBUFFER_SRGB);
 

@@ -17,10 +17,10 @@ public class Game {
         shader = new Shader("simple.vs", "simple.fs").compile();
 
         transform = new Transform();
-        camera = new Camera(100, (float) Window.width / (float) Window.height, 0.1f, 150f);
+        camera = new Camera(100, (float) Window.width / (float) Window.height, 0.01f, 100f);
         frustum = new FrustumCulling();
 
-        World.init(1, 2, 2, 1);
+        World.init(5, 8, 8, 8);
         World.gen();
     }
 

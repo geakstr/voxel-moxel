@@ -3,28 +3,110 @@ package me.geakstr.voxel.model;
 import java.util.Arrays;
 
 public class CubeManager {
-	public static float[] get_side(int side_idx, int x, int z, int y) {
+    public static float[] get_side(int side_idx, int x, int z, int y) {
         float[] side = get_side(side_idx);
-        
+
         for (int i = 0; i < cube_side_vertices_size; i += 3) {
             side[i] += x;
             side[i + 1] += z;
             side[i + 2] += y;
         }
-        
+
         return side;
     }
-	
-	public static float[] get_side(int side_idx, int x0, int y0, int x1, int y1) {
-		float[] side = get_side(side_idx);
-		
-		
-		
-		return side;
-	}
-	
-	public static float[] get_side(int side_idx) {
-		float[] side = null;
+
+    public static float[] get_side(int side_idx, int x0, int y0, int x1, int y1, int z) {
+        float[] side = get_side(side_idx);
+
+        if (side_idx == 0 || side_idx == 1) {
+            if (side_idx == 1) {
+                x0 = x1;
+            }
+            side[0] += x0;
+            side[1] += z;
+            side[2] += y0;
+
+            side[3] += x0;
+            side[4] += z;
+            side[5] += y1;
+
+            side[6] += x0;
+            side[7] += z;
+            side[8] += y1;
+
+            side[9] += x0;
+            side[10] += z;
+            side[11] += y0;
+
+            side[12] += x0;
+            side[13] += z;
+            side[14] += y1;
+
+            side[15] += x0;
+            side[16] += z;
+            side[17] += y0;
+        } else if (side_idx == 2 || side_idx == 3) {
+            if (side_idx == 3) {
+                y1 = y0;
+            }
+            side[0] += x0;
+            side[1] += z;
+            side[2] += y1;
+
+            side[3] += x0;
+            side[4] += z;
+            side[5] += y1;
+
+            side[6] += x1;
+            side[7] += z;
+            side[8] += y1;
+
+            side[9] += x1;
+            side[10] += z;
+            side[11] += y1;
+
+            side[12] += x0;
+            side[13] += z;
+            side[14] += y1;
+
+            side[15] += x1;
+            side[16] += z;
+            side[17] += y1;
+        } else if (side_idx == 4 || side_idx == 5) {
+            x0--;
+            y0--;
+            x1++;
+            y1++;
+            side[0] += x0;
+            side[1] += z;
+            side[2] += y0;
+
+            side[3] += x1;
+            side[4] += z;
+            side[5] += y1;
+
+            side[6] += x0;
+            side[7] += z;
+            side[8] += y1;
+
+            side[9] += x0;
+            side[10] += z;
+            side[11] += y0;
+
+            side[12] += x1;
+            side[13] += z;
+            side[14] += y0;
+
+            side[15] += x1;
+            side[16] += z;
+            side[17] += y1;
+        }
+
+        return side;
+    }
+
+    public static float[] get_side(int side_idx) {
+        float[] side = null;
         switch (side_idx) {
             case 0:
                 side = Arrays.copyOf(back_vertices, cube_side_vertices_size);
@@ -46,7 +128,7 @@ public class CubeManager {
                 break;
         }
         return side;
-	}
+    }
 
     public static Cube get_cube(int x, int z, int y/*, int offset*/) {
         Cube cube = new Cube(Arrays.copyOf(vertices, vertices.length)/*, Arrays.copyOf(indices, vertices.length)*/);
@@ -153,75 +235,82 @@ public class CubeManager {
     };
 
     public static final float[] right_vertices = new float[]{
-            // RIGHT
-            // 7 - 4 - 5
+            // 2 - 1 - 7
             -0.5f, 0.5f, 0.5f,
             -0.5f, -0.5f, 0.5f,
             0.5f, -0.5f, 0.5f,
-            // 6 - 7 - 5
+            // 4 - 2 - 7
             0.5f, 0.5f, 0.5f,
             -0.5f, 0.5f, 0.5f,
             0.5f, -0.5f, 0.5f,
     };
 
     public static final float[] left_vertices = new float[]{
-            // LEFT
-            // 2 - 1 - 0
-            0.5f, 0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            // 2 - 0 - 3
-            0.5f, 0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
+            // 3 - 0 - 5
             -0.5f, 0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            0.5f, -0.5f, -0.5f,
+
+            // 6 - 3 - 5
+            0.5f, 0.5f, -0.5f,
+            -0.5f, 0.5f, -0.5f,
+            0.5f, -0.5f, -0.5f
+
+            // 2 - 1 - 0
+//            0.5f, 0.5f, -0.5f,
+//            0.5f, -0.5f, -0.5f,
+//            -0.5f, -0.5f, -0.5f,
+//            // 2 - 0 - 3
+//            0.5f, 0.5f, -0.5f,
+//            -0.5f, -0.5f, -0.5f,
+//            -0.5f, 0.5f, -0.5f,
     };
 
     public static final float[] front_vertices = new float[]{
-            // FRONT
-            // 6 - 1 - 2
-            0.5f, 0.5f, 0.5f,
+            // 5 - 7 - 4
             0.5f, -0.5f, -0.5f,
-            0.5f, 0.5f, -0.5f,
-            // 1 - 6 - 5
-            0.5f, -0.5f, -0.5f,
-            0.5f, 0.5f, 0.5f,
             0.5f, -0.5f, 0.5f,
+            0.5f, 0.5f, 0.5f,
+
+            // 5 - 4 - 6
+            0.5f, -0.5f, -0.5f,
+            0.5f, 0.5f, 0.5f,
+            0.5f, 0.5f, -0.5f,
     };
 
     public static final float[] back_vertices = new float[]{
-            // BACK
-            // 0 - 4 - 7
+            // 0 - 1 - 2
             -0.5f, -0.5f, -0.5f,
             -0.5f, -0.5f, 0.5f,
             -0.5f, 0.5f, 0.5f,
-            // 0 - 7 - 3
+
+            // 0 - 2 - 3
             -0.5f, -0.5f, -0.5f,
             -0.5f, 0.5f, 0.5f,
             -0.5f, 0.5f, -0.5f,
     };
 
     public static final float[] bottom_vertices = new float[]{
-            // BOTTOM
-            // 5 - 0 - 1
+            // 7 - 0 - 5
             0.5f, -0.5f, 0.5f,
             -0.5f, -0.5f, -0.5f,
             0.5f, -0.5f, -0.5f,
-            // 5 - 4 - 0
+            // 7 - 1 - 0
             0.5f, -0.5f, 0.5f,
             -0.5f, -0.5f, 0.5f,
             -0.5f, -0.5f, -0.5f,
     };
 
-    public static final float[] top_vertices = new float[]{
-            // TOP
-            // 6 - 2 - 3
+    public static final float[] top_vertices = new float[] {
+            // 4 - 3 - 6
             0.5f, 0.5f, 0.5f,
+            -0.5f, 0.5f, -0.5f,
             0.5f, 0.5f, -0.5f,
-            -0.5f, 0.5f, -0.5f,
-            // 6 - 3 - 7
+
+            // 4 - 2 - 3
             0.5f, 0.5f, 0.5f,
-            -0.5f, 0.5f, -0.5f,
-            -0.5f, 0.5f, 0.5f
+            -0.5f, 0.5f, 0.5f,
+            -0.5f, 0.5f, -0.5f
     };
 
     public static final int cube_vertices_size = vertices.length;
