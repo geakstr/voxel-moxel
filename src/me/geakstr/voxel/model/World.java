@@ -42,7 +42,7 @@ public class World {
                 for (int y = 0; y < World.chunk_length; y++) {
                     for (int x = 0; x < World.chunk_width; x++) {
                         for (int z = 0; z < World.chunk_height; z++) {
-                            chunk.cubes[x][y][z] = CubeManager.pack_type(0, rnd.nextInt(4));
+                            chunk.cubes[x][y][z] = CubeManager.pack_type(0, rnd.nextInt(2));
                         }
                     }
                 }
@@ -54,10 +54,10 @@ public class World {
         chunks_in_frame = 0;
         for (int x = 0; x < world_size; x++) {
             for (int y = 0; y < world_size; y++) {
-                if (Game.frustum.chunkInFrustum(x, y)) {
+                //if (Game.frustum.chunkInFrustum(x, y)) {
                     chunks_in_frame++;
                     chunks[x][y].render();
-                }
+                //}
             }
         }
     }

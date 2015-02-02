@@ -49,49 +49,47 @@ public class Chunk extends Mesh {
                     int val = cubes[x][y][z];
                     int type = CubeManager.unpack_type(val);
 
-                    int i = y, j = x;
-
                     if (type == 0) {
                         continue;
                     }
 
                     boolean update_coords = false;
 
-                    if (proj[j] != -1) {
-                        mark[i][j] = mark[i - 1][j];
-                        projFlag = j;
+                    if (proj[x] != -1) {
+                        mark[y][x] = mark[y - 1][x];
+                        projFlag = x;
                         len = 0;
                         update_coords = true;
-                    } else if (((j > 0) && (CubeManager.unpack_type(cubes[j - 1][i][z]) == type) && (projFlag != j - 1))) {
-                        mark[i][j] = mark[i][j - 1];
+                    } else if (((x > 0) && (CubeManager.unpack_type(cubes[x - 1][y][z]) == type) && (projFlag != x - 1))) {
+                        mark[y][x] = mark[y][x - 1];
                         update_coords = true;
                     } else {
-                        mark[i][j] = ++next_color;
-                        coords_map.put(next_color, new int[]{j, i, j, i});
+                        mark[y][x] = ++next_color;
+                        coords_map.put(next_color, new int[]{x, y, x, y});
                         len = 0;
                     }
 
                     if (update_coords) {
                         int[] tmp = null;
-                        int face = proj[j] != -1 ? proj[j] : mark[i][j - 1];
+                        int face = proj[x] != -1 ? proj[x] : mark[y][x - 1];
                         tmp = coords_map.get(face);
-                        tmp[2] = j;
-                        tmp[3] = i;
+                        tmp[2] = x;
+                        tmp[3] = y;
                         coords_map.put(face, tmp);
                     }
 
-                    if (j > 0 && mark[i][j - 1] == mark[i][j]) {
+                    if (x > 0 && mark[y][x - 1] == mark[y][x]) {
                         len++;
                     }
 
-                    canDown = !(len > 0 && !canDown) && (i < (World.chunk_length - 1) && (CubeManager.unpack_type(cubes[j][i + 1][z]) == type));
+                    canDown = !(len > 0 && !canDown) && (y < (World.chunk_length - 1) && (CubeManager.unpack_type(cubes[x][y + 1][z]) == type));
 
                     if (canDown) {
-                        proj[j] = mark[i][j];
+                        proj[x] = mark[y][x];
                     } else {
                         int tmp = len;
                         while (tmp >= 0) {
-                            proj[j - tmp] = -1;
+                            proj[x - tmp] = -1;
                             tmp--;
                         }
                     }
@@ -100,17 +98,17 @@ public class Chunk extends Mesh {
 
             for (Map.Entry<Integer, int[]> e : coords_map.entrySet()) {
                 int[] coords = e.getValue();
-                int x0 = x_offset + coords[0], y0 = y_offset + coords[1];
-                int x1 = x_offset + coords[2], y1 = y_offset + coords[3];
+                int x0 = coords[0], y0 = coords[1];
+                int x1 = coords[2], y1 = coords[3];
 
-                // boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1);
+                boolean[] renderable_sides = renderable_sides_2(x0, y0, x1, y1, z);
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
-                    // if (renderable_sides[side_idx]) {
-                    float[] side = CubeManager.get_side(side_idx, x0, y0, x1, y1, z);
+                    if (renderable_sides[side_idx]) {
+                        float[] side = CubeManager.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z);
 
-                    System.arraycopy(side, 0, vertices, vertices_offset, CubeManager.cube_side_vertices_size);
-                    vertices_offset += CubeManager.cube_side_vertices_size;
-                    // }
+                        System.arraycopy(side, 0, vertices, vertices_offset, CubeManager.cube_side_vertices_size);
+                        vertices_offset += CubeManager.cube_side_vertices_size;
+                    }
                 }
             }
         }
@@ -121,53 +119,124 @@ public class Chunk extends Mesh {
         fill_buffers();
     }
 
-    public boolean[] renderable_sides(int x, int y, int z) {
+    public boolean[] renderable_sides_2(int x0, int y0, int x1, int y1, int z) {
         boolean[] sides = new boolean[6];
 
-        // Blocks inside chunk
-        if (x == 0 || CubeManager.unpack_type(cubes[x - 1][y][z]) == 0) {
-            sides[0] = true; // Back
+        if (x0 == 0) {
+            sides[0] = true;
+        } else if (x0 > 0) {
+            for (int y = y0; y <= y1; y++) {
+                if (CubeManager.unpack_type(cubes[x0 - 1][y][z]) == 0) {
+                    sides[0] = true;
+                    break;
+                }
+            }
         }
-        if (x == World.chunk_width - 1 || CubeManager.unpack_type(cubes[x + 1][y][z]) == 0) {
-            sides[1] = true; // Front
-        }
-        if (y == World.chunk_length - 1 || CubeManager.unpack_type(cubes[x][y + 1][z]) == 0) {
-            sides[2] = true; // Right
-        }
-        if (y == 0 || CubeManager.unpack_type(cubes[x][y - 1][z]) == 0) {
-            sides[3] = true; // Left
-        }
-        if (z == World.chunk_height - 1 || CubeManager.unpack_type(cubes[x][y][z + 1]) == 0) {
-            sides[4] = true; // Bottom
-        }
-        if (z == 0 || CubeManager.unpack_type(cubes[x][y][z - 1]) == 0) {
-            sides[5] = true; // Top
+        if (x1 == World.chunk_width - 1) {
+            sides[1] = true;
+        } else if (x1 < World.chunk_width - 1) {
+            for (int y = y0; y <= y1; y++) {
+                if (CubeManager.unpack_type(cubes[x1 + 1][y][z]) == 0) {
+                    sides[1] = true;
+                    break;
+                }
+            }
         }
 
-        // Blocks on edge of chunk
+        if (y0 == 0) {
+            sides[3] = true;
+        } else if (y0 > 0) {
+            for (int x = x0; x <= x1; x++) {
+                if (CubeManager.unpack_type(cubes[x][y0 - 1][z]) == 0) {
+                    sides[3] = true;
+                    break;
+                }
+            }
+        }
+
+        if (y1 == World.chunk_length - 1) {
+            sides[2] = true;
+        } else if (y1 < World.chunk_length - 1) {
+            for (int x = x0; x <= x1; x++) {
+                if (CubeManager.unpack_type(cubes[x][y1 + 1][z]) == 0) {
+                    sides[2] = true;
+                    break;
+                }
+            }
+        }
+
+        if (z == 0) {
+            sides[4] = true;
+        } else if (z > 0) {
+            for (int x = x0; x <= x1; x++) {
+                for (int y = y0; y <= y1; y++) {
+                    if (CubeManager.unpack_type(cubes[x][y][z - 1]) == 0) {
+                        sides[4] = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (z == World.chunk_height - 1) {
+            sides[5] = true;
+        } else if (z < World.chunk_height - 1) {
+            for (int x = x0; x <= x1; x++) {
+                for (int y = y0; y <= y1; y++) {
+                    if (CubeManager.unpack_type(cubes[x][y][z + 1]) == 0) {
+                        sides[5] = true;
+                        break;
+                    }
+                }
+            }
+        }
+
         if (sides[0] &&
-                x == 0 &&
-                x_chunk_pos != 0 &&
-                CubeManager.unpack_type(World.chunks[x_chunk_pos - 1][y_chunk_pos].cubes[World.chunk_width - 1][y][x]) != 0) {
+                x0 == 0 &&
+                x_chunk_pos != 0) {
             sides[0] = false;
+            for (int y = y0; y <= y1; y++) {
+                if (CubeManager.unpack_type(World.chunks[x_chunk_pos - 1][y_chunk_pos].cubes[World.chunk_width - 1][y][z]) == 0) {
+                    sides[0] = true;
+                    break;
+                }
+            }
         }
+
         if (sides[1] &&
-                x == World.chunk_width - 1 &&
-                x_chunk_pos != World.world_size - 1 &&
-                CubeManager.unpack_type(World.chunks[x_chunk_pos + 1][y_chunk_pos].cubes[0][y][z]) != 0) {
+                x1 == World.chunk_width - 1 &&
+                x_chunk_pos != World.world_size - 1) {
             sides[1] = false;
+            for (int y = y0; y <= y1; y++) {
+                if (CubeManager.unpack_type(World.chunks[x_chunk_pos + 1][y_chunk_pos].cubes[0][y][z]) == 0) {
+                    sides[1] = true;
+                    break;
+                }
+            }
         }
+
         if (sides[2] &&
-                y == World.chunk_length - 1 &&
-                y_chunk_pos != World.world_size - 1 &&
-                CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos + 1].cubes[x][0][x]) != 0) {
+                y1 == World.chunk_length - 1 &&
+                y_chunk_pos != World.world_size - 1) {
             sides[2] = false;
+            for (int x = x0; x <= x1; x++) {
+                if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos + 1].cubes[x][0][z]) == 0) {
+                    sides[2] = true;
+                    break;
+                }
+            }
         }
+
         if (sides[3] &&
-                y == 0 &&
-                y_chunk_pos != 0 &&
-                CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos - 1].cubes[x][World.chunk_length - 1][z]) != 0) {
+                y0 == 0 &&
+                y_chunk_pos != 0) {
             sides[3] = false;
+            for (int x = x0; x <= x1; x++) {
+                if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos - 1].cubes[x][World.chunk_length - 1][z]) == 0) {
+                    sides[3] = true;
+                    break;
+                }
+            }
         }
 
         return sides;

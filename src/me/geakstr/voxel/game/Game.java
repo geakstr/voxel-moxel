@@ -20,7 +20,7 @@ public class Game {
         camera = new Camera(100, (float) Window.width / (float) Window.height, 0.01f, 100f);
         frustum = new FrustumCulling();
 
-        World.init(5, 8, 8, 8);
+        World.init(1, 3, 3, 3);
         World.gen();
     }
 
