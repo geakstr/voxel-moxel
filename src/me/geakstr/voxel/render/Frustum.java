@@ -3,15 +3,11 @@ package me.geakstr.voxel.render;
 import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.model.World;
 
-public class FrustumCulling {
-    private float frustum[][];
+public class Frustum {
+    private static final float frustum[][] = new float[6][4];
 
-    public FrustumCulling() {
-        frustum = new float[6][4];
-    }
-
-    public void update(final Matrix4f projection, final Matrix4f view) {
-        Matrix4f a = Matrix4f.mul(projection, view, null);
+    public static void update() {
+        Matrix4f a = Matrix4f.mul(Camera.projection, Camera.view, null);
 
         // Extract the numbers for the Right plane
         frustum[0][0] = a.m03 - a.m00;
@@ -58,7 +54,7 @@ public class FrustumCulling {
         }
     }
 
-    public boolean pointInFrustum(float x, float y, float z) {
+    public static boolean pointInFrustum(float x, float y, float z) {
         for (int i = 0; i < 6; i++) {
             if (frustum[i][0] * x + frustum[i][1] * y + frustum[i][2] * z + frustum[i][3] <= 0.0F) {
                 return false;
@@ -68,7 +64,35 @@ public class FrustumCulling {
         return true;
     }
 
-    public boolean chunkInFrustum(float x, float y, float z) {
+    public static boolean chunkInFrustum(float x, float y, float z) {
+
+        float rot_y = Math.abs(Camera.rotation.y % 360);
+        float rot_x = Camera.rotation.x;
+
+        System.out.println(rot_x);
+
+        int pos_x = (int) Camera.position.x;
+        int pos_y = (int) Camera.position.y;
+        int pos_z = (int) Camera.position.z;
+
+        // 0 - right
+        // 1 - top
+        // 2 - left
+        // 3 - bottom
+        boolean[] hor_dirs = new boolean[4];
+        if (rot_y >= 315 && rot_y <= 45) {
+            hor_dirs[0] = true;
+        } else if (rot_y >= 45 && rot_y <= 135) {
+            hor_dirs[1] = true;
+        } else if (rot_y >= 135 && rot_y <= 225) {
+            hor_dirs[2] = true;
+        } else if (rot_y >= 225 && rot_y <= 315) {
+            hor_dirs[3] = true;
+        }
+
+        boolean[] vert_dirs = new boolean[2];
+
+
         int width = World.chunk_width;
         int length = World.chunk_length;
         int height = World.chunk_height;
@@ -87,20 +111,10 @@ public class FrustumCulling {
                 pointInFrustum(x_mul_width + width + 1, z_mul_height - 1, y_mul_length - 1) ||
                 pointInFrustum(x_mul_width + width + 1, z_mul_height - 1, y_mul_length + length + 1) ||
 
-//                pointInFrustum(x_mul_width - 1, half_half_height, y_mul_length - 1) ||
-//                pointInFrustum(x_mul_width - 1, half_half_height, y_mul_length + length + 1) ||
-//                pointInFrustum(x_mul_width + width + 1, half_half_height, y_mul_length - 1) ||
-//                pointInFrustum(x_mul_width + width + 1, half_half_height, y_mul_length + length + 1) ||
-//
-//                pointInFrustum(x_mul_width - 1, half_height, y_mul_length - 1) ||
-//                pointInFrustum(x_mul_width - 1, half_height, y_mul_length + length + 1) ||
-//                pointInFrustum(x_mul_width + width + 1, half_height, y_mul_length - 1) ||
-//                pointInFrustum(x_mul_width + width + 1, half_height, y_mul_length + length + 1) ||
-//
-//                pointInFrustum(x_mul_width - 1, half_height + half_half_height, y_mul_length - 1) ||
-//                pointInFrustum(x_mul_width - 1, half_height + half_half_height, y_mul_length + length + 1) ||
-//                pointInFrustum(x_mul_width + width + 1, half_height + half_half_height, y_mul_length - 1) ||
-//                pointInFrustum(x_mul_width + width + 1, half_height + half_half_height, y_mul_length + length + 1) ||
+                pointInFrustum(x_mul_width - 1, half_height, y_mul_length - 1) ||
+                pointInFrustum(x_mul_width - 1, half_height, y_mul_length + length + 1) ||
+                pointInFrustum(x_mul_width + width + 1, half_height, y_mul_length - 1) ||
+                pointInFrustum(x_mul_width + width + 1, half_height, y_mul_length + length + 1) ||
 
                 pointInFrustum(x_mul_width - 1, z_mul_height + height + 1, y_mul_length - 1) ||
                 pointInFrustum(x_mul_width - 1, z_mul_height + height + 1, y_mul_length + length + 1) ||

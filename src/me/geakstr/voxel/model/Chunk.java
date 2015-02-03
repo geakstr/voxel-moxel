@@ -240,37 +240,37 @@ public class Chunk extends Mesh {
                 }
             }
         }
-        
+
         if (sides[4] &&
-        		z == 0 &&
-        		z_chunk_pos != 0) {
-        	sides[4] = false;
-        	for (int x = x0; x <= x1; x++) {
-        		for (int y = y0; y <= y1; y++) {
-        			if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos - 1].cubes[x][y][World.chunk_height - 1]) == 0) {
-        				sides[4] = true;
-        				break;
-        			}
-        		}
-        	}
+                z == 0 &&
+                z_chunk_pos != 0) {
+            sides[4] = false;
+            for (int x = x0; x <= x1; x++) {
+                for (int y = y0; y <= y1; y++) {
+                    if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos - 1].cubes[x][y][World.chunk_height - 1]) == 0) {
+                        sides[4] = true;
+                        break;
+                    }
+                }
+            }
         }
-        
+
         if (sides[5] &&
-        		z == World.chunk_height - 1 &&
-        		z_chunk_pos != World.world_height - 1) {
-        	sides[5] = false;
-        	for (int x = x0; x <= x1; x++) {
-        		for (int y = y0; y <= y1; y++) {
-        			if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos + 1].cubes[x][y][0]) == 0) {
-        				sides[5] = true;
-        				break;
-        			}
-        		}
-        	}
-        	
+                z == World.chunk_height - 1 &&
+                z_chunk_pos != World.world_height - 1) {
+            sides[5] = false;
+            for (int x = x0; x <= x1; x++) {
+                for (int y = y0; y <= y1; y++) {
+                    if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos + 1].cubes[x][y][0]) == 0) {
+                        sides[5] = true;
+                        break;
+                    }
+                }
+            }
+
         }
-        
-        
+
+
         return sides;
     }
 

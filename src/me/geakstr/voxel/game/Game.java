@@ -3,38 +3,36 @@ package me.geakstr.voxel.game;
 import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.render.Camera;
-import me.geakstr.voxel.render.FrustumCulling;
+import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.render.Shader;
 import me.geakstr.voxel.render.Transform;
 
 public class Game {
-    public static Transform transform;
-    public static Shader shader;
-    public static Camera camera;
-    public static FrustumCulling frustum;
+    public static Transform world_transform;
+    public static Shader world_shader;
 
     public static void init() {
-        shader = new Shader("simple.vs", "simple.fs").compile();
+        Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 100f);
 
-        transform = new Transform();
-        camera = new Camera(100, (float) Window.width / (float) Window.height, 0.01f, 100f);
-        frustum = new FrustumCulling();
+        world_shader = new Shader("simple.vs", "simple.fs").compile();
+        world_transform = new Transform();
 
-        World.init(4, 16, 16, 16, 16);
+        World.init(2, 1, 1, 1, 1);
         World.gen();
     }
 
     public static void before_render() {
-        camera.input();
-        camera.apply();
-        frustum.update(camera.getProjectionMatrix(), camera.getViewMatrix());
+        Camera.input();
+        Camera.apply();
 
-        shader.bind();
+        Frustum.update();
 
-        shader.set_uniform("uniform_color", 1);
-        shader.set_uniform("uniform_transform", transform.getTransform());
-        shader.set_uniform("uniform_camera_projection", camera.getProjectionMatrix());
-        shader.set_uniform("uniform_camera_view", camera.getViewMatrix());
+        world_shader.bind();
+
+        world_shader.set_uniform("uniform_color", 1);
+        world_shader.set_uniform("uniform_transform", world_transform.getTransform());
+        world_shader.set_uniform("uniform_camera_projection", Camera.projection);
+        world_shader.set_uniform("uniform_camera_view", Camera.view);
     }
 
     public static void render() {
@@ -42,6 +40,6 @@ public class Game {
     }
 
     public static void after_render() {
-        shader.unbind();
+        world_shader.unbind();
     }
 }

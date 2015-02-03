@@ -1,6 +1,6 @@
 package me.geakstr.voxel.model;
 
-import me.geakstr.voxel.game.Game;
+import me.geakstr.voxel.render.Frustum;
 
 import java.util.Random;
 
@@ -22,7 +22,7 @@ public class World {
         world_size = _world_size;
         world_height = _world_height;
         world_volume = world_size * world_size * world_height;
-        
+
         chunks = new Chunk[world_size][world_size][world_height];
 
         chunk_width = _chunk_width;
@@ -32,9 +32,9 @@ public class World {
 
         for (int x = 0; x < world_size; x++) {
             for (int y = 0; y < world_size; y++) {
-            	for (int z = 0; z < world_height; z++) {
-            		chunks[x][y][z] = new Chunk(x, y, z);
-            	}
+                for (int z = 0; z < world_height; z++) {
+                    chunks[x][y][z] = new Chunk(x, y, z);
+                }
             }
         }
     }
@@ -43,18 +43,18 @@ public class World {
         Random rnd = new Random();
         for (int i = 0; i < world_size; i++) {
             for (int j = 0; j < world_size; j++) {
-            	for (int k = 0; k < world_height; k++) {
-	                Chunk chunk = chunks[i][j][k];
-	                chunk.gen_buffers();
-	
-	                for (int y = 0; y < World.chunk_length; y++) {
-	                    for (int x = 0; x < World.chunk_width; x++) {
-	                        for (int z = 0; z < World.chunk_height; z++) {
-	                            chunk.cubes[x][y][z] = CubeManager.pack_type(0, rnd.nextInt(2));
-	                        }
-	                    }
-	                }
-            	}
+                for (int k = 0; k < world_height; k++) {
+                    Chunk chunk = chunks[i][j][k];
+                    chunk.gen_buffers();
+
+                    for (int y = 0; y < World.chunk_length; y++) {
+                        for (int x = 0; x < World.chunk_width; x++) {
+                            for (int z = 0; z < World.chunk_height; z++) {
+                                chunk.cubes[x][y][z] = CubeManager.pack_type(0, 1);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -63,12 +63,12 @@ public class World {
         chunks_in_frame = 0;
         for (int x = 0; x < world_size; x++) {
             for (int y = 0; y < world_size; y++) {
-            	for (int z = 0; z < world_height; z++) {
-	               if (Game.frustum.chunkInFrustum(x, y, z)) {
-	                    chunks_in_frame++;
-	                    chunks[x][y][z].render();
-	               }
-            	}
+                for (int z = 0; z < world_height; z++) {
+                    if (Frustum.chunkInFrustum(x, y, z)) {
+                        chunks_in_frame++;
+                        chunks[x][y][z].render();
+                    }
+                }
             }
         }
     }
