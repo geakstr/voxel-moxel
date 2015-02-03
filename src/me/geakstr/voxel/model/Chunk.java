@@ -9,17 +9,19 @@ public class Chunk extends Mesh {
 
     public boolean changed;
 
-    public int x_chunk_pos, y_chunk_pos;
-    public int x_offset, y_offset;
+    public int x_chunk_pos, y_chunk_pos, z_chunk_pos;
+    public int x_offset, y_offset, z_offset;
 
-    public Chunk(int x_chunk_pos, int y_chunk_pos) {
+    public Chunk(int x_chunk_pos, int y_chunk_pos, int z_chunk_pos) {
         super();
 
         this.x_chunk_pos = x_chunk_pos;
         this.y_chunk_pos = y_chunk_pos;
+        this.z_chunk_pos = z_chunk_pos;
 
         this.x_offset = x_chunk_pos * World.chunk_width;
         this.y_offset = y_chunk_pos * World.chunk_length;
+        this.z_offset = z_chunk_pos * World.chunk_height;
 
         this.vertices_size = World.chunk_volume * CubeManager.cube_vertices_size;
         //this.indices_size = volume * 36 + width;
@@ -104,7 +106,7 @@ public class Chunk extends Mesh {
                 boolean[] renderable_sides = renderable_sides_2(x0, y0, x1, y1, z);
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        float[] side = CubeManager.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z);
+                        float[] side = CubeManager.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset);
 
                         System.arraycopy(side, 0, vertices, vertices_offset, CubeManager.cube_side_vertices_size);
                         vertices_offset += CubeManager.cube_side_vertices_size;
@@ -196,7 +198,7 @@ public class Chunk extends Mesh {
                 x_chunk_pos != 0) {
             sides[0] = false;
             for (int y = y0; y <= y1; y++) {
-                if (CubeManager.unpack_type(World.chunks[x_chunk_pos - 1][y_chunk_pos].cubes[World.chunk_width - 1][y][z]) == 0) {
+                if (CubeManager.unpack_type(World.chunks[x_chunk_pos - 1][y_chunk_pos][z_chunk_pos].cubes[World.chunk_width - 1][y][z]) == 0) {
                     sides[0] = true;
                     break;
                 }
@@ -208,7 +210,7 @@ public class Chunk extends Mesh {
                 x_chunk_pos != World.world_size - 1) {
             sides[1] = false;
             for (int y = y0; y <= y1; y++) {
-                if (CubeManager.unpack_type(World.chunks[x_chunk_pos + 1][y_chunk_pos].cubes[0][y][z]) == 0) {
+                if (CubeManager.unpack_type(World.chunks[x_chunk_pos + 1][y_chunk_pos][z_chunk_pos].cubes[0][y][z]) == 0) {
                     sides[1] = true;
                     break;
                 }
@@ -220,7 +222,7 @@ public class Chunk extends Mesh {
                 y_chunk_pos != World.world_size - 1) {
             sides[2] = false;
             for (int x = x0; x <= x1; x++) {
-                if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos + 1].cubes[x][0][z]) == 0) {
+                if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos + 1][z_chunk_pos].cubes[x][0][z]) == 0) {
                     sides[2] = true;
                     break;
                 }
@@ -232,13 +234,43 @@ public class Chunk extends Mesh {
                 y_chunk_pos != 0) {
             sides[3] = false;
             for (int x = x0; x <= x1; x++) {
-                if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos - 1].cubes[x][World.chunk_length - 1][z]) == 0) {
+                if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos - 1][z_chunk_pos].cubes[x][World.chunk_length - 1][z]) == 0) {
                     sides[3] = true;
                     break;
                 }
             }
         }
-
+        
+        if (sides[4] &&
+        		z == 0 &&
+        		z_chunk_pos != 0) {
+        	sides[4] = false;
+        	for (int x = x0; x <= x1; x++) {
+        		for (int y = y0; y <= y1; y++) {
+        			if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos - 1].cubes[x][y][World.chunk_height - 1]) == 0) {
+        				sides[4] = true;
+        				break;
+        			}
+        		}
+        	}
+        }
+        
+        if (sides[5] &&
+        		z == World.chunk_height - 1 &&
+        		z_chunk_pos != World.world_height - 1) {
+        	sides[5] = false;
+        	for (int x = x0; x <= x1; x++) {
+        		for (int y = y0; y <= y1; y++) {
+        			if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos + 1].cubes[x][y][0]) == 0) {
+        				sides[5] = true;
+        				break;
+        			}
+        		}
+        	}
+        	
+        }
+        
+        
         return sides;
     }
 

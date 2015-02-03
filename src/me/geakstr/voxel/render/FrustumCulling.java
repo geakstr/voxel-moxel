@@ -68,7 +68,7 @@ public class FrustumCulling {
         return true;
     }
 
-    public boolean chunkInFrustum(float x, float y) {
+    public boolean chunkInFrustum(float x, float y, float z) {
         int width = World.chunk_width;
         int length = World.chunk_length;
         int height = World.chunk_height;
@@ -79,31 +79,32 @@ public class FrustumCulling {
         int half_half_height = half_height / 2;
 
         float x_mul_width = x * width;
-        float y_mul_length = y * width;
+        float y_mul_length = y * length;
+        float z_mul_height = z * height;
 
-        return pointInFrustum(x_mul_width - 1, -1, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width - 1, -1, y_mul_length + length + 1) ||
-                pointInFrustum(x_mul_width + width + 1, -1, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width + width + 1, -1, y_mul_length + length + 1) ||
+        return pointInFrustum(x_mul_width - 1, z_mul_height - 1, y_mul_length - 1) ||
+                pointInFrustum(x_mul_width - 1, z_mul_height - 1, y_mul_length + length + 1) ||
+                pointInFrustum(x_mul_width + width + 1, z_mul_height - 1, y_mul_length - 1) ||
+                pointInFrustum(x_mul_width + width + 1, z_mul_height - 1, y_mul_length + length + 1) ||
 
 //                pointInFrustum(x_mul_width - 1, half_half_height, y_mul_length - 1) ||
 //                pointInFrustum(x_mul_width - 1, half_half_height, y_mul_length + length + 1) ||
 //                pointInFrustum(x_mul_width + width + 1, half_half_height, y_mul_length - 1) ||
 //                pointInFrustum(x_mul_width + width + 1, half_half_height, y_mul_length + length + 1) ||
 //
-                pointInFrustum(x_mul_width - 1, half_height, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width - 1, half_height, y_mul_length + length + 1) ||
-                pointInFrustum(x_mul_width + width + 1, half_height, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width + width + 1, half_height, y_mul_length + length + 1) ||
+//                pointInFrustum(x_mul_width - 1, half_height, y_mul_length - 1) ||
+//                pointInFrustum(x_mul_width - 1, half_height, y_mul_length + length + 1) ||
+//                pointInFrustum(x_mul_width + width + 1, half_height, y_mul_length - 1) ||
+//                pointInFrustum(x_mul_width + width + 1, half_height, y_mul_length + length + 1) ||
 //
 //                pointInFrustum(x_mul_width - 1, half_height + half_half_height, y_mul_length - 1) ||
 //                pointInFrustum(x_mul_width - 1, half_height + half_half_height, y_mul_length + length + 1) ||
 //                pointInFrustum(x_mul_width + width + 1, half_height + half_half_height, y_mul_length - 1) ||
 //                pointInFrustum(x_mul_width + width + 1, half_height + half_half_height, y_mul_length + length + 1) ||
 
-                pointInFrustum(x_mul_width - 1, height + 1, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width - 1, height + 1, y_mul_length + length + 1) ||
-                pointInFrustum(x_mul_width + width + 1, height + 1, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width + width + 1, height + 1, y_mul_length + length + 1);
+                pointInFrustum(x_mul_width - 1, z_mul_height + height + 1, y_mul_length - 1) ||
+                pointInFrustum(x_mul_width - 1, z_mul_height + height + 1, y_mul_length + length + 1) ||
+                pointInFrustum(x_mul_width + width + 1, z_mul_height + height + 1, y_mul_length - 1) ||
+                pointInFrustum(x_mul_width + width + 1, z_mul_height + height + 1, y_mul_length + length + 1);
     }
 }
