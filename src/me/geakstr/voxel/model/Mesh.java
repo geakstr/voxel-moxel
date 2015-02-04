@@ -4,7 +4,6 @@ import me.geakstr.voxel.util.ExtendedBufferUtil;
 import me.geakstr.voxel.util.ResourceUtil;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
 
 public class Mesh {
     public float[] vertices;
@@ -48,17 +47,20 @@ public class Mesh {
     }
 
     public void render() {
-
-
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-        glDrawArrays(GL_TRIANGLES, 0, vertices_size);
-        glDisableVertexAttribArray(0);
-
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glBindTexture(GL_TEXTURE_2D, ResourceUtil.getTexturesID("stone2.png"));
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glVertexPointer(3, GL_FLOAT, 0, 0);
+
         glBindBuffer(GL_ARRAY_BUFFER, tbo);
         glTexCoordPointer(2, GL_FLOAT, 0, 0);
+
+        glDrawArrays(GL_TRIANGLES, 0, vertices_size);
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
 }

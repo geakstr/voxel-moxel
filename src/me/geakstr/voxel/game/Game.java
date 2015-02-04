@@ -20,10 +20,10 @@ public class Game {
         world_shader = new Shader("simple.vs", "simple.fs").compile();
         world_transform = new Transform();
 
-        World.init(1, 2, 4, 4, 4);
+        World.init(4, 4, 5, 8, 4);
         World.gen();
         
-        ResourceUtil.loadTextures("stone2.png");
+        ResourceUtil.loadTextures("stone2.png", "stone.png");
         glEnable(GL_TEXTURE_2D);
     }
 
