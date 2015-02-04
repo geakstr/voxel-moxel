@@ -48,17 +48,14 @@ public class Mesh {
     }
 
     public void render() {
-        glEnableVertexAttribArray(0);
 
+
+        glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
         glDrawArrays(GL_TRIANGLES, 0, vertices_size);
-
-//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-//        glDrawElements(GL_TRIANGLES, indices_size, GL_UNSIGNED_INT, 0);
-
         glDisableVertexAttribArray(0);
-        
+
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glBindTexture(GL_TEXTURE_2D, ResourceUtil.getTexturesID("stone2.png"));
         glBindBuffer(GL_ARRAY_BUFFER, tbo);

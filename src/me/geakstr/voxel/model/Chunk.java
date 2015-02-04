@@ -109,7 +109,7 @@ public class Chunk extends Mesh {
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
                         float[] side = Cube.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset);
-                    	float[] texture = Cube.get_texture(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset);
+                    	float[] texture = Cube.get_texture(side_idx, x0, y0, x1, y1);
                     	System.arraycopy(texture, 0, texture_coords, texture_offset, Cube.cube_side_texture_size);
                     	texture_offset += Cube.cube_side_texture_size;
                         System.arraycopy(side, 0, vertices, vertices_offset, Cube.cube_side_vertices_size);
