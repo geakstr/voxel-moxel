@@ -16,77 +16,23 @@ public class Mesh {
     //public int indices_size;
 
     public int vbo;
-    public int vboTexture;
+    public int tbo;
 //    public int ibo;
     
-    float[] texture_array = {
-    		 0.0f, 16.0f,
-             0.0f, 1.0f,
-             1.0f, 1.0f,
-             
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             
-             16.0f, 16.0f,
-             16.0f, 0.0f,
-             0.0f, 0.0f,
-             
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             
-             0.0f, 0.0f,
-             0.0f, 0.0f,
-             0.0f, 0.0f
-    };
-    
+    public Mesh() {}
 
-    public Mesh() { 
-         texture_coords = texture_array;
-         this.texture_coords_size = texture_coords.length;
-    }
-
-    public Mesh(float[] vertices/*, int[] indices*/) {
+    public Mesh(float[] vertices, float[] texture_coords/*, int[] indices*/) {
         this.vertices = vertices;
 //        this.indices = indices;
         this.vertices_size = vertices.length;
 //        this.indices_size = indices.length;
-        texture_coords = texture_array;
+        this.texture_coords = texture_coords;
         this.texture_coords_size = texture_coords.length;
     }
 
     public void gen_buffers() {
         vbo = glGenBuffers();
-        vboTexture = glGenBuffers();
+        tbo = glGenBuffers();
 //        this.ibo = glGenBuffers();
     }
 
@@ -97,7 +43,7 @@ public class Mesh {
 //        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 //        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(indices), GL_STATIC_DRAW);
         
-        glBindBuffer(GL_ARRAY_BUFFER, vboTexture);
+        glBindBuffer(GL_ARRAY_BUFFER, tbo);
         glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(texture_coords), GL_STATIC_DRAW);
     }
 
@@ -115,8 +61,7 @@ public class Mesh {
         
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glBindTexture(GL_TEXTURE_2D, ResourceUtil.getTexturesID(1));
-       
-        glBindBuffer(GL_ARRAY_BUFFER, vboTexture);
+        glBindBuffer(GL_ARRAY_BUFFER, tbo);
         glTexCoordPointer(2, GL_FLOAT, 0, 0);
     }
 }

@@ -23,10 +23,12 @@ public class Chunk extends Mesh {
         this.y_offset = y_chunk_pos * World.chunk_length;
         this.z_offset = z_chunk_pos * World.chunk_height;
 
-        this.vertices_size = World.chunk_volume * CubeManager.cube_vertices_size;
+        this.vertices_size = World.chunk_volume * Cube.cube_side_vertices_size * 6;
+        this.texture_coords_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
         //this.indices_size = volume * 36 + width;
 
         this.vertices = new float[vertices_size];
+        this.texture_coords = new float[texture_coords_size];
         //this.indices = new int[indices_size];
 
         this.cubes = new int[World.chunk_width][World.chunk_length][World.chunk_height];
@@ -37,7 +39,7 @@ public class Chunk extends Mesh {
         changed = false;
 
         int next_color = 512;
-        int vertices_offset = 0/*, indices_offset = 0*/;
+        int vertices_offset = 0, texture_offset = 0/*, indices_offset = 0*/;
         for (int z = 0; z < World.chunk_height; z++) {
             int[][] mark = new int[World.chunk_length][World.chunk_width];
             int[] proj = new int[mark[0].length];
@@ -49,7 +51,7 @@ public class Chunk extends Mesh {
                 int projFlag = -1;
                 for (int x = 0; x < World.chunk_width; x++) {
                     int val = cubes[x][y][z];
-                    int type = CubeManager.unpack_type(val);
+                    int type = Cube.unpack_type(val);
 
                     if (type == 0) {
                         continue;
@@ -62,7 +64,7 @@ public class Chunk extends Mesh {
                         projFlag = x;
                         len = 0;
                         update_coords = true;
-                    } else if (((x > 0) && (CubeManager.unpack_type(cubes[x - 1][y][z]) == type) && (projFlag != x - 1))) {
+                    } else if (((x > 0) && (Cube.unpack_type(cubes[x - 1][y][z]) == type) && (projFlag != x - 1))) {
                         mark[y][x] = mark[y][x - 1];
                         update_coords = true;
                     } else {
@@ -84,7 +86,7 @@ public class Chunk extends Mesh {
                         len++;
                     }
 
-                    canDown = !(len > 0 && !canDown) && (y < (World.chunk_length - 1) && (CubeManager.unpack_type(cubes[x][y + 1][z]) == type));
+                    canDown = !(len > 0 && !canDown) && (y < (World.chunk_length - 1) && (Cube.unpack_type(cubes[x][y + 1][z]) == type));
 
                     if (canDown) {
                         proj[x] = mark[y][x];
@@ -103,13 +105,15 @@ public class Chunk extends Mesh {
                 int x0 = coords[0], y0 = coords[1];
                 int x1 = coords[2], y1 = coords[3];
 
-                boolean[] renderable_sides = renderable_sides_2(x0, y0, x1, y1, z);
+                boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        float[] side = CubeManager.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset);
-                        
-                        System.arraycopy(side, 0, vertices, vertices_offset, CubeManager.cube_side_vertices_size);
-                        vertices_offset += CubeManager.cube_side_vertices_size;
+                        float[] side = Cube.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset);
+                    	float[] texture = Cube.get_texture(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset);
+                    	System.arraycopy(texture, 0, texture_coords, texture_offset, Cube.cube_side_texture_size);
+                    	texture_offset += Cube.cube_side_vertices_size;
+                        System.arraycopy(side, 0, vertices, vertices_offset, Cube.cube_side_vertices_size);
+                        vertices_offset += Cube.cube_side_vertices_size;
                     }
                 }
             }
@@ -117,18 +121,21 @@ public class Chunk extends Mesh {
 
         vertices = Arrays.copyOfRange(vertices, 0, vertices_offset);
         vertices_size = vertices_offset;
+        
+        texture_coords = Arrays.copyOfRange(texture_coords, 0, texture_offset);
+        texture_coords_size = texture_offset;
 
         fill_buffers();
     }
 
-    public boolean[] renderable_sides_2(int x0, int y0, int x1, int y1, int z) {
+    public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
         boolean[] sides = new boolean[6];
 
         if (x0 == 0) {
             sides[0] = true;
         } else if (x0 > 0) {
             for (int y = y0; y <= y1; y++) {
-                if (CubeManager.unpack_type(cubes[x0 - 1][y][z]) == 0) {
+                if (Cube.unpack_type(cubes[x0 - 1][y][z]) == 0) {
                     sides[0] = true;
                     break;
                 }
@@ -138,7 +145,7 @@ public class Chunk extends Mesh {
             sides[1] = true;
         } else if (x1 < World.chunk_width - 1) {
             for (int y = y0; y <= y1; y++) {
-                if (CubeManager.unpack_type(cubes[x1 + 1][y][z]) == 0) {
+                if (Cube.unpack_type(cubes[x1 + 1][y][z]) == 0) {
                     sides[1] = true;
                     break;
                 }
@@ -149,7 +156,7 @@ public class Chunk extends Mesh {
             sides[3] = true;
         } else if (y0 > 0) {
             for (int x = x0; x <= x1; x++) {
-                if (CubeManager.unpack_type(cubes[x][y0 - 1][z]) == 0) {
+                if (Cube.unpack_type(cubes[x][y0 - 1][z]) == 0) {
                     sides[3] = true;
                     break;
                 }
@@ -160,7 +167,7 @@ public class Chunk extends Mesh {
             sides[2] = true;
         } else if (y1 < World.chunk_length - 1) {
             for (int x = x0; x <= x1; x++) {
-                if (CubeManager.unpack_type(cubes[x][y1 + 1][z]) == 0) {
+                if (Cube.unpack_type(cubes[x][y1 + 1][z]) == 0) {
                     sides[2] = true;
                     break;
                 }
@@ -172,7 +179,7 @@ public class Chunk extends Mesh {
         } else if (z > 0) {
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (CubeManager.unpack_type(cubes[x][y][z - 1]) == 0) {
+                    if (Cube.unpack_type(cubes[x][y][z - 1]) == 0) {
                         sides[4] = true;
                         break;
                     }
@@ -185,7 +192,7 @@ public class Chunk extends Mesh {
         } else if (z < World.chunk_height - 1) {
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (CubeManager.unpack_type(cubes[x][y][z + 1]) == 0) {
+                    if (Cube.unpack_type(cubes[x][y][z + 1]) == 0) {
                         sides[5] = true;
                         break;
                     }
@@ -198,7 +205,7 @@ public class Chunk extends Mesh {
                 x_chunk_pos != 0) {
             sides[0] = false;
             for (int y = y0; y <= y1; y++) {
-                if (CubeManager.unpack_type(World.chunks[x_chunk_pos - 1][y_chunk_pos][z_chunk_pos].cubes[World.chunk_width - 1][y][z]) == 0) {
+                if (Cube.unpack_type(World.chunks[x_chunk_pos - 1][y_chunk_pos][z_chunk_pos].cubes[World.chunk_width - 1][y][z]) == 0) {
                     sides[0] = true;
                     break;
                 }
@@ -210,7 +217,7 @@ public class Chunk extends Mesh {
                 x_chunk_pos != World.world_size - 1) {
             sides[1] = false;
             for (int y = y0; y <= y1; y++) {
-                if (CubeManager.unpack_type(World.chunks[x_chunk_pos + 1][y_chunk_pos][z_chunk_pos].cubes[0][y][z]) == 0) {
+                if (Cube.unpack_type(World.chunks[x_chunk_pos + 1][y_chunk_pos][z_chunk_pos].cubes[0][y][z]) == 0) {
                     sides[1] = true;
                     break;
                 }
@@ -222,7 +229,7 @@ public class Chunk extends Mesh {
                 y_chunk_pos != World.world_size - 1) {
             sides[2] = false;
             for (int x = x0; x <= x1; x++) {
-                if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos + 1][z_chunk_pos].cubes[x][0][z]) == 0) {
+                if (Cube.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos + 1][z_chunk_pos].cubes[x][0][z]) == 0) {
                     sides[2] = true;
                     break;
                 }
@@ -234,7 +241,7 @@ public class Chunk extends Mesh {
                 y_chunk_pos != 0) {
             sides[3] = false;
             for (int x = x0; x <= x1; x++) {
-                if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos - 1][z_chunk_pos].cubes[x][World.chunk_length - 1][z]) == 0) {
+                if (Cube.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos - 1][z_chunk_pos].cubes[x][World.chunk_length - 1][z]) == 0) {
                     sides[3] = true;
                     break;
                 }
@@ -247,7 +254,7 @@ public class Chunk extends Mesh {
             sides[4] = false;
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos - 1].cubes[x][y][World.chunk_height - 1]) == 0) {
+                    if (Cube.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos - 1].cubes[x][y][World.chunk_height - 1]) == 0) {
                         sides[4] = true;
                         break;
                     }
@@ -261,7 +268,7 @@ public class Chunk extends Mesh {
             sides[5] = false;
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (CubeManager.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos + 1].cubes[x][y][0]) == 0) {
+                    if (Cube.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos + 1].cubes[x][y][0]) == 0) {
                         sides[5] = true;
                         break;
                     }

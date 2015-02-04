@@ -4,7 +4,6 @@ import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.math.Vector3f;
 import me.geakstr.voxel.util.ExtendedBufferUtil;
 import me.geakstr.voxel.util.ResourceUtil;
-import sun.security.provider.SHA;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL20.*;

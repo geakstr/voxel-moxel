@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
 
 public class ResourceUtil {
 	

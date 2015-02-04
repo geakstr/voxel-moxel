@@ -28,7 +28,6 @@ public class Window {
 
     private static GLFWErrorCallback errorCallback;
     private static GLFWKeyCallback keyCallback;
-    private static GLFWWindowSizeCallback resizeCallback;
 
     public static boolean was_resize = false;
 

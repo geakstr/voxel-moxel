@@ -20,7 +20,7 @@ public class Game {
         world_shader = new Shader("simple.vs", "simple.fs").compile();
         world_transform = new Transform();
 
-        World.init(1, 1, 16, 16, 16);
+        World.init(1, 1, 10, 4, 4);
         World.gen();
         
         ResourceUtil.loadTextures("stone.png");
@@ -35,7 +35,6 @@ public class Game {
 
         world_shader.bind();
 
-        world_shader.set_uniform("uniform_color", 1);
         world_shader.set_uniform("uniform_transform", world_transform.getTransform());
         world_shader.set_uniform("uniform_camera_projection", Camera.projection);
         world_shader.set_uniform("uniform_camera_view", Camera.view);
