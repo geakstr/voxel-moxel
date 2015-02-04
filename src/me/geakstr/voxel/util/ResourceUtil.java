@@ -1,7 +1,5 @@
 package me.geakstr.voxel.util;
 
-import me.geakstr.voxel.model.Texture;
-
 import org.lwjgl.BufferUtils;
 
 import javax.imageio.ImageIO;
@@ -11,16 +9,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class ResourceUtil {
-	
-	private static Set<String> loadedTextures = new HashSet<String>();
-	private static Map<Integer, Texture> textures = new HashMap<Integer, Texture>();
+
+	private static Map<String, Integer> textures = new HashMap<String, Integer>();
 	
     public static String load_shader(String shader_name) {
         return FileUtil.readFromFile("res/shaders/" + shader_name);
@@ -30,13 +25,10 @@ public class ResourceUtil {
         for (String name : names) load_texture(name);
     }
 
-    public static Texture load_texture(String texture_name) {
-        if (loadedTextures.contains(texture_name)) {
-            for (Texture texture : textures.values()) {
-                if (texture.name.equals(texture_name)) return texture;
-            }
+    public static int load_texture(String texture_name) {
+        if (textures.get(texture_name) != null) {
+            return textures.get(texture_name);
         }
-        loadedTextures.add(texture_name);
 
         BufferedImage bimg = null;
         try {
@@ -79,13 +71,12 @@ public class ResourceUtil {
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, bimg.getWidth(), bimg.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
-        Texture newTexture = new Texture(textureID, bimg.getWidth(), bimg.getHeight(), texture_name);
-        textures.put(textureID, newTexture);
-        return newTexture;
+        textures.put(texture_name, textureID);
+        return textureID;
     }
     
-    public static int getTexturesID(int id) {
-        return textures.get(id).id;
+    public static int getTexturesID(String texture_name) {
+        return textures.get(texture_name);
     }
     
 }

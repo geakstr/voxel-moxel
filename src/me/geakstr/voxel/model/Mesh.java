@@ -60,7 +60,7 @@ public class Mesh {
         glDisableVertexAttribArray(0);
         
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glBindTexture(GL_TEXTURE_2D, ResourceUtil.getTexturesID(1));
+        glBindTexture(GL_TEXTURE_2D, ResourceUtil.getTexturesID("stone.png"));
         glBindBuffer(GL_ARRAY_BUFFER, tbo);
         glTexCoordPointer(2, GL_FLOAT, 0, 0);
     }

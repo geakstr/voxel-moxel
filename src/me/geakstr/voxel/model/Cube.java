@@ -275,12 +275,12 @@ public class Cube {
     
     public static final float[] bottom_texture = {
 	        1.0f, 0.0f,
-	        0.0f, 0.0f,
-	        0.0f, 0.0f,
+	        1.0f, 1.0f,
+	        0.0f, 1.0f,
 	        
-	        10.0f, 1.0f,
 	        0.0f, 0.0f,
-	        1.0f, 0.0f
+	        0.0f, 0.0f,
+	        0.0f, 0.0f
     };
 
     public static final float[] top_vertices = new float[] {
