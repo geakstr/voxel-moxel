@@ -69,8 +69,6 @@ public class Frustum {
         float rot_y = Math.abs(Camera.rotation.y % 360);
         float rot_x = Camera.rotation.x;
 
-        System.out.println(rot_x);
-
         int pos_x = (int) Camera.position.x;
         int pos_y = (int) Camera.position.y;
         int pos_z = (int) Camera.position.z;

@@ -107,7 +107,7 @@ public class Chunk extends Mesh {
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
                         float[] side = CubeManager.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset);
-
+                        
                         System.arraycopy(side, 0, vertices, vertices_offset, CubeManager.cube_side_vertices_size);
                         vertices_offset += CubeManager.cube_side_vertices_size;
                     }

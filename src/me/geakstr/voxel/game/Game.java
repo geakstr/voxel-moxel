@@ -6,6 +6,9 @@ import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.render.Shader;
 import me.geakstr.voxel.render.Transform;
+import me.geakstr.voxel.util.ResourceUtil;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 
 public class Game {
     public static Transform world_transform;
@@ -17,8 +20,11 @@ public class Game {
         world_shader = new Shader("simple.vs", "simple.fs").compile();
         world_transform = new Transform();
 
-        World.init(2, 1, 1, 1, 1);
+        World.init(1, 1, 16, 16, 16);
         World.gen();
+        
+        ResourceUtil.loadTextures("stone.png");
+        glEnable(GL_TEXTURE_2D);
     }
 
     public static void before_render() {
@@ -33,6 +39,7 @@ public class Game {
         world_shader.set_uniform("uniform_transform", world_transform.getTransform());
         world_shader.set_uniform("uniform_camera_projection", Camera.projection);
         world_shader.set_uniform("uniform_camera_view", Camera.view);
+        world_shader.set_uniform("texture", 0);
     }
 
     public static void render() {

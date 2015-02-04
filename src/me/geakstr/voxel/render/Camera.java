@@ -107,13 +107,13 @@ public class Camera {
     }
 
     public static void pitch(float angle) {
-        if (rotation.x - angle > 90.0f) {
-            rotation.x = 89.0f;
-            return;
-        } else if (rotation.x - angle < -90.0f) {
-            rotation.x = -89.0f;
-            return;
-        }
+//        if (rotation.x - angle > 90.0f) {
+//            rotation.x = 89.0f;
+//            return;
+//        } else if (rotation.x - angle < -90.0f) {
+//            rotation.x = -89.0f;
+//            return;
+//        }
         addRotation(angle, 0, 0);
     }
 
