@@ -124,13 +124,13 @@ public class Cube {
         }
         return side;
     }
-    
+
     public static float[] get_texture(int side_idx) {
-    	float[] texture = null;
-		texture = Arrays.copyOf(bottom_texture, cube_side_texture_size);
-    	return texture;
+        float[] texture = null;
+        texture = Arrays.copyOf(bottom_texture, cube_side_texture_size);
+        return texture;
     }
-    
+
 //  right top
 //  texture[0] += y1;
 //	texture[1] += x1;
@@ -138,23 +138,23 @@ public class Cube {
 //	texture[3] += x1;
 //	texture[4] += y0;
 //	texture[5] += x0;
-    
+
     public static float[] get_texture(int side_idx, int x0, int y0, int x1, int y1) {
-    	float[] texture = get_texture(side_idx);
-    	texture[0] += y1;
-    	texture[1] += x1;
-    	texture[2] += y0;
-    	texture[3] += x1;
-    	texture[4] += y0;
-    	texture[5] += x0;
-    	
-    	texture[6] += x0;
-    	texture[7] += y0;
-    	texture[8] += x1;
-    	texture[9] += y0;
-    	texture[10] += x1;
-    	texture[11] += y1;
-    	return texture;
+        float[] texture = new float[12];
+        texture[0] += x1;
+        texture[1] += y1;
+        texture[2] += x0;
+        texture[3] += y0;
+        texture[4] += x1;
+        texture[5] += y0;
+
+        texture[6] += -x0;
+        texture[7] += -y0;
+        texture[8] += -x1;
+        texture[9] += -y0;
+        texture[10] += -x1;
+        texture[11] += -y1;
+        return texture;
     }
 
     // Docs for pack/unpack function placed in Cube class
@@ -174,7 +174,7 @@ public class Cube {
         int v = visibility ? 1 : 0;
         return val | ((v & 511) << 15);
     }
-    
+
     public static final float[] right_vertices = new float[]{
             // 2 - 1 - 7
             -0.5f, 0.5f, 0.5f,
@@ -185,15 +185,15 @@ public class Cube {
             -0.5f, 0.5f, 0.5f,
             0.5f, -0.5f, 0.5f,
     };
-    
+
     public static final float[] right_texture = {
-	        16.0f, 16.0f,
-	        16.0f, 0.0f,
-	        0.0f, 0.0f,
-	        
-	        0.0f, 0.0f,
-	        0.0f, 0.0f,
-	        0.0f, 0.0f
+            16.0f, 16.0f,
+            16.0f, 0.0f,
+            0.0f, 0.0f,
+
+            0.0f, 0.0f,
+            0.0f, 0.0f,
+            0.0f, 0.0f
     };
 
     public static final float[] left_vertices = new float[]{
@@ -207,15 +207,15 @@ public class Cube {
             -0.5f, 0.5f, -0.5f,
             0.5f, -0.5f, -0.5f
     };
-    
+
     public static final float[] left_texture = {
-	        16.0f, 16.0f,
-	        16.0f, 0.0f,
-	        0.0f, 0.0f,
-	        
-	        0.0f, 0.0f,
-	        0.0f, 0.0f,
-	        0.0f, 0.0f
+            16.0f, 16.0f,
+            16.0f, 0.0f,
+            0.0f, 0.0f,
+
+            0.0f, 0.0f,
+            0.0f, 0.0f,
+            0.0f, 0.0f
     };
 
     public static final float[] front_vertices = new float[]{
@@ -229,15 +229,15 @@ public class Cube {
             0.5f, 0.5f, 0.5f,
             0.5f, 0.5f, -0.5f,
     };
-    
+
     public static final float[] front_texture = {
-	        16.0f, 16.0f,
-	        16.0f, 0.0f,
-	        0.0f, 0.0f,
-	        
-	        0.0f, 0.0f,
-	        0.0f, 0.0f,
-	        0.0f, 0.0f
+            16.0f, 16.0f,
+            16.0f, 0.0f,
+            0.0f, 0.0f,
+
+            0.0f, 0.0f,
+            0.0f, 0.0f,
+            0.0f, 0.0f
     };
 
     public static final float[] back_vertices = new float[]{
@@ -251,15 +251,15 @@ public class Cube {
             -0.5f, 0.5f, 0.5f,
             -0.5f, 0.5f, -0.5f,
     };
-    
+
     public static final float[] back_texture = {
-	        0.0f, 0.0f,
-	        0.0f, 0.0f,
-	        0.0f, 0.0f,
-	        
-	        0.0f, 0.0f,
-	        0.0f, 0.0f,
-	        0.0f, 0.0f
+            0.0f, 0.0f,
+            0.0f, 0.0f,
+            0.0f, 0.0f,
+
+            0.0f, 0.0f,
+            0.0f, 0.0f,
+            0.0f, 0.0f
     };
 
     public static final float[] bottom_vertices = new float[]{
@@ -272,18 +272,18 @@ public class Cube {
             -0.5f, -0.5f, 0.5f,
             -0.5f, -0.5f, -0.5f,
     };
-    
+
     public static final float[] bottom_texture = {
-	        1.0f, 0.0f,
-	        1.0f, 1.0f,
-	        0.0f, 1.0f,
-	        
-	        0.0f, 0.0f,
-	        0.0f, 0.0f,
-	        0.0f, 0.0f
+            0.0f, 0.0f,
+            0.0f, 0.0f,
+            0.0f, 0.0f,
+
+            0.0f, 0.0f,
+            0.0f, 0.0f,
+            0.0f, 0.0f
     };
 
-    public static final float[] top_vertices = new float[] {
+    public static final float[] top_vertices = new float[]{
             // 4 - 3 - 6
             0.5f, 0.5f, 0.5f,
             -0.5f, 0.5f, -0.5f,
@@ -294,15 +294,15 @@ public class Cube {
             -0.5f, 0.5f, 0.5f,
             -0.5f, 0.5f, -0.5f
     };
-    
+
     public static final float[] top_texture = {
-	        16.0f, 16.0f,
-	        16.0f, 0.0f,
-	        0.0f, 0.0f,
-	        
-	        0.0f, 0.0f,
-	        0.0f, 0.0f,
-	        0.0f, 0.0f
+            16.0f, 16.0f,
+            16.0f, 0.0f,
+            0.0f, 0.0f,
+
+            0.0f, 0.0f,
+            0.0f, 0.0f,
+            0.0f, 0.0f
     };
 
     public static final int cube_side_vertices_size = right_vertices.length;

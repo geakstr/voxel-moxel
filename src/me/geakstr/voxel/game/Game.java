@@ -23,7 +23,7 @@ public class Game {
         World.init(1, 1, 10, 4, 4);
         World.gen();
         
-        ResourceUtil.loadTextures("stone.png");
+        ResourceUtil.loadTextures("stone2.png");
         glEnable(GL_TEXTURE_2D);
     }
 
