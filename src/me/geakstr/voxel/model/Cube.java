@@ -130,32 +130,28 @@ public class Cube {
     public static float[] get_texture(int side_idx, int x0, int y0, int x1, int y1) {
         float[] texture = new float[12];
 
+        int xx = x1 - x0 + 1;
+        int yy = y1 - y0 + 1;
         if (side_idx == 4 || side_idx == 5) {
-            texture[1] += y1 - y0 + 1;
-            texture[2] += x1 - x0 + 1;
+            texture[1] = yy;
+            texture[2] = xx;
 
-            texture[6] -= x1 - x0 + 1;
-            texture[11] -= y1 - y0 + 1;
+            texture[6] = -xx;
+            texture[11] = -yy;
         } else if (side_idx == 0 || side_idx == 1) {
-            texture[0] += y1 - y0 + 1;
-            texture[5] += 1;
+            texture[0] = yy;
+            texture[5] = 1;
 
-            texture[7] -= 1;
-            texture[8] -= y1 - y0 + 1;
+            texture[7] = -1;
+            texture[8] = -yy;
         } else if (side_idx == 2 || side_idx == 3) {
-            texture[0] += 0;
-            texture[1] += 0;
-            texture[2] += 0;
-            texture[3] += 1;
-            texture[4] += x1 - x0 + 1;
-            texture[5] += 1;
+            texture[3] = 1;
+            texture[4] = xx;
+            texture[5] = 1;
 
-            texture[6] += 0;
-            texture[7] -= 1;
-            texture[8] -= x1 - x0 + 1;
-            texture[9] -= 1;
-            texture[10] += 0;
-            texture[11] += 0;
+            texture[7] = -1;
+            texture[8] = -xx;
+            texture[9] = -1;
         }
         return texture;
     }
