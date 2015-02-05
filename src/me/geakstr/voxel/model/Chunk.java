@@ -1,8 +1,11 @@
 package me.geakstr.voxel.model;
 
+import me.geakstr.voxel.math.Vector2f;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class Chunk extends Mesh {
     public int[][][] cubes; // [x][y][z]
@@ -24,12 +27,12 @@ public class Chunk extends Mesh {
         this.z_offset = z_chunk_pos * World.chunk_height;
 
         this.vertices_size = World.chunk_volume * Cube.cube_side_vertices_size * 6;
-        this.texture_coords_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
-        //this.indices_size = volume * 36 + width;
+        this.textures_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
+        this.textures_offsets_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
 
         this.vertices = new float[vertices_size];
-        this.texture_coords = new float[texture_coords_size];
-        //this.indices = new int[indices_size];
+        this.textures = new float[textures_size];
+        this.textures_offsets = new float[textures_offsets_size];
 
         this.cubes = new int[World.chunk_width][World.chunk_length][World.chunk_height];
         this.changed = true;
@@ -38,8 +41,10 @@ public class Chunk extends Mesh {
     public void update() {
         changed = false;
 
+        Random rnd = new Random();
+
         int next_color = 512;
-        int vertices_offset = 0, texture_offset = 0/*, indices_offset = 0*/;
+        int vertices_offset = 0, texture_offset = 0, offsets_offset = 0;
         for (int z = 0; z < World.chunk_height; z++) {
             int[][] mark = new int[World.chunk_length][World.chunk_width];
             int[] proj = new int[mark[0].length];
@@ -106,14 +111,21 @@ public class Chunk extends Mesh {
                 int x1 = coords[2], y1 = coords[3];
 
                 boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
+
+                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.atlas.get("cobblestone") : TextureAtlas.atlas.get("dirt_with_grass");
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
                         float[] side = Cube.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset);
-                        float[] texture = Cube.get_texture(side_idx, x0, y0, x1, y1);
-                        System.arraycopy(texture, 0, texture_coords, texture_offset, Cube.cube_side_texture_size);
-                        texture_offset += Cube.cube_side_texture_size;
                         System.arraycopy(side, 0, vertices, vertices_offset, Cube.cube_side_vertices_size);
                         vertices_offset += Cube.cube_side_vertices_size;
+
+                        float[] texture = Cube.get_texture(side_idx, x0, y0, x1, y1);
+                        System.arraycopy(texture, 0, textures, texture_offset, Cube.cube_side_texture_size);
+                        texture_offset += Cube.cube_side_texture_size;
+
+                        float[] offset = new float[]{tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y,};
+                        System.arraycopy(offset, 0, textures_offsets, offsets_offset, Cube.cube_side_texture_size);
+                        offsets_offset += Cube.cube_side_texture_size;
                     }
                 }
             }
@@ -122,8 +134,11 @@ public class Chunk extends Mesh {
         vertices = Arrays.copyOfRange(vertices, 0, vertices_offset);
         vertices_size = vertices_offset;
 
-        texture_coords = Arrays.copyOfRange(texture_coords, 0, texture_offset);
-        texture_coords_size = texture_offset;
+        textures = Arrays.copyOfRange(textures, 0, texture_offset);
+        textures_size = texture_offset;
+
+        textures_offsets = Arrays.copyOfRange(textures_offsets, 0, offsets_offset);
+        textures_offsets_size = offsets_offset;
 
         fill_buffers();
     }

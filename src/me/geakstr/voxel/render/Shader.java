@@ -5,16 +5,23 @@ import me.geakstr.voxel.math.Vector3f;
 import me.geakstr.voxel.util.ExtendedBufferUtil;
 import me.geakstr.voxel.util.ResourceUtil;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL20.*;
 
 public class Shader {
-    private int program;
-    private int vertex_shader;
-    private int fragment_shader;
+    public int program;
+    public int vertex_shader;
+    public int fragment_shader;
+
+    public Map<String, Integer> attributes;
 
     public Shader(String vertex_shader_name, String fragment_shader_name) {
         this.program = glCreateProgram();
+        this.attributes = new HashMap<>();
+
         attach_vertex_shader(vertex_shader_name);
         attach_fragment_shader(fragment_shader_name);
     }
@@ -61,6 +68,22 @@ public class Shader {
 
     public void set_uniform(String name, float value) {
         glUniform1f(glGetUniformLocation(program, name), value);
+    }
+
+    public Shader save_attr(String attr_name) {
+        attributes.put(attr_name, glGetAttribLocation(program, attr_name));
+        return this;
+    }
+
+    public int attr(String attr_name) {
+        if (!attributes.containsKey(attr_name)) {
+            try {
+                throw new Exception("This attribute not saved in map");
+            } catch (Exception e) {
+                dispose();
+            }
+        }
+        return attributes.get(attr_name);
     }
 
     private void attach_vertex_shader(String shader_name) {

@@ -5,9 +5,9 @@ import me.geakstr.voxel.render.Frustum;
 import java.util.Random;
 
 public class World {
-    public static int world_size; // world_size * world_size chunks
+    public static int world_size;
     public static int world_height;
-    public static int world_volume;
+    public static int world_volume; // world_size * world_size * world_height chunks
 
     public static int chunk_height; // z axis size
     public static int chunk_width; // x axis size

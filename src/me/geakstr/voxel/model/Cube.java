@@ -128,7 +128,7 @@ public class Cube {
     }
 
     public static float[] get_texture(int side_idx, int x0, int y0, int x1, int y1) {
-        float[] texture = new float[12];
+        float[] texture = new float[cube_side_texture_size];
 
         int xx = x1 - x0 + 1;
         int yy = y1 - y0 + 1;

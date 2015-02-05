@@ -1,9 +1,11 @@
 package me.geakstr.voxel.util;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL14;
 
 import javax.imageio.ImageIO;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -12,71 +14,66 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+
 
 public class ResourceUtil {
+    private static Map<String, Integer> textures = new HashMap<>();
 
-	private static Map<String, Integer> textures = new HashMap<String, Integer>();
-	
     public static String load_shader(String shader_name) {
         return FileUtil.readFromFile("res/shaders/" + shader_name);
     }
-    
+
     public static void loadTextures(String... names) {
         for (String name : names) load_texture(name);
     }
 
     public static int load_texture(String texture_name) {
-        if (textures.get(texture_name) != null) {
+        if (textures.containsKey(texture_name)) {
             return textures.get(texture_name);
         }
 
-        BufferedImage bimg = null;
+        BufferedImage img = null;
         try {
-            bimg = ImageIO.read(new File("res/textures/" + texture_name));
+            img = ImageIO.read(new File("res/textures/" + texture_name));
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Unable to load Texture: " + texture_name);
             System.exit(1);
         }
 
-        int[] pixels = new int[bimg.getWidth() * bimg.getHeight()];
-        bimg.getRGB(0, 0, bimg.getWidth(), bimg.getHeight(), pixels, 0, bimg.getWidth());
-        ByteBuffer buffer = BufferUtils.createByteBuffer(bimg.getWidth() * bimg.getHeight() * 4);
-        
-        // Iterate through all the pixels and add them to the ByteBuffer
-        for (int y = 0; y < bimg.getHeight(); y++) {
-            for (int x = 0; x < bimg.getWidth(); x++) {
-                // Select the pixel
-                int pixel = pixels[y * bimg.getWidth() + x];
-                // Add the RED component
+        int[] pixels = new int[img.getWidth() * img.getHeight()];
+        img.getRGB(0, 0, img.getWidth(), img.getHeight(), pixels, 0, img.getWidth());
+        ByteBuffer buffer = BufferUtils.createByteBuffer(img.getWidth() * img.getHeight() * 4);
+
+        for (int y = 0; y < img.getHeight(); y++) {
+            for (int x = 0; x < img.getWidth(); x++) {
+                int pixel = pixels[y * img.getWidth() + x];
                 buffer.put((byte) ((pixel >> 16) & 0xFF));
-                // Add the GREEN component
                 buffer.put((byte) ((pixel >> 8) & 0xFF));
-                // Add the BLUE component
                 buffer.put((byte) (pixel & 0xFF));
-                // Add the ALPHA component
                 buffer.put((byte) ((pixel >> 24) & 0xFF));
             }
         }
         buffer.flip();
 
-        int textureID = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, textureID);
+        int texture_id = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texture_id);
 
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, bimg.getWidth(), bimg.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, img.getWidth(), img.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
-        textures.put(texture_name, textureID);
-        return textureID;
+        textures.put(texture_name, texture_id);
+        return texture_id;
     }
-    
+
     public static int getTexturesID(String texture_name) {
         return textures.get(texture_name);
     }
-    
+
 }

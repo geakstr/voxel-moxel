@@ -13,14 +13,16 @@ public class Game {
     public static Shader world_shader;
 
     public static void init() {
-        ResourceUtil.loadTextures("stone2.png", "stone.png", "dirt.png");
+        ResourceUtil.loadTextures("atlas.png");
 
         Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 100f);
 
         world_shader = new Shader("simple.vs", "simple.fs").compile();
+        world_shader.save_attr("attr_pos").save_attr("attr_texture_offset");
+
         world_transform = new Transform();
 
-        World.init(4, 4, 4, 4, 4);
+        World.init(1, 1, 16, 16, 16);
         World.gen();
     }
 
@@ -35,7 +37,7 @@ public class Game {
         world_shader.set_uniform("uniform_transform", world_transform.getTransform());
         world_shader.set_uniform("uniform_camera_projection", Camera.projection);
         world_shader.set_uniform("uniform_camera_view", Camera.view);
-        world_shader.set_uniform("texture", 0);
+        world_shader.set_uniform("uniform_texture", 0);
     }
 
     public static void render() {
