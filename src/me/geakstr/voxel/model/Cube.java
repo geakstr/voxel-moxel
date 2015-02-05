@@ -139,11 +139,11 @@ public class Cube {
             texture[6] = -xx;
             texture[11] = -yy;
         } else if (side_idx == 0 || side_idx == 1) {
-            texture[0] = yy;
-            texture[5] = 1;
+            texture[0] = -yy;
+            texture[5] = -1;
 
-            texture[7] = -1;
-            texture[8] = -yy;
+            texture[7] = 1;
+            texture[8] = yy;
         } else if (side_idx == 2 || side_idx == 3) {
             texture[3] = 1;
             texture[4] = xx;
