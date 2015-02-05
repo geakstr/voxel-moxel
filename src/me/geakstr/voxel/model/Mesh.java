@@ -39,7 +39,7 @@ public class Mesh {
     }
 
     public void render() {
-        glBindTexture(GL_TEXTURE_2D, ResourceUtil.getTexturesID("stone.png"));
+        glBindTexture(GL_TEXTURE_2D, ResourceUtil.getTexturesID("stone2.png"));
 
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
