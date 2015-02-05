@@ -13,7 +13,7 @@ public class Game {
     public static Shader world_shader;
 
     public static void init() {
-        ResourceUtil.loadTextures("stone2.png", "stone.png");
+        ResourceUtil.loadTextures("stone2.png", "stone.png", "dirt.png");
 
         Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 100f);
 

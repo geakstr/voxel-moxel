@@ -9,6 +9,8 @@ First 16 bits (from left to right) is a type of block (511 possible values)
 Next 1 bit is a visibility (1 - vis, 0 - invis)
  */
 public class Cube {
+    public static final int cube_side_vertices_size = 18;
+    public static final int cube_side_texture_size = 12;
 
     public static float[] get_side(int side_idx, int x0, int y0, int x1, int y1, int z) {
         float[] side = get_side(side_idx);
@@ -148,12 +150,26 @@ public class Cube {
             texture[2] += 0;
             texture[3] += 0;
             texture[4] += 0;
+            texture[5] += -(y1 - y0 + 1);
+
+            texture[6] += 0;
+            texture[7] += y1 - y0 + 1;
+            texture[8] += x1 - x0 + 1;
+            texture[9] += 0;
+            texture[10] += 0;
+            texture[11] += 0;
+        } else if (side_idx == 2 || side_idx == 3) {
+            texture[0] += 0;
+            texture[1] += 0;
+            texture[2] += 0;
+            texture[3] += 1;
+            texture[4] += 1 + x1 - x0;
             texture[5] += 1;
 
             texture[6] += 0;
-            texture[7] += 0;
-            texture[8] += 0;
-            texture[9] += 0;
+            texture[7] += -1;
+            texture[8] += -(1 + x1 - x0);
+            texture[9] += -1;
             texture[10] += 0;
             texture[11] += 0;
         }
@@ -183,10 +199,11 @@ public class Cube {
             -0.5f, 0.5f, 0.5f,
             -0.5f, -0.5f, 0.5f,
             0.5f, -0.5f, 0.5f,
+
             // 4 - 2 - 7
             0.5f, 0.5f, 0.5f,
             -0.5f, 0.5f, 0.5f,
-            0.5f, -0.5f, 0.5f,
+            0.5f, -0.5f, 0.5f
     };
 
     public static final float[] left_vertices = new float[]{
@@ -210,7 +227,7 @@ public class Cube {
             // 5 - 4 - 6
             0.5f, -0.5f, -0.5f,
             0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, -0.5f,
+            0.5f, 0.5f, -0.5f
     };
 
     public static final float[] back_vertices = new float[]{
@@ -222,7 +239,7 @@ public class Cube {
             // 0 - 2 - 3
             -0.5f, -0.5f, -0.5f,
             -0.5f, 0.5f, 0.5f,
-            -0.5f, 0.5f, -0.5f,
+            -0.5f, 0.5f, -0.5f
     };
 
     public static final float[] bottom_vertices = new float[]{
@@ -230,10 +247,11 @@ public class Cube {
             0.5f, -0.5f, 0.5f,
             -0.5f, -0.5f, -0.5f,
             0.5f, -0.5f, -0.5f,
+
             // 7 - 1 - 0
             0.5f, -0.5f, 0.5f,
             -0.5f, -0.5f, 0.5f,
-            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f
     };
 
     public static final float[] top_vertices = new float[]{
@@ -247,8 +265,4 @@ public class Cube {
             -0.5f, 0.5f, 0.5f,
             -0.5f, 0.5f, -0.5f
     };
-
-    public static final int cube_side_vertices_size = 18;
-    public static final int cube_side_texture_size = 12;
-
 }
