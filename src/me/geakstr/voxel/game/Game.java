@@ -7,24 +7,21 @@ import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.render.Shader;
 import me.geakstr.voxel.render.Transform;
 import me.geakstr.voxel.util.ResourceUtil;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 
 public class Game {
     public static Transform world_transform;
     public static Shader world_shader;
 
     public static void init() {
+        ResourceUtil.loadTextures("stone2.png", "stone.png");
+
         Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 100f);
 
         world_shader = new Shader("simple.vs", "simple.fs").compile();
         world_transform = new Transform();
 
-        World.init(4, 4, 5, 8, 4);
+        World.init(4, 4, 4, 4, 4);
         World.gen();
-        
-        ResourceUtil.loadTextures("stone2.png", "stone.png");
-        glEnable(GL_TEXTURE_2D);
     }
 
     public static void before_render() {

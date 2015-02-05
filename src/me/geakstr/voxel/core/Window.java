@@ -68,6 +68,7 @@ public class Window {
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FRAMEBUFFER_SRGB);
+        glEnable(GL_TEXTURE_2D);
 
         glViewport(0, 0, Math.max(Window.width, Window.height), Math.max(Window.width, Window.height));
 
@@ -92,12 +93,16 @@ public class Window {
 
     public static void destroy() {
         glfwDestroyWindow(window);
-        keyCallback.release();
+        if (keyCallback != null) {
+            keyCallback.release();
+        }
     }
 
     public static void terminate() {
         glfwTerminate();
-        errorCallback.release();
+        if (errorCallback != null) {
+            errorCallback.release();
+        }
     }
 
     public static boolean should_close() {
