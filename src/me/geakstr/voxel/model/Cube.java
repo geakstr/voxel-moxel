@@ -146,16 +146,16 @@ public class Cube {
             texture[11] -= y1 - y0 + 1;
         } else if (side_idx == 0 || side_idx == 1) {
             texture[0] += 0;
-            texture[1] += 0;
+            texture[1] += y1 - y0 + 1;
             texture[2] += 0;
             texture[3] += 0;
-            texture[4] += 0;
-            texture[5] += -(y1 - y0 + 1);
+            texture[4] += 1;
+            texture[5] += 0;
 
-            texture[6] += 0;
-            texture[7] += y1 - y0 + 1;
-            texture[8] += x1 - x0 + 1;
-            texture[9] += 0;
+            texture[6] -= 1;
+            texture[7] += 0;
+            texture[8] += 0;
+            texture[9] -= y1 - y0 + 1;
             texture[10] += 0;
             texture[11] += 0;
         } else if (side_idx == 2 || side_idx == 3) {
