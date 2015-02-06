@@ -6,14 +6,12 @@ import me.geakstr.voxel.util.ResourceUtil;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
 
 public class Mesh {
-    public float[] vertices;
-    public float[] textures;
+    public int[] vertices;
+    public int[] textures;
     public float[] textures_offsets;
 
     public int vertices_size;
@@ -27,7 +25,7 @@ public class Mesh {
 
     public Mesh() {}
 
-    public Mesh(float[] vertices, float[] textures, float[] textures_offsets) {
+    public Mesh(int[] vertices, int[] textures, float[] textures_offsets) {
         this.vertices = vertices;
         this.vertices_size = vertices.length;
         this.textures = textures;
@@ -51,12 +49,15 @@ public class Mesh {
     public void init_vbo() {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(vertices), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glBindBuffer(GL_ARRAY_BUFFER, tbo);
         glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(textures), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glBindBuffer(GL_ARRAY_BUFFER, tobo);
         glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(textures_offsets), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     public void init_vao() {
@@ -69,22 +70,20 @@ public class Mesh {
         glEnableVertexAttribArray(Game.world_shader.attr("attr_tex_coord"));
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glVertexAttribPointer(Game.world_shader.attr("attr_pos"), 3, GL_FLOAT, false, 0, 0);
+        glVertexAttribPointer(Game.world_shader.attr("attr_pos"), 3, GL_INT, false, 0, 0);
 
+        glBindBuffer(GL_ARRAY_BUFFER, tbo);
+        glVertexAttribPointer(Game.world_shader.attr("attr_tex_coord"), 2, GL_INT, false, 0, 0);
 
         glBindBuffer(GL_ARRAY_BUFFER, tobo);
         glVertexAttribPointer(Game.world_shader.attr("attr_tex_offset"), 2, GL_FLOAT, false, 0, 0);
-
-
-        glBindBuffer(GL_ARRAY_BUFFER, tbo);
-        glVertexAttribPointer(Game.world_shader.attr("attr_tex_coord"), 2, GL_FLOAT, false, 0, 0);
 
         glBindVertexArray(0);
     }
 
     public void render() {
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, vertices_size * 3);
+        glDrawArrays(GL_TRIANGLES, 0, vertices_size);
         glBindVertexArray(0);
     }
 }

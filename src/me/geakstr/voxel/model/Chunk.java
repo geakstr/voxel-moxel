@@ -30,8 +30,8 @@ public class Chunk extends Mesh {
         this.textures_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
         this.textures_offsets_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
 
-        this.vertices = new float[vertices_size];
-        this.textures = new float[textures_size];
+        this.vertices = new int[vertices_size];
+        this.textures = new int[textures_size];
         this.textures_offsets = new float[textures_offsets_size];
 
         this.cubes = new int[World.chunk_width][World.chunk_length][World.chunk_height];
@@ -112,14 +112,14 @@ public class Chunk extends Mesh {
 
                 boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
 
-                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.atlas.get("cobblestone") : TextureAtlas.atlas.get("dirt_with_grass");
+                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.atlas.get("cobblestone") : TextureAtlas.atlas.get("grass");
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        float[] side = Cube.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset);
+                        int[] side = Cube.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset);
                         System.arraycopy(side, 0, vertices, vertices_offset, Cube.cube_side_vertices_size);
                         vertices_offset += Cube.cube_side_vertices_size;
 
-                        float[] texture = Cube.get_texture(side_idx, x0, y0, x1, y1);
+                        int[] texture = Cube.get_texture(side_idx, x0, y0, x1, y1);
                         System.arraycopy(texture, 0, textures, texture_offset, Cube.cube_side_texture_size);
                         texture_offset += Cube.cube_side_texture_size;
 

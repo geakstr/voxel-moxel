@@ -12,8 +12,8 @@ public class Cube {
     public static final int cube_side_vertices_size = 18;
     public static final int cube_side_texture_size = 12;
 
-    public static float[] get_side(int side_idx, int x0, int y0, int x1, int y1, int z) {
-        float[] side = get_side(side_idx);
+    public static int[] get_side(int side_idx, int x0, int y0, int x1, int y1, int z) {
+        int[] side = get_side(side_idx);
 
         if (side_idx == 0 || side_idx == 1) {
             if (side_idx == 1) {
@@ -102,8 +102,8 @@ public class Cube {
         return side;
     }
 
-    public static float[] get_side(int side_idx) {
-        float[] side = null;
+    public static int[] get_side(int side_idx) {
+        int[] side = null;
         switch (side_idx) {
             case 0:
                 side = Arrays.copyOf(back_vertices, cube_side_vertices_size);
@@ -127,8 +127,8 @@ public class Cube {
         return side;
     }
 
-    public static float[] get_texture(int side_idx, int x0, int y0, int x1, int y1) {
-        float[] texture = new float[cube_side_texture_size];
+    public static int[] get_texture(int side_idx, int x0, int y0, int x1, int y1) {
+        int[] texture = new int[cube_side_texture_size];
 
         int xx = x1 - x0 + 1;
         int yy = y1 - y0 + 1;
@@ -174,75 +174,75 @@ public class Cube {
         return val | ((v & 511) << 15);
     }
 
-    public static final float[] right_vertices = new float[]{
+    public static final int[] right_vertices = new int[]{
             // 2 - 1 - 7
-            -0.5f, 0.5f, 0.5f,
-            -0.5f, -0.5f, 0.5f,
-            0.5f, -0.5f, 0.5f,
+            0, 1, 1,
+            0, 0, 1,
+            1, 0, 1,
 
             // 4 - 2 - 7
-            0.5f, 0.5f, 0.5f,
-            -0.5f, 0.5f, 0.5f,
-            0.5f, -0.5f, 0.5f
+            1, 1, 1,
+            0, 1, 1,
+            1, 0, 1
     };
 
-    public static final float[] left_vertices = new float[]{
+    public static final int[] left_vertices = new int[]{
             // 3 - 0 - 5
-            -0.5f, 0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
+            0, 1, 0,
+            0, 0, 0,
+            1, 0, 0,
 
             // 6 - 3 - 5
-            0.5f, 0.5f, -0.5f,
-            -0.5f, 0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f
+            1, 1, 0,
+            0, 1, 0,
+            1, 0, 0
     };
 
-    public static final float[] front_vertices = new float[]{
+    public static final int[] front_vertices = new int[]{
             // 5 - 7 - 4
-            0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f, 0.5f,
-            0.5f, 0.5f, 0.5f,
+            1, 0, 0,
+            1, 0, 1,
+            1, 1, 1,
 
             // 5 - 4 - 6
-            0.5f, -0.5f, -0.5f,
-            0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, -0.5f
+            1, 0, 0,
+            1, 1, 1,
+            1, 1, 0
     };
 
-    public static final float[] back_vertices = new float[]{
+    public static final int[] back_vertices = new int[]{
             // 0 - 1 - 2
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, 0.5f,
-            -0.5f, 0.5f, 0.5f,
+            0, 0, 0,
+            0, 0, 1,
+            0, 1, 1,
 
             // 0 - 2 - 3
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, 0.5f, 0.5f,
-            -0.5f, 0.5f, -0.5f
+            0, 0, 0,
+            0, 1, 1,
+            0, 1, 0
     };
 
-    public static final float[] bottom_vertices = new float[]{
+    public static final int[] bottom_vertices = new int[]{
             // 7 - 0 - 5
-            0.5f, -0.5f, 0.5f,
-            -0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
+            1, 0, 1,
+            0, 0, 0,
+            1, 0, 0,
 
             // 7 - 1 - 0
-            0.5f, -0.5f, 0.5f,
-            -0.5f, -0.5f, 0.5f,
-            -0.5f, -0.5f, -0.5f
+            1, 0, 1,
+            0, 0, 1,
+            0, 0, 0
     };
 
-    public static final float[] top_vertices = new float[]{
+    public static final int[] top_vertices = new int[]{
             // 4 - 3 - 6
-            0.5f, 0.5f, 0.5f,
-            -0.5f, 0.5f, -0.5f,
-            0.5f, 0.5f, -0.5f,
+            1, 1, 1,
+            0, 1, 0,
+            1, 1, 0,
 
             // 4 - 2 - 3
-            0.5f, 0.5f, 0.5f,
-            -0.5f, 0.5f, 0.5f,
-            -0.5f, 0.5f, -0.5f
+            1, 1, 1,
+            0, 1, 1,
+            0, 1, 0
     };
 }
