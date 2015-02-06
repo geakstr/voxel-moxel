@@ -24,7 +24,7 @@ public class ResourceUtil {
         return FileUtil.readFromFile("res/shaders/" + shader_name);
     }
 
-    public static void loadTextures(String... names) {
+    public static void load_textures(String... names) {
         for (String name : names) load_texture(name);
     }
 
@@ -72,7 +72,7 @@ public class ResourceUtil {
         return texture_id;
     }
 
-    public static int getTexturesID(String texture_name) {
+    public static int texture_id(String texture_name) {
         return textures.get(texture_name);
     }
 

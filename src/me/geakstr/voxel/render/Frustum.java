@@ -109,10 +109,10 @@ public class Frustum {
                 pointInFrustum(x_mul_width + width + 1, z_mul_height - 1, y_mul_length - 1) ||
                 pointInFrustum(x_mul_width + width + 1, z_mul_height - 1, y_mul_length + length + 1) ||
 
-                pointInFrustum(x_mul_width - 1, half_height, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width - 1, half_height, y_mul_length + length + 1) ||
-                pointInFrustum(x_mul_width + width + 1, half_height, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width + width + 1, half_height, y_mul_length + length + 1) ||
+                pointInFrustum(x_mul_width - 1, z_mul_height + half_height, y_mul_length - 1) ||
+                pointInFrustum(x_mul_width - 1, z_mul_height + half_height, y_mul_length + length + 1) ||
+                pointInFrustum(x_mul_width + width + 1, z_mul_height + half_height, y_mul_length - 1) ||
+                pointInFrustum(x_mul_width + width + 1, z_mul_height + half_height, y_mul_length + length + 1) ||
 
                 pointInFrustum(x_mul_width - 1, z_mul_height + height + 1, y_mul_length - 1) ||
                 pointInFrustum(x_mul_width - 1, z_mul_height + height + 1, y_mul_length + length + 1) ||

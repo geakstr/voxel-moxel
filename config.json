@@ -1,0 +1,12 @@
+{
+  "screen_resolution" : [800, 600],
+  "texture_atlas" : {
+    "grass" : [0, 0],
+    "stone" : [1, 0],
+    "dirt" : [2, 0],
+    "dirt_with_grass": [3, 0],
+    "wood_0" : [4, 0],
+
+    "cobblestone" : [0, 1]
+  }
+}

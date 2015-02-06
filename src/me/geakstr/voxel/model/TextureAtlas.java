@@ -12,6 +12,7 @@ public class TextureAtlas {
     public static final float gl_pixel_size = (float) 1 / (float) atlas_size;
     public static final float gl_crop_size = gl_pixel_size * crop_size;
 
+
     public static final Map<String, Integer> title_to_id = new HashMap<String, Integer>() {{
         put("grass", 1);
         put("stone", 2);

@@ -140,7 +140,7 @@ public class Chunk extends Mesh {
         textures_offsets = Arrays.copyOfRange(textures_offsets, 0, offsets_offset);
         textures_offsets_size = offsets_offset;
 
-        fill_buffers();
+        prepare_render();
     }
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {

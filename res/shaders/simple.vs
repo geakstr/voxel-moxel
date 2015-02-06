@@ -1,9 +1,11 @@
-#version 120
+#version 330 core
 
-attribute vec3 attr_pos;
-attribute vec2 attr_texture_offset;
+in vec3 attr_pos;
+in vec2 attr_tex_offset;
+in vec2 attr_tex_coord;
 
-varying vec2 out_texture_offset;
+out vec2 out_tex_offset;
+out vec2 out_tex_coord;
 
 uniform mat4 uniform_transform;
 uniform mat4 uniform_camera_view;
@@ -11,7 +13,8 @@ uniform mat4 uniform_camera_projection;
 
 void main()
 {
-    out_texture_offset = attr_texture_offset;
-	gl_TexCoord[0] = gl_MultiTexCoord0;
+    out_tex_offset = attr_tex_offset;
+	out_tex_coord = attr_tex_coord;
+
     gl_Position = uniform_camera_projection * uniform_camera_view * uniform_transform * vec4(attr_pos, 1.0);
 }
