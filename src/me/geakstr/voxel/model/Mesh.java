@@ -12,6 +12,11 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class Mesh {
+    public Integer[] vertices;
+    public Integer[] textures;
+    public Float[] textures_offsets;
+    public Float[] colors;
+
     public int vertices_size;
     public int textures_size;
     public int textures_offsets_size;
@@ -23,7 +28,19 @@ public class Mesh {
     public int tobo; // texture offset buffer
     public int cbo; // color buffer
 
-    public Mesh() {}
+    public int oq;
+
+    public Mesh() {
+        this.vertices = new Integer[]{};
+        this.textures = new Integer[]{};
+        this.textures_offsets = new Float[]{};
+        this.colors = new Float[]{};
+
+        this.vertices_size = 0;
+        this.textures_size = 0;
+        this.textures_offsets_size = 0;
+        this.colors_size = 0;
+    }
 
     public void gen_buffers() {
         vao = glGenVertexArrays();
@@ -33,17 +50,14 @@ public class Mesh {
         cbo = glGenBuffers();
     }
 
-    public void prepare_render(Integer[] vertices, Integer[] textures, Float[] textures_offsets, Float[] colors) {
-        init_vbo(vertices, textures, textures_offsets, colors);
-        init_vao();
+    public void prepare_render() {
+        if (vertices_size > 0) {
+            init_vbo();
+            init_vao();
+        }
     }
 
-    public void init_vbo(Integer[] vertices, Integer[] textures, Float[] textures_offsets, Float[] colors) {
-        vertices_size = vertices.length;
-        textures_size = textures.length;
-        textures_offsets_size = textures_offsets.length;
-        colors_size = colors.length;
-
+    public void init_vbo() {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(vertices), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -87,9 +101,12 @@ public class Mesh {
     }
 
     public void render() {
-        glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, vertices_size);
-        glBindVertexArray(0);
-        World.faces_in_frame += vertices_size / 3;
+        if (vertices_size > 0) {
+            glBindVertexArray(vao);
+            glDrawArrays(GL_TRIANGLES, 0, vertices_size);
+            glBindVertexArray(0);
+
+            World.faces_in_frame += vertices_size / 3;
+        }
     }
 }

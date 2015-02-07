@@ -7,10 +7,12 @@ import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.render.Shader;
 import me.geakstr.voxel.render.Transform;
 import me.geakstr.voxel.util.ResourceUtil;
+import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
 
 public class Game {
     public static Transform world_transform;
     public static Shader world_shader;
+    public static ChunksWorkersExecutorService chunks_workers_executor_service;
 
     public static void init() {
         ResourceUtil.load_textures("atlas.png");
@@ -22,7 +24,9 @@ public class Game {
 
         world_transform = new Transform();
 
-        World.init(4, 4, 16, 16, 16);
+        chunks_workers_executor_service = new ChunksWorkersExecutorService();
+
+        World.init(16, 16, 16, 16, 16);
         World.gen();
     }
 
