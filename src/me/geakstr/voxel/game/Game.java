@@ -18,7 +18,7 @@ public class Game {
         Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 500f);
 
         world_shader = new Shader("simple.vs", "simple.fs").compile();
-        world_shader.save_attr("attr_pos").save_attr("attr_tex_offset").save_attr("attr_tex_coord");
+        world_shader.save_attr("attr_pos").save_attr("attr_tex_offset").save_attr("attr_tex_coord").save_attr("attr_color");
 
         world_transform = new Transform();
 

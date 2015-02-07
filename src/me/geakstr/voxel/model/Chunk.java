@@ -40,6 +40,7 @@ public class Chunk extends Mesh {
         List<Integer> vertices = new ArrayList<>();
         List<Integer> textures = new ArrayList<>();
         List<Float> textures_offsets = new ArrayList<>();
+        List<Float> colors = new ArrayList<>();
 
         int next_color = 512;
         for (int z = 0; z < World.chunk_height; z++) {
@@ -108,18 +109,30 @@ public class Chunk extends Mesh {
 
                 boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
 
-                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.atlas.get("dirt") : TextureAtlas.atlas.get("grass");
+                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.atlas.get("grass") : TextureAtlas.atlas.get("dirt");
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
                         vertices.addAll(Arrays.asList(Cube.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset)));
                         textures.addAll(Arrays.asList(Cube.get_texture(side_idx, x0, y0, x1, y1)));
                         textures_offsets.addAll(Arrays.asList(tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y));
+
+                        float r = 1.0f, g = 1.0f, b = 1.0f;
+                        if (side_idx >= 0 && side_idx <= 3) {
+                            r = 0.7f;
+                            g = 0.7f;
+                            b = 0.7f;
+                        }
+                        colors.addAll(Arrays.asList(r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b));
                     }
                 }
             }
         }
 
-        prepare_render(vertices.toArray(new Integer[vertices.size()]), textures.toArray(new Integer[textures.size()]), textures_offsets.toArray(new Float[textures_offsets.size()]));
+        prepare_render(
+                vertices.toArray(new Integer[vertices.size()]),
+                textures.toArray(new Integer[textures.size()]),
+                textures_offsets.toArray(new Float[textures_offsets.size()]),
+                colors.toArray(new Float[colors.size()]));
     }
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
@@ -271,12 +284,12 @@ public class Chunk extends Mesh {
 
         }
 
-//        sides[0] = true;
-//        sides[1] = true;
-//        sides[2] = true;
-//        sides[3] = true;
-//        sides[4] = true;
-//        sides[5] = true;
+        sides[0] = true;
+        sides[1] = true;
+        sides[2] = true;
+        sides[3] = true;
+        sides[4] = true;
+        sides[5] = true;
 
         return sides;
     }
