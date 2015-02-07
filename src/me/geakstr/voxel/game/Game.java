@@ -22,8 +22,8 @@ public class Game {
 
         world_transform = new Transform();
 
-        World.init(4, 16, 16, 16, 16);
-        World.gen();
+        World.init(1, 1, 8, 8, 4);
+        World.new_gen();
     }
 
     public static void before_render() {

@@ -105,14 +105,20 @@ public class Chunk extends Mesh {
                 }
             }
 
+            int cubes_cnt = 0;
             for (Map.Entry<Integer, int[]> e : coords_map.entrySet()) {
                 int[] coords = e.getValue();
                 int x0 = coords[0], y0 = coords[1];
                 int x1 = coords[2], y1 = coords[3];
 
+                if (z == 0) {
+                    cubes_cnt += x1 - x0 + y1 - y0 + 2;
+                    System.out.println(Arrays.toString(coords));
+                }
+
                 boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
 
-                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.atlas.get("cobblestone") : TextureAtlas.atlas.get("grass");
+                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.atlas.get("cobblestone") : TextureAtlas.atlas.get("wood_0");
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
                         int[] side = Cube.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset);
@@ -128,6 +134,9 @@ public class Chunk extends Mesh {
                         offsets_offset += Cube.cube_side_texture_size;
                     }
                 }
+            }
+            if (z == 0) {
+                System.out.println(cubes_cnt);
             }
         }
 
@@ -145,6 +154,14 @@ public class Chunk extends Mesh {
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
         boolean[] sides = new boolean[6];
+
+        sides[0] = true;
+        sides[1] = true;
+        sides[2] = true;
+        sides[3] = true;
+        sides[4] = true;
+        sides[5] = true;
+
 
         if (x0 == 0) {
             sides[0] = true;
