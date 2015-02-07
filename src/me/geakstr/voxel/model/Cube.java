@@ -12,8 +12,8 @@ public class Cube {
     public static final int cube_side_vertices_size = 18;
     public static final int cube_side_texture_size = 12;
 
-    public static int[] get_side(int side_idx, int x0, int y0, int x1, int y1, int z) {
-        int[] side = get_side(side_idx);
+    public static Integer[] get_side(int side_idx, int x0, int y0, int x1, int y1, int z) {
+        Integer[] side = get_side(side_idx);
 
         if (side_idx == 0 || side_idx == 1) {
             if (side_idx == 1) {
@@ -102,33 +102,34 @@ public class Cube {
         return side;
     }
 
-    public static int[] get_side(int side_idx) {
-        int[] side = null;
+    public static Integer[] get_side(int side_idx) {
+        Integer[] side = new Integer[cube_side_vertices_size];
         switch (side_idx) {
             case 0:
-                side = Arrays.copyOf(back_vertices, cube_side_vertices_size);
+                System.arraycopy(back_vertices, 0, side, 0, cube_side_vertices_size);
                 break;
             case 1:
-                side = Arrays.copyOf(front_vertices, cube_side_vertices_size);
+                System.arraycopy(front_vertices, 0, side, 0, cube_side_vertices_size);
                 break;
             case 2:
-                side = Arrays.copyOf(right_vertices, cube_side_vertices_size);
+                System.arraycopy(right_vertices, 0, side, 0, cube_side_vertices_size);
                 break;
             case 3:
-                side = Arrays.copyOf(left_vertices, cube_side_vertices_size);
+                System.arraycopy(left_vertices, 0, side, 0, cube_side_vertices_size);
                 break;
             case 4:
-                side = Arrays.copyOf(bottom_vertices, cube_side_vertices_size);
+                System.arraycopy(bottom_vertices, 0, side, 0, cube_side_vertices_size);
                 break;
             case 5:
-                side = Arrays.copyOf(top_vertices, cube_side_vertices_size);
+                System.arraycopy(top_vertices, 0, side, 0, cube_side_vertices_size);
                 break;
         }
         return side;
     }
 
-    public static int[] get_texture(int side_idx, int x0, int y0, int x1, int y1) {
-        int[] texture = new int[cube_side_texture_size];
+    public static Integer[] get_texture(int side_idx, int x0, int y0, int x1, int y1) {
+        Integer[] texture = new Integer[cube_side_texture_size];
+        Arrays.fill(texture, 0);
 
         int xx = x1 - x0 + 1;
         int yy = y1 - y0 + 1;
@@ -174,7 +175,7 @@ public class Cube {
         return val | ((v & 511) << 15);
     }
 
-    public static final int[] right_vertices = new int[]{
+    public static final Integer[] right_vertices = new Integer[]{
             // 2 - 1 - 7
             0, 1, 1,
             0, 0, 1,
@@ -186,7 +187,7 @@ public class Cube {
             1, 0, 1
     };
 
-    public static final int[] left_vertices = new int[]{
+    public static final Integer[] left_vertices = new Integer[]{
             // 3 - 0 - 5
             0, 1, 0,
             0, 0, 0,
@@ -198,7 +199,7 @@ public class Cube {
             1, 0, 0
     };
 
-    public static final int[] front_vertices = new int[]{
+    public static final Integer[] front_vertices = new Integer[]{
             // 5 - 7 - 4
             1, 0, 0,
             1, 0, 1,
@@ -210,7 +211,7 @@ public class Cube {
             1, 1, 0
     };
 
-    public static final int[] back_vertices = new int[]{
+    public static final Integer[] back_vertices = new Integer[]{
             // 0 - 1 - 2
             0, 0, 0,
             0, 0, 1,
@@ -222,7 +223,7 @@ public class Cube {
             0, 1, 0
     };
 
-    public static final int[] bottom_vertices = new int[]{
+    public static final Integer[] bottom_vertices = new Integer[]{
             // 7 - 0 - 5
             1, 0, 1,
             0, 0, 0,
@@ -234,7 +235,7 @@ public class Cube {
             0, 0, 0
     };
 
-    public static final int[] top_vertices = new int[]{
+    public static final Integer[] top_vertices = new Integer[]{
             // 4 - 3 - 6
             1, 1, 1,
             0, 1, 0,

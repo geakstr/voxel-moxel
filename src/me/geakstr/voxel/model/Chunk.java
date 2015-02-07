@@ -2,10 +2,7 @@ package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.math.Vector2f;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class Chunk extends Mesh {
     public int[][][] cubes; // [x][y][z]
@@ -30,10 +27,6 @@ public class Chunk extends Mesh {
         this.textures_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
         this.textures_offsets_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
 
-        this.vertices = new int[vertices_size];
-        this.textures = new int[textures_size];
-        this.textures_offsets = new float[textures_offsets_size];
-
         this.cubes = new int[World.chunk_width][World.chunk_length][World.chunk_height];
         this.changed = true;
     }
@@ -43,8 +36,12 @@ public class Chunk extends Mesh {
 
         Random rnd = new Random();
 
+
+        List<Integer> vertices = new ArrayList<>();
+        List<Integer> textures = new ArrayList<>();
+        List<Float> textures_offsets = new ArrayList<>();
+
         int next_color = 512;
-        int vertices_offset = 0, texture_offset = 0, offsets_offset = 0;
         for (int z = 0; z < World.chunk_height; z++) {
             int[][] mark = new int[World.chunk_length][World.chunk_width];
             int[] proj = new int[mark[0].length];
@@ -104,64 +101,29 @@ public class Chunk extends Mesh {
                     }
                 }
             }
-
-            int cubes_cnt = 0;
             for (Map.Entry<Integer, int[]> e : coords_map.entrySet()) {
                 int[] coords = e.getValue();
                 int x0 = coords[0], y0 = coords[1];
                 int x1 = coords[2], y1 = coords[3];
 
-                if (z == 0) {
-                    cubes_cnt += x1 - x0 + y1 - y0 + 2;
-                    System.out.println(Arrays.toString(coords));
-                }
-
                 boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
 
-                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.atlas.get("cobblestone") : TextureAtlas.atlas.get("wood_0");
+                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.atlas.get("dirt") : TextureAtlas.atlas.get("grass");
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        int[] side = Cube.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset);
-                        System.arraycopy(side, 0, vertices, vertices_offset, Cube.cube_side_vertices_size);
-                        vertices_offset += Cube.cube_side_vertices_size;
-
-                        int[] texture = Cube.get_texture(side_idx, x0, y0, x1, y1);
-                        System.arraycopy(texture, 0, textures, texture_offset, Cube.cube_side_texture_size);
-                        texture_offset += Cube.cube_side_texture_size;
-
-                        float[] offset = new float[]{tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y,};
-                        System.arraycopy(offset, 0, textures_offsets, offsets_offset, Cube.cube_side_texture_size);
-                        offsets_offset += Cube.cube_side_texture_size;
+                        vertices.addAll(Arrays.asList(Cube.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset)));
+                        textures.addAll(Arrays.asList(Cube.get_texture(side_idx, x0, y0, x1, y1)));
+                        textures_offsets.addAll(Arrays.asList(tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y));
                     }
                 }
             }
-            if (z == 0) {
-                System.out.println(cubes_cnt);
-            }
         }
 
-        vertices = Arrays.copyOfRange(vertices, 0, vertices_offset);
-        vertices_size = vertices_offset;
-
-        textures = Arrays.copyOfRange(textures, 0, texture_offset);
-        textures_size = texture_offset;
-
-        textures_offsets = Arrays.copyOfRange(textures_offsets, 0, offsets_offset);
-        textures_offsets_size = offsets_offset;
-
-        prepare_render();
+        prepare_render(vertices.toArray(new Integer[vertices.size()]), textures.toArray(new Integer[textures.size()]), textures_offsets.toArray(new Float[textures_offsets.size()]));
     }
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
         boolean[] sides = new boolean[6];
-
-        sides[0] = true;
-        sides[1] = true;
-        sides[2] = true;
-        sides[3] = true;
-        sides[4] = true;
-        sides[5] = true;
-
 
         if (x0 == 0) {
             sides[0] = true;
@@ -237,7 +199,7 @@ public class Chunk extends Mesh {
                 x_chunk_pos != 0) {
             sides[0] = false;
             for (int y = y0; y <= y1; y++) {
-                if (Cube.unpack_type(World.chunks[x_chunk_pos - 1][y_chunk_pos][z_chunk_pos].cubes[World.chunk_width - 1][y][z]) == 0) {
+                if (Cube.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos - 1][y_chunk_pos].cubes[World.chunk_width - 1][y][z]) == 0) {
                     sides[0] = true;
                     break;
                 }
@@ -249,7 +211,7 @@ public class Chunk extends Mesh {
                 x_chunk_pos != World.world_size - 1) {
             sides[1] = false;
             for (int y = y0; y <= y1; y++) {
-                if (Cube.unpack_type(World.chunks[x_chunk_pos + 1][y_chunk_pos][z_chunk_pos].cubes[0][y][z]) == 0) {
+                if (Cube.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos + 1][y_chunk_pos].cubes[0][y][z]) == 0) {
                     sides[1] = true;
                     break;
                 }
@@ -261,7 +223,7 @@ public class Chunk extends Mesh {
                 y_chunk_pos != World.world_size - 1) {
             sides[2] = false;
             for (int x = x0; x <= x1; x++) {
-                if (Cube.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos + 1][z_chunk_pos].cubes[x][0][z]) == 0) {
+                if (Cube.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos + 1].cubes[x][0][z]) == 0) {
                     sides[2] = true;
                     break;
                 }
@@ -273,7 +235,7 @@ public class Chunk extends Mesh {
                 y_chunk_pos != 0) {
             sides[3] = false;
             for (int x = x0; x <= x1; x++) {
-                if (Cube.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos - 1][z_chunk_pos].cubes[x][World.chunk_length - 1][z]) == 0) {
+                if (Cube.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos - 1].cubes[x][World.chunk_length - 1][z]) == 0) {
                     sides[3] = true;
                     break;
                 }
@@ -286,7 +248,7 @@ public class Chunk extends Mesh {
             sides[4] = false;
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (Cube.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos - 1].cubes[x][y][World.chunk_height - 1]) == 0) {
+                    if (Cube.unpack_type(World.chunks[z_chunk_pos - 1][x_chunk_pos][y_chunk_pos].cubes[x][y][World.chunk_height - 1]) == 0) {
                         sides[4] = true;
                         break;
                     }
@@ -300,7 +262,7 @@ public class Chunk extends Mesh {
             sides[5] = false;
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (Cube.unpack_type(World.chunks[x_chunk_pos][y_chunk_pos][z_chunk_pos + 1].cubes[x][y][0]) == 0) {
+                    if (Cube.unpack_type(World.chunks[z_chunk_pos + 1][x_chunk_pos][y_chunk_pos].cubes[x][y][0]) == 0) {
                         sides[5] = true;
                         break;
                     }
@@ -309,6 +271,12 @@ public class Chunk extends Mesh {
 
         }
 
+//        sides[0] = true;
+//        sides[1] = true;
+//        sides[2] = true;
+//        sides[3] = true;
+//        sides[4] = true;
+//        sides[5] = true;
 
         return sides;
     }

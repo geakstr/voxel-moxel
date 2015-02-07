@@ -7,16 +7,20 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 public class ExtendedBufferUtil {
-    public static FloatBuffer create_flipped_buffer(float[] values) {
+    public static FloatBuffer create_flipped_buffer(Float[] values) {
         FloatBuffer ret = BufferUtils.createFloatBuffer(values.length);
-        ret.put(values);
+        for (Float val : values) {
+            ret.put(val);
+        }
         ret.flip();
         return ret;
     }
 
-    public static IntBuffer create_flipped_buffer(int[] values) {
+    public static IntBuffer create_flipped_buffer(Integer[] values) {
         IntBuffer ret = BufferUtils.createIntBuffer(values.length);
-        ret.put(values);
+        for (Integer val : values) {
+            ret.put(val);
+        }
         ret.flip();
         return ret;
     }

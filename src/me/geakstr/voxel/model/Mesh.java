@@ -6,14 +6,12 @@ import me.geakstr.voxel.util.ResourceUtil;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class Mesh {
-    public int[] vertices;
-    public int[] textures;
-    public float[] textures_offsets;
-
     public int vertices_size;
     public int textures_size;
     public int textures_offsets_size;
@@ -25,15 +23,6 @@ public class Mesh {
 
     public Mesh() {}
 
-    public Mesh(int[] vertices, int[] textures, float[] textures_offsets) {
-        this.vertices = vertices;
-        this.vertices_size = vertices.length;
-        this.textures = textures;
-        this.textures_size = textures.length;
-        this.textures_offsets = textures_offsets;
-        this.textures_offsets_size = textures_offsets.length;
-    }
-
     public void gen_buffers() {
         vao = glGenVertexArrays();
         vbo = glGenBuffers();
@@ -41,12 +30,16 @@ public class Mesh {
         tobo = glGenBuffers();
     }
 
-    public void prepare_render() {
-        init_vbo();
+    public void prepare_render(Integer[] vertices, Integer[] textures, Float[] textures_offsets) {
+        init_vbo(vertices, textures, textures_offsets);
         init_vao();
     }
 
-    public void init_vbo() {
+    public void init_vbo(Integer[] vertices, Integer[] textures, Float[] textures_offsets) {
+        vertices_size = vertices.length;
+        textures_size = textures.length;
+        textures_offsets_size = textures_offsets.length;
+
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(vertices), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -85,5 +78,6 @@ public class Mesh {
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, vertices_size);
         glBindVertexArray(0);
+        World.faces_in_frame += vertices_size / 3;
     }
 }

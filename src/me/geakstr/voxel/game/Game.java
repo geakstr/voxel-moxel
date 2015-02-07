@@ -15,15 +15,15 @@ public class Game {
     public static void init() {
         ResourceUtil.load_textures("atlas.png");
 
-        Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 100f);
+        Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 500f);
 
         world_shader = new Shader("simple.vs", "simple.fs").compile();
         world_shader.save_attr("attr_pos").save_attr("attr_tex_offset").save_attr("attr_tex_coord");
 
         world_transform = new Transform();
 
-        World.init(1, 1, 8, 8, 4);
-        World.new_gen();
+        World.init(4, 4, 16, 16, 16);
+        World.gen();
     }
 
     public static void before_render() {

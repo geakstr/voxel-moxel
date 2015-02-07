@@ -134,7 +134,9 @@ public class Window {
             glfwSetWindowTitle(window,
                     "Voxel Moxel | " +
                             fps + " fps; " +
-                            World.chunks_in_frame + "/" + World.world_volume + " chunks");
+                            World.chunks_in_frame + "/" + World.world_volume + " chunks; " +
+                            World.faces_in_frame + " triangles"
+            );
             fps = 0;
             last_time++;
             return true;
@@ -142,3 +144,4 @@ public class Window {
         return false;
     }
 }
+
