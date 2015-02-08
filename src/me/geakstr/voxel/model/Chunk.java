@@ -109,7 +109,7 @@ public class Chunk extends Mesh {
 
                 boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
 
-                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.atlas.get("grass") : TextureAtlas.atlas.get("dirt");
+                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.get_coord("cobblestone") : TextureAtlas.get_coord("dirt");
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
                         vertices.addAll(Arrays.asList(Cube.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset)));
@@ -284,12 +284,12 @@ public class Chunk extends Mesh {
 
         }
 
-        sides[0] = true;
-        sides[1] = true;
-        sides[2] = true;
-        sides[3] = true;
-        sides[4] = true;
-        sides[5] = true;
+//        sides[0] = true;
+//        sides[1] = true;
+//        sides[2] = true;
+//        sides[3] = true;
+//        sides[4] = true;
+//        sides[5] = true;
 
         return sides;
     }

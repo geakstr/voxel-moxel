@@ -1,5 +1,6 @@
 package me.geakstr.voxel;
 
+import me.geakstr.voxel.core.Configurator;
 import me.geakstr.voxel.core.Input;
 import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.game.Game;
@@ -18,7 +19,8 @@ public class Runner {
     }
 
     private void init() {
-        Window.init(800, 800, true);
+        Configurator.init("config.json");
+        Window.init(Configurator.screen_width, Configurator.screen_height, Configurator.vsync);
         Input.init();
         Game.init();
     }

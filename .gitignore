@@ -155,4 +155,7 @@ crashlytics-build.properties
 .classpath
 .project
 
+/config.json
+
 !lib/lwjgl/*.jar
+!lib/*.jar
