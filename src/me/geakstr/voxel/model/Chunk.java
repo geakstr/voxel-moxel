@@ -10,6 +10,7 @@ public class Chunk extends Mesh {
     public int[][][] cubes; // [x][y][z]
 
     public boolean changed, updating, updated;
+    public boolean drawable;
 
     public int x_chunk_pos, y_chunk_pos, z_chunk_pos;
     public int x_offset, y_offset, z_offset;
@@ -30,6 +31,8 @@ public class Chunk extends Mesh {
         this.changed = true;
         this.updating = false;
         this.updated = true;
+
+        this.drawable = false;
     }
 
     public void update() {
@@ -38,7 +41,7 @@ public class Chunk extends Mesh {
             Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
         }
 
-        if (updated && updating) {
+        if (updated && updating && drawable) {
             updating = false;
             prepare_render();
         }
@@ -67,13 +70,11 @@ public class Chunk extends Mesh {
                 boolean canDown = false;
                 int projFlag = -1;
                 for (int x = 0; x < World.chunk_width; x++) {
-                    int val = this.cubes[x][y][z];
-                    int type = Cube.unpack_type(val);
-
-                    if (type == 0) {
+                    if (Cube.unpack_type(this.cubes[x][y][z]) == 0) {
                         continue;
                     }
 
+                    int type = 1;
                     boolean update_coords = false;
 
                     if (proj[x] != -1) {
@@ -160,14 +161,14 @@ public class Chunk extends Mesh {
         this.colors_size = this.colors.length;
 
         this.updated = true;
+
+        this.drawable = this.vertices_size > 0;
     }
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
         boolean[] sides = new boolean[6];
 
-        if (x0 == 0) {
-            sides[0] = true;
-        } else if (x0 > 0) {
+        if (x0 > 0) {
             for (int y = y0; y <= y1; y++) {
                 if (Cube.unpack_type(cubes[x0 - 1][y][z]) == 0) {
                     sides[0] = true;
@@ -175,9 +176,7 @@ public class Chunk extends Mesh {
                 }
             }
         }
-        if (x1 == World.chunk_width - 1) {
-            sides[1] = true;
-        } else if (x1 < World.chunk_width - 1) {
+        if (x1 < World.chunk_width - 1) {
             for (int y = y0; y <= y1; y++) {
                 if (Cube.unpack_type(cubes[x1 + 1][y][z]) == 0) {
                     sides[1] = true;
@@ -186,9 +185,7 @@ public class Chunk extends Mesh {
             }
         }
 
-        if (y0 == 0) {
-            sides[3] = true;
-        } else if (y0 > 0) {
+        if (y0 > 0) {
             for (int x = x0; x <= x1; x++) {
                 if (Cube.unpack_type(cubes[x][y0 - 1][z]) == 0) {
                     sides[3] = true;
@@ -197,9 +194,7 @@ public class Chunk extends Mesh {
             }
         }
 
-        if (y1 == World.chunk_length - 1) {
-            sides[2] = true;
-        } else if (y1 < World.chunk_length - 1) {
+        if (y1 < World.chunk_length - 1) {
             for (int x = x0; x <= x1; x++) {
                 if (Cube.unpack_type(cubes[x][y1 + 1][z]) == 0) {
                     sides[2] = true;
@@ -208,9 +203,7 @@ public class Chunk extends Mesh {
             }
         }
 
-        if (z == 0) {
-            sides[4] = true;
-        } else if (z > 0) {
+        if (z > 0) {
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
                     if (Cube.unpack_type(cubes[x][y][z - 1]) == 0) {
@@ -221,9 +214,7 @@ public class Chunk extends Mesh {
             }
         }
 
-        if (z == World.chunk_height - 1) {
-            sides[5] = true;
-        } else if (z < World.chunk_height - 1) {
+        if (z < World.chunk_height - 1) {
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
                     if (Cube.unpack_type(cubes[x][y][z + 1]) == 0) {
@@ -324,8 +315,9 @@ public class Chunk extends Mesh {
     public void render() {
         if (changed || updating) {
             update();
-        } else {
+        } else if (drawable) {
             super.render();
+            World.chunks_in_frame++;
         }
     }
 }

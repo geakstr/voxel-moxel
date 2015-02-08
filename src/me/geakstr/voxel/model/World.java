@@ -48,7 +48,7 @@ public class World {
 
         for (int global_x = 0; global_x < world_size * chunk_width; global_x++) {
             for (int global_y = 0; global_y < world_size * chunk_length; global_y++) {
-                double global_z = ((noise.eval(global_x / 128.0, global_y / 128.0, 1.0) + 1)) * world_height * chunk_height / 2;
+                double global_z = ((noise.eval(global_x / 256.0, global_y / 256.0, 1.0) + 1)) * world_height * chunk_height / 2;
 
                 int chunk_x = global_x / (chunk_width);
                 int chunk_y = global_y / (chunk_length);
@@ -63,7 +63,7 @@ public class World {
                     int height = chunk_z == chunk_vert_size - 1 ? (int) (global_z % chunk_height) : chunk_height;
 
                     for (int cube_z = 0; cube_z < height; cube_z++) {
-                        chunk.cubes[cube_x][cube_y][cube_z] = Cube.pack_type(0, 1);
+                        chunk.cubes[cube_x][cube_y][cube_z] = Cube.pack_type(0, rnd.nextInt(4) + 1);
                     }
                 }
             }
@@ -85,7 +85,6 @@ public class World {
             for (int x = 0; x < world_size; x++) {
                 for (int y = 0; y < world_size; y++) {
                     if (Frustum.chunkInFrustum(x, y, z)) {
-                        chunks_in_frame++;
                         chunks[z][x][y].render();
                     }
                 }
