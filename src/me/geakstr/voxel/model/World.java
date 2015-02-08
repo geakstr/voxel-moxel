@@ -84,10 +84,10 @@ public class World {
         for (int z = 0; z < world_height; z++) {
             for (int x = 0; x < world_size; x++) {
                 for (int y = 0; y < world_size; y++) {
-                    if (Frustum.chunkInFrustum(x, y, z)) {
+                    //if (Frustum.chunkInFrustum(x, y, z)) {
                         chunks_in_frame++;
                         chunks[z][x][y].render();
-                    }
+                    //}
                 }
             }
         }

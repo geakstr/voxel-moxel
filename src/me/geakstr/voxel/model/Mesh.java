@@ -8,8 +8,10 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER_SRGB;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.ARBOcclusionQuery.*;
 
 public class Mesh {
     public int vertices_size;
@@ -23,6 +25,8 @@ public class Mesh {
     public int tobo; // texture offset buffer
     public int cbo; // color buffer
 
+    public int q;
+
     public Mesh() {}
 
     public void gen_buffers() {
@@ -31,6 +35,8 @@ public class Mesh {
         tbo = glGenBuffers();
         tobo = glGenBuffers();
         cbo = glGenBuffers();
+
+        q = glGenQueries();
     }
 
     public void prepare_render(Integer[] vertices, Integer[] textures, Float[] textures_offsets, Float[] colors) {
@@ -64,32 +70,53 @@ public class Mesh {
     public void init_vao() {
         glBindVertexArray(vao);
 
-        glBindTexture(GL_TEXTURE_2D, ResourceUtil.texture_id("atlas.png"));
+        //glBindTexture(GL_TEXTURE_2D, ResourceUtil.texture_id("atlas.png"));
 
         glEnableVertexAttribArray(Game.world_shader.attr("attr_pos"));
-        glEnableVertexAttribArray(Game.world_shader.attr("attr_tex_offset"));
-        glEnableVertexAttribArray(Game.world_shader.attr("attr_tex_coord"));
-        glEnableVertexAttribArray(Game.world_shader.attr("attr_color"));
+        //glEnableVertexAttribArray(Game.world_shader.attr("attr_tex_offset"));
+        //glEnableVertexAttribArray(Game.world_shader.attr("attr_tex_coord"));
+//        glEnableVertexAttribArray(Game.world_shader.attr("attr_color"));
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glVertexAttribPointer(Game.world_shader.attr("attr_pos"), 3, GL_INT, false, 0, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, tbo);
-        glVertexAttribPointer(Game.world_shader.attr("attr_tex_coord"), 2, GL_INT, false, 0, 0);
+//        glBindBuffer(GL_ARRAY_BUFFER, tbo);
+//        glVertexAttribPointer(Game.world_shader.attr("attr_tex_coord"), 2, GL_INT, false, 0, 0);
+//
+//        glBindBuffer(GL_ARRAY_BUFFER, tobo);
+//        glVertexAttribPointer(Game.world_shader.attr("attr_tex_offset"), 2, GL_FLOAT, false, 0, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, tobo);
-        glVertexAttribPointer(Game.world_shader.attr("attr_tex_offset"), 2, GL_FLOAT, false, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, cbo);
-        glVertexAttribPointer(Game.world_shader.attr("attr_color"), 3, GL_FLOAT, false, 0, 0);
+//        glBindBuffer(GL_ARRAY_BUFFER, cbo);
+//        glVertexAttribPointer(Game.world_shader.attr("attr_color"), 3, GL_FLOAT, false, 0, 0);
 
         glBindVertexArray(0);
     }
 
     public void render() {
+        //glBeginQuery(GL_SAMPLES_PASSED_ARB, q);
+
+        //glEndQuery(GL_SAMPLES_PASSED_ARB);
+
+
+        //int pixels = glGetQueryObjectui(q, GL_QUERY_RESULT_ARB);
+        //System.err.println(pixels);
+
+        //if (pixels > 0) {
+
         glBindVertexArray(vao);
+
+        glColorMask(false, false, false, false);
+        glDepthMask(false);
+
+        glBeginQuery(GL_SAMPLES_PASSED_ARB, q);
         glDrawArrays(GL_TRIANGLES, 0, vertices_size);
+        glEndQuery(GL_SAMPLES_PASSED_ARB);
+
         glBindVertexArray(0);
         World.faces_in_frame += vertices_size / 3;
+        // }
+
+        int pixels = glGetQueryObjectui(q, GL_QUERY_RESULT_ARB);
+        System.err.println(pixels);
     }
 }

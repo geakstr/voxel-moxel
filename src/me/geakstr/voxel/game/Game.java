@@ -22,7 +22,7 @@ public class Game {
 
         world_transform = new Transform();
 
-        World.init(4, 4, 16, 16, 16);
+        World.init(48, 1, 16, 16, 256);
         World.gen();
     }
 
