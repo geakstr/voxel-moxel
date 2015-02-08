@@ -31,11 +31,7 @@ public class Window {
 
     public static boolean was_resize = false;
 
-    public static void init(int width, int height, boolean vsync) {
-        Window.width = width;
-        Window.height = height;
-        Window.vsync = vsync;
-
+    public static void init() {
         Window.last_time = glfwGetTime();
         Window.fps = 0;
 

@@ -20,7 +20,7 @@ public class Runner {
 
     private void init() {
         Configurator.init("config.json");
-        Window.init(Configurator.screen_width, Configurator.screen_height, Configurator.vsync);
+        Window.init();
         Input.init();
         Game.init();
     }
