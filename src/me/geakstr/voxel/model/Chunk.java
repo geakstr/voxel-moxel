@@ -16,7 +16,7 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 public class Chunk extends Mesh {
     public int[][][] cubes; // [x][y][z]
 
-    public boolean changed, updating, updated, drawable;
+    public boolean changed, updating, updated, empty;
     public Integer[] box;
 
     public boolean waiting;
@@ -183,7 +183,7 @@ public class Chunk extends Mesh {
         this.updating = false;
         this.updated = true;
 
-        this.drawable = false;
+        this.empty = true;
     }
 
     public void update() {
@@ -192,7 +192,7 @@ public class Chunk extends Mesh {
             Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
         }
 
-        if (updated && updating && drawable) {
+        if (updated && updating && !empty) {
             updating = false;
             prepare_render(vertices, textures, textures_offsets, colors, box);
         }
@@ -325,7 +325,7 @@ public class Chunk extends Mesh {
 
         this.updated = true;
 
-        this.drawable = this.vertices_size > 0;
+        this.empty = this.vertices_size == 0;
     }
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
@@ -483,7 +483,7 @@ public class Chunk extends Mesh {
         if (changed || updating) {
             update();
         }
-        if (drawable && !waiting) {
+        if (!empty && !waiting) {
             this.waiting = true;
             glBeginQuery(GL_SAMPLES_PASSED_ARB, occlusion_query);
             glBindVertexArray(occlusion_vao);

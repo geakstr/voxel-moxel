@@ -31,7 +31,7 @@ public class Game {
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(16, 16, 16, 16, 16);
+        World.init(64, 1, 16, 16, 256);
         World.gen();
     }
 
@@ -68,6 +68,18 @@ public class Game {
         terrain_shader.unbind();
     }
 
-    public static void after_render() {
+    public static void after_render() {}
+
+    public static void destroy() {
+        World.destroy();
+        if (null != terrain_shader) {
+            terrain_shader.dispose();
+        }
+        if (null != occlusion_shader) {
+            occlusion_shader.dispose();
+        }
+        if (null != chunks_workers_executor_service) {
+            chunks_workers_executor_service.es.shutdown();
+        }
     }
 }

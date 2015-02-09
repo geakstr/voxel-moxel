@@ -135,4 +135,8 @@ public class Mesh {
         glBindVertexArray(0);
         World.faces_in_frame += vertices_size / 3;
     }
+
+    public void destroy() {
+        glDeleteQueries(occlusion_query);
+    }
 }

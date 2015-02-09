@@ -104,7 +104,7 @@ public class World {
         for (int z = 0; z < world_height; z++) {
             for (int x = 0; x < world_size; x++) {
                 for (int y = 0; y < world_size; y++) {
-                    if (chunks[z][x][y].drawable) {
+                    if (!chunks[z][x][y].empty) {
                         if (chunks[z][x][y].waiting) {
                             int result = glGetQueryObjectui(chunks[z][x][y].occlusion_query, GL_QUERY_RESULT_AVAILABLE);
                             if (result == 1) {
@@ -116,6 +116,18 @@ public class World {
                                 chunks[z][x][y].terrain_render();
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void destroy() {
+        for (int z = 0; z < world_height; z++) {
+            for (int x = 0; x < world_size; x++) {
+                for (int y = 0; y < world_size; y++) {
+                    if (null != chunks[z][x][y]) {
+                        chunks[z][x][y].destroy();
                     }
                 }
             }
