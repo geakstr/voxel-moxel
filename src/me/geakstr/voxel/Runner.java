@@ -42,6 +42,9 @@ public class Runner {
 
     private void destroy() {
         Window.destroy();
+        if (null != Game.chunks_workers_executor_service) {
+            Game.chunks_workers_executor_service.es.shutdown();
+        }
     }
 
     private void terminate() {

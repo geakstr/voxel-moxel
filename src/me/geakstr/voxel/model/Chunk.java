@@ -1,13 +1,16 @@
 package me.geakstr.voxel.model;
 
+import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector2f;
+import me.geakstr.voxel.workers.ChunkWorker;
 
 import java.util.*;
 
 public class Chunk extends Mesh {
     public int[][][] cubes; // [x][y][z]
 
-    public boolean changed;
+    public boolean changed, updating, updated;
+    public boolean drawable;
 
     public int x_chunk_pos, y_chunk_pos, z_chunk_pos;
     public int x_offset, y_offset, z_offset;
@@ -23,19 +26,33 @@ public class Chunk extends Mesh {
         this.y_offset = y_chunk_pos * World.chunk_length;
         this.z_offset = z_chunk_pos * World.chunk_height;
 
-        this.vertices_size = World.chunk_volume * Cube.cube_side_vertices_size * 6;
-        this.textures_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
-        this.textures_offsets_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
-
         this.cubes = new int[World.chunk_width][World.chunk_length][World.chunk_height];
+
         this.changed = true;
+        this.updating = false;
+        this.updated = true;
+
+        this.drawable = false;
     }
 
     public void update() {
+        if (changed && !updating && updated) {
+            updated = false;
+            Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
+        }
+
+        if (updated && updating && drawable) {
+            updating = false;
+            prepare_render();
+        }
+
         changed = false;
+    }
+
+    public void rebuild() {
+        this.updating = true;
 
         Random rnd = new Random();
-
 
         List<Integer> vertices = new ArrayList<>();
         List<Integer> textures = new ArrayList<>();
@@ -53,13 +70,11 @@ public class Chunk extends Mesh {
                 boolean canDown = false;
                 int projFlag = -1;
                 for (int x = 0; x < World.chunk_width; x++) {
-                    int val = cubes[x][y][z];
-                    int type = Cube.unpack_type(val);
-
-                    if (type == 0) {
+                    if (Cube.unpack_type(this.cubes[x][y][z]) == 0) {
                         continue;
                     }
 
+                    int type = 1;
                     boolean update_coords = false;
 
                     if (proj[x] != -1) {
@@ -67,7 +82,7 @@ public class Chunk extends Mesh {
                         projFlag = x;
                         len = 0;
                         update_coords = true;
-                    } else if (((x > 0) && (Cube.unpack_type(cubes[x - 1][y][z]) == type) && (projFlag != x - 1))) {
+                    } else if (((x > 0) && (Cube.unpack_type(this.cubes[x - 1][y][z]) == type) && (projFlag != x - 1))) {
                         mark[y][x] = mark[y][x - 1];
                         update_coords = true;
                     } else {
@@ -89,7 +104,7 @@ public class Chunk extends Mesh {
                         len++;
                     }
 
-                    canDown = !(len > 0 && !canDown) && (y < (World.chunk_length - 1) && (Cube.unpack_type(cubes[x][y + 1][z]) == type));
+                    canDown = !(len > 0 && !canDown) && (y < (World.chunk_length - 1) && (Cube.unpack_type(this.cubes[x][y + 1][z]) == type));
 
                     if (canDown) {
                         proj[x] = mark[y][x];
@@ -107,12 +122,19 @@ public class Chunk extends Mesh {
                 int x0 = coords[0], y0 = coords[1];
                 int x1 = coords[2], y1 = coords[3];
 
-                boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
+                boolean[] renderable_sides = this.renderable_sides(x0, y0, x1, y1, z);
 
                 Vector2f tex = rnd.nextBoolean() ? TextureAtlas.get_coord("cobblestone") : TextureAtlas.get_coord("dirt");
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        vertices.addAll(Arrays.asList(Cube.get_side(side_idx, x0 + x_offset, y0 + y_offset, x1 + x_offset, y1 + y_offset, z + z_offset)));
+                        vertices.addAll(Arrays.asList(Cube.get_side(
+                                side_idx,
+                                x0 + this.x_offset,
+                                y0 + this.y_offset,
+                                x1 + this.x_offset,
+                                y1 + this.y_offset,
+                                z + this.z_offset)));
+
                         textures.addAll(Arrays.asList(Cube.get_texture(side_idx, x0, y0, x1, y1)));
                         textures_offsets.addAll(Arrays.asList(tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y, tex.x, tex.y));
 
@@ -128,19 +150,25 @@ public class Chunk extends Mesh {
             }
         }
 
-        prepare_render(
-                vertices.toArray(new Integer[vertices.size()]),
-                textures.toArray(new Integer[textures.size()]),
-                textures_offsets.toArray(new Float[textures_offsets.size()]),
-                colors.toArray(new Float[colors.size()]));
+        this.vertices = vertices.toArray(new Integer[vertices.size()]);
+        this.textures = textures.toArray(new Integer[textures.size()]);
+        this.textures_offsets = textures_offsets.toArray(new Float[textures_offsets.size()]);
+        this.colors = colors.toArray(new Float[colors.size()]);
+
+        this.vertices_size = this.vertices.length;
+        this.textures_size = this.textures.length;
+        this.textures_offsets_size = this.textures_offsets.length;
+        this.colors_size = this.colors.length;
+
+        this.updated = true;
+
+        this.drawable = this.vertices_size > 0;
     }
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
         boolean[] sides = new boolean[6];
 
-        if (x0 == 0) {
-            sides[0] = true;
-        } else if (x0 > 0) {
+        if (x0 > 0) {
             for (int y = y0; y <= y1; y++) {
                 if (Cube.unpack_type(cubes[x0 - 1][y][z]) == 0) {
                     sides[0] = true;
@@ -148,9 +176,7 @@ public class Chunk extends Mesh {
                 }
             }
         }
-        if (x1 == World.chunk_width - 1) {
-            sides[1] = true;
-        } else if (x1 < World.chunk_width - 1) {
+        if (x1 < World.chunk_width - 1) {
             for (int y = y0; y <= y1; y++) {
                 if (Cube.unpack_type(cubes[x1 + 1][y][z]) == 0) {
                     sides[1] = true;
@@ -159,9 +185,7 @@ public class Chunk extends Mesh {
             }
         }
 
-        if (y0 == 0) {
-            sides[3] = true;
-        } else if (y0 > 0) {
+        if (y0 > 0) {
             for (int x = x0; x <= x1; x++) {
                 if (Cube.unpack_type(cubes[x][y0 - 1][z]) == 0) {
                     sides[3] = true;
@@ -170,9 +194,7 @@ public class Chunk extends Mesh {
             }
         }
 
-        if (y1 == World.chunk_length - 1) {
-            sides[2] = true;
-        } else if (y1 < World.chunk_length - 1) {
+        if (y1 < World.chunk_length - 1) {
             for (int x = x0; x <= x1; x++) {
                 if (Cube.unpack_type(cubes[x][y1 + 1][z]) == 0) {
                     sides[2] = true;
@@ -181,9 +203,7 @@ public class Chunk extends Mesh {
             }
         }
 
-        if (z == 0) {
-            sides[4] = true;
-        } else if (z > 0) {
+        if (z > 0) {
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
                     if (Cube.unpack_type(cubes[x][y][z - 1]) == 0) {
@@ -194,9 +214,7 @@ public class Chunk extends Mesh {
             }
         }
 
-        if (z == World.chunk_height - 1) {
-            sides[5] = true;
-        } else if (z < World.chunk_height - 1) {
+        if (z < World.chunk_height - 1) {
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
                     if (Cube.unpack_type(cubes[x][y][z + 1]) == 0) {
@@ -295,9 +313,11 @@ public class Chunk extends Mesh {
     }
 
     public void render() {
-        if (changed) {
+        if (changed || updating) {
             update();
+        } else if (drawable) {
+            super.render();
+            World.chunks_in_frame++;
         }
-        super.render();
     }
 }
