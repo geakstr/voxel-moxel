@@ -1,13 +1,13 @@
-#version 120
+#version 330 core
 
-attribute vec3 attr_pos;
-attribute vec2 attr_tex_offset;
-attribute vec2 attr_tex_coord;
-attribute vec3 attr_color;
+in vec3 attr_pos;
+in vec2 attr_tex_offset;
+in vec2 attr_tex_coord;
+in vec3 attr_color;
 
-varying vec2 out_tex_offset;
-varying vec2 out_tex_coord;
-varying vec3 out_color;
+out vec2 out_tex_offset;
+out vec2 out_tex_coord;
+out vec3 out_color;
 
 uniform mat4 uniform_transform;
 uniform mat4 uniform_camera_view;

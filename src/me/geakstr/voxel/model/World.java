@@ -2,14 +2,18 @@ package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.util.OpenSimplexNoise;
-import org.lwjgl.system.libffi.Closure;
 
 import java.util.Random;
+
+import static org.lwjgl.opengl.ARBOcclusionQuery.GL_QUERY_RESULT_ARB;
+import static org.lwjgl.opengl.GL15.GL_QUERY_RESULT_AVAILABLE;
+import static org.lwjgl.opengl.GL15.glGetQueryObjectui;
 
 public class World {
     public static int world_size;
     public static int world_height;
-    public static int world_volume; // world_size * world_size * world_height chunks
+    public static int world_volume; // world_size * world_size * world_height
+    // chunks
 
     public static int chunk_height; // z axis size
     public static int chunk_width; // x axis size
@@ -21,7 +25,8 @@ public class World {
     public static int chunks_in_frame = 0;
     public static int faces_in_frame = 0;
 
-    public static void init(int _world_size, int _world_height, int _chunk_width, int _chunk_length, int _chunk_height) {
+    public static void init(int _world_size, int _world_height,
+                            int _chunk_width, int _chunk_length, int _chunk_height) {
         world_size = _world_size;
         world_height = _world_height;
         world_volume = world_size * world_size * world_height;
@@ -44,11 +49,12 @@ public class World {
 
     public static void gen() {
         Random rnd = new Random();
-        OpenSimplexNoise noise = new OpenSimplexNoise(rnd.nextInt(Integer.MAX_VALUE));
+        OpenSimplexNoise noise = new OpenSimplexNoise(
+                rnd.nextInt(Integer.MAX_VALUE));
 
         for (int global_x = 0; global_x < world_size * chunk_width; global_x++) {
             for (int global_y = 0; global_y < world_size * chunk_length; global_y++) {
-                double global_z = ((noise.eval(global_x / 256.0, global_y / 256.0, 1.0) + 1)) * world_height * chunk_height / 2;
+                double global_z = ((noise.eval(global_x / 128.0, global_y / 128.0, 1.0) + 1)) * world_height * chunk_height / 2;
 
                 int chunk_x = global_x / (chunk_width);
                 int chunk_y = global_y / (chunk_length);
@@ -60,10 +66,11 @@ public class World {
                 for (int chunk_z = 0; chunk_z < chunk_vert_size; chunk_z++) {
                     Chunk chunk = chunks[chunk_z][chunk_x][chunk_y];
 
-                    int height = chunk_z == chunk_vert_size - 1 ? (int) (global_z % chunk_height) : chunk_height;
+                    int height = chunk_z == chunk_vert_size - 1 ? (int) (global_z % chunk_height)
+                            : chunk_height;
 
                     for (int cube_z = 0; cube_z < height; cube_z++) {
-                        chunk.cubes[cube_x][cube_y][cube_z] = Cube.pack_type(0, rnd.nextInt(4) + 1);
+                        chunk.cubes[cube_x][cube_y][cube_z] = Cube.pack_type(0, 1);
                     }
                 }
             }
@@ -78,14 +85,37 @@ public class World {
         }
     }
 
-    public static void render() {
-        chunks_in_frame = 0;
-        faces_in_frame = 0;
+    public static void occlusion_render() {
         for (int z = 0; z < world_height; z++) {
             for (int x = 0; x < world_size; x++) {
                 for (int y = 0; y < world_size; y++) {
                     if (Frustum.chunkInFrustum(x, y, z)) {
-                        chunks[z][x][y].render();
+                        chunks[z][x][y].occlusion_render();
+                    }
+                }
+            }
+        }
+    }
+
+    public static void render() {
+        chunks_in_frame = 0;
+        faces_in_frame = 0;
+
+        for (int z = 0; z < world_height; z++) {
+            for (int x = 0; x < world_size; x++) {
+                for (int y = 0; y < world_size; y++) {
+                    if (chunks[z][x][y].drawable) {
+                        if (chunks[z][x][y].waiting) {
+                            int result = glGetQueryObjectui(chunks[z][x][y].occlusion_query, GL_QUERY_RESULT_AVAILABLE);
+                            if (result == 1) {
+                                chunks[z][x][y].waiting = false;
+                                chunks[z][x][y].visible = glGetQueryObjectui(chunks[z][x][y].occlusion_query, GL_QUERY_RESULT_ARB) > 0;
+                            }
+                            if (chunks[z][x][y].visible) {
+                                chunks_in_frame++;
+                                chunks[z][x][y].terrain_render();
+                            }
+                        }
                     }
                 }
             }

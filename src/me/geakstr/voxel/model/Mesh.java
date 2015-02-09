@@ -22,13 +22,16 @@ public class Mesh {
     public int textures_offsets_size;
     public int colors_size;
 
-    public int vao;
-    public int vbo; // vertex buffer
-    public int tbo; // texture buffer
-    public int tobo; // texture offset buffer
-    public int cbo; // color buffer
+    public int terrain_vao;
+    public int terrain_vert_buf;
+    public int terrain_tex_buf;
+    public int terrain_tex_offset_buf;
+    public int terrain_color_buf;
 
-    public int oq;
+    public int occlusion_vao;
+    public int occlusion_vert_buf;
+
+    public int occlusion_query;
 
     public Mesh() {
         this.vertices = new Integer[]{};
@@ -43,70 +46,93 @@ public class Mesh {
     }
 
     public void gen_buffers() {
-        vao = glGenVertexArrays();
-        vbo = glGenBuffers();
-        tbo = glGenBuffers();
-        tobo = glGenBuffers();
-        cbo = glGenBuffers();
+        terrain_vao = glGenVertexArrays();
+        terrain_vert_buf = glGenBuffers();
+        terrain_tex_buf = glGenBuffers();
+        terrain_tex_offset_buf = glGenBuffers();
+        terrain_color_buf = glGenBuffers();
+
+        occlusion_vao = glGenVertexArrays();
+        occlusion_vert_buf = glGenBuffers();
+
+        occlusion_query = glGenQueries();
     }
 
-    public void prepare_render() {
-        if (vertices_size > 0) {
-            init_vbo();
-            init_vao();
-        }
+    public void prepare_render(Integer[] terrain_vert, Integer[] terrain_tex, Float[] terrain_tex_offset, Float[] terrain_color, Integer[] box) {
+        init_terrain_vbo(terrain_vert, terrain_tex, terrain_tex_offset, terrain_color);
+        init_terrain_vao();
+
+        init_occlusion_vbo(box);
+        init_occlusion_vao();
     }
 
-    public void init_vbo() {
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    public void init_terrain_vbo(Integer[] vertices, Integer[] textures, Float[] textures_offsets, Float[] colors) {
+        vertices_size = vertices.length;
+        textures_size = textures.length;
+        textures_offsets_size = textures_offsets.length;
+        colors_size = colors.length;
+
+        glBindBuffer(GL_ARRAY_BUFFER, terrain_vert_buf);
         glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(vertices), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, tbo);
+        glBindBuffer(GL_ARRAY_BUFFER, terrain_tex_buf);
         glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(textures), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, tobo);
+        glBindBuffer(GL_ARRAY_BUFFER, terrain_tex_offset_buf);
         glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(textures_offsets), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, cbo);
+        glBindBuffer(GL_ARRAY_BUFFER, terrain_color_buf);
         glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(colors), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    public void init_vao() {
-        glBindVertexArray(vao);
+    public void init_terrain_vao() {
+        glBindVertexArray(terrain_vao);
 
         glBindTexture(GL_TEXTURE_2D, ResourceUtil.texture_id("atlas.png"));
 
-        glEnableVertexAttribArray(Game.world_shader.attr("attr_pos"));
-        glEnableVertexAttribArray(Game.world_shader.attr("attr_tex_offset"));
-        glEnableVertexAttribArray(Game.world_shader.attr("attr_tex_coord"));
-        glEnableVertexAttribArray(Game.world_shader.attr("attr_color"));
+        glEnableVertexAttribArray(Game.terrain_shader.attr("attr_pos"));
+        glEnableVertexAttribArray(Game.terrain_shader.attr("attr_tex_offset"));
+        glEnableVertexAttribArray(Game.terrain_shader.attr("attr_tex_coord"));
+        glEnableVertexAttribArray(Game.terrain_shader.attr("attr_color"));
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glVertexAttribPointer(Game.world_shader.attr("attr_pos"), 3, GL_INT, false, 0, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, terrain_vert_buf);
+        glVertexAttribPointer(Game.terrain_shader.attr("attr_pos"), 3, GL_INT, false, 0, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, tbo);
-        glVertexAttribPointer(Game.world_shader.attr("attr_tex_coord"), 2, GL_INT, false, 0, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, terrain_tex_buf);
+        glVertexAttribPointer(Game.terrain_shader.attr("attr_tex_coord"), 2, GL_INT, false, 0, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, tobo);
-        glVertexAttribPointer(Game.world_shader.attr("attr_tex_offset"), 2, GL_FLOAT, false, 0, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, terrain_tex_offset_buf);
+        glVertexAttribPointer(Game.terrain_shader.attr("attr_tex_offset"), 2, GL_FLOAT, false, 0, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, cbo);
-        glVertexAttribPointer(Game.world_shader.attr("attr_color"), 3, GL_FLOAT, false, 0, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, terrain_color_buf);
+        glVertexAttribPointer(Game.terrain_shader.attr("attr_color"), 3, GL_FLOAT, false, 0, 0);
 
         glBindVertexArray(0);
     }
 
-    public void render() {
-        if (vertices_size > 0) {
-            glBindVertexArray(vao);
-            glDrawArrays(GL_TRIANGLES, 0, vertices_size);
-            glBindVertexArray(0);
+    public void init_occlusion_vbo(Integer[] box) {
+        glBindBuffer(GL_ARRAY_BUFFER, occlusion_vert_buf);
+        glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(box), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
 
-            World.faces_in_frame += vertices_size / 3;
-        }
+    public void init_occlusion_vao() {
+        glBindVertexArray(occlusion_vao);
+
+        glEnableVertexAttribArray(Game.occlusion_shader.attr("attr_pos"));
+        glBindBuffer(GL_ARRAY_BUFFER, occlusion_vert_buf);
+        glVertexAttribPointer(Game.occlusion_shader.attr("attr_pos"), 3, GL_INT, false, 0, 0);
+        glBindVertexArray(0);
+    }
+
+    public void terrain_render() {
+        glBindVertexArray(terrain_vao);
+        glDrawArrays(GL_TRIANGLES, 0, vertices_size);
+        glBindVertexArray(0);
+        World.faces_in_frame += vertices_size / 3;
     }
 }

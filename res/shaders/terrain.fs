@@ -1,10 +1,12 @@
-#version 120
+#version 330 core
 
-varying vec2 out_tex_offset;
-varying vec2 out_tex_coord;
-varying vec3 out_color;
+in vec2 out_tex_offset;
+in vec2 out_tex_coord;
+in vec3 out_color;
 
 uniform sampler2D uniform_texture;
+
+out vec4 FragColor;
 
 void main()
 {
@@ -17,8 +19,8 @@ void main()
     tex_coord.x = fract(tex_coord.x) * crop_size + out_tex_offset.x;
     tex_coord.y = fract(tex_coord.y) * crop_size + out_tex_offset.y;
 
-    vec4 tex_color = texture2D(uniform_texture, tex_coord);
+    vec4 tex_color = texture(uniform_texture, tex_coord);
     vec4 color = vec4(tex_color.r * out_color.r, tex_color.g * out_color.g, tex_color.b * out_color.b, 1.0);
 
-    gl_FragColor = color;
+    FragColor = color;
 }

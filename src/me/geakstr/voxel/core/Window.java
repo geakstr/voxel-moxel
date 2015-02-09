@@ -14,6 +14,7 @@ import static org.lwjgl.glfw.Callbacks.errorCallbackPrint;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER_SRGB;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
@@ -67,8 +68,7 @@ public class Window {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_FRAMEBUFFER_SRGB);
-        glEnable(GL_TEXTURE_2D);
+        glDepthFunc(GL_LEQUAL);
 
         glViewport(0, 0, Math.max(Window.width, Window.height), Math.max(Window.width, Window.height));
 
