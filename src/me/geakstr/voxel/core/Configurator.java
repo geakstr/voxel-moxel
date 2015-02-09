@@ -1,5 +1,6 @@
 package me.geakstr.voxel.core;
 
+import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.model.TextureAtlas;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -18,6 +19,8 @@ public class Configurator {
             Window.width = (int) ((long) screen_resolution.get(0));
             Window.height = (int) ((long) screen_resolution.get(1));
             Window.vsync = (boolean) json.get("vsync");
+
+            Game.occlusion = (boolean) json.get("occlusion");
 
             TextureAtlas.fill((JSONObject) json.get("texture_atlas"));
         } catch (FileNotFoundException e) {

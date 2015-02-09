@@ -493,4 +493,16 @@ public class Chunk extends Mesh {
         }
     }
 
+    public void terrain_render() {
+        if (changed || updating) {
+            update();
+        }
+        if (!empty) {
+            glBindVertexArray(terrain_vao);
+            glDrawArrays(GL_TRIANGLES, 0, vertices_size);
+            glBindVertexArray(0);
+            World.faces_in_frame += vertices_size / 3;
+        }
+    }
+
 }

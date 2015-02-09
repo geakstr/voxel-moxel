@@ -52,18 +52,21 @@ public class Mesh {
         terrain_tex_offset_buf = glGenBuffers();
         terrain_color_buf = glGenBuffers();
 
-        occlusion_vao = glGenVertexArrays();
-        occlusion_vert_buf = glGenBuffers();
-
-        occlusion_query = glGenQueries();
+        if (Game.occlusion) {
+            occlusion_vao = glGenVertexArrays();
+            occlusion_vert_buf = glGenBuffers();
+            occlusion_query = glGenQueries();
+        }
     }
 
     public void prepare_render(Integer[] terrain_vert, Integer[] terrain_tex, Float[] terrain_tex_offset, Float[] terrain_color, Integer[] box) {
         init_terrain_vbo(terrain_vert, terrain_tex, terrain_tex_offset, terrain_color);
         init_terrain_vao();
 
-        init_occlusion_vbo(box);
-        init_occlusion_vao();
+        if (Game.occlusion) {
+            init_occlusion_vbo(box);
+            init_occlusion_vao();
+        }
     }
 
     public void init_terrain_vbo(Integer[] vertices, Integer[] textures, Float[] textures_offsets, Float[] colors) {
@@ -127,13 +130,6 @@ public class Mesh {
         glBindBuffer(GL_ARRAY_BUFFER, occlusion_vert_buf);
         glVertexAttribPointer(Game.occlusion_shader.attr("attr_pos"), 3, GL_INT, false, 0, 0);
         glBindVertexArray(0);
-    }
-
-    public void terrain_render() {
-        glBindVertexArray(terrain_vao);
-        glDrawArrays(GL_TRIANGLES, 0, vertices_size);
-        glBindVertexArray(0);
-        World.faces_in_frame += vertices_size / 3;
     }
 
     public void destroy() {

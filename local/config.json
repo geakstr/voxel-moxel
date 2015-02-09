@@ -1,6 +1,7 @@
 {
   "screen_resolution" : [800, 800],
   "vsync" : true,
+  "occlusion" : false,
   "texture_atlas" : {
     "grass" : [0, 0],
     "stone" : [1, 0],

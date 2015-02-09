@@ -12,6 +12,8 @@ import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Game {
+    public static boolean occlusion;
+
     public static Transform world_transform;
     public static ChunksWorkersExecutorService chunks_workers_executor_service;
     public static Shader terrain_shader, occlusion_shader;
@@ -24,8 +26,10 @@ public class Game {
         terrain_shader = new Shader("terrain.vs", "terrain.fs").compile();
         terrain_shader.save_attr("attr_pos").save_attr("attr_tex_offset").save_attr("attr_tex_coord").save_attr("attr_color");
 
-        occlusion_shader = new Shader("occlusion.vs", "occlusion.fs").compile();
-        occlusion_shader.save_attr("attr_pos");
+        if (occlusion) {
+            occlusion_shader = new Shader("occlusion.vs", "occlusion.fs").compile();
+            occlusion_shader.save_attr("attr_pos");
+        }
 
         world_transform = new Transform();
 
@@ -45,16 +49,17 @@ public class Game {
     static boolean odd_frame = true;
 
     public static void render() {
-        occlusion_shader.bind();
-        occlusion_shader.set_uniform("uniform_transform", world_transform.getTransform());
-        occlusion_shader.set_uniform("uniform_camera_projection", Camera.projection);
-        occlusion_shader.set_uniform("uniform_camera_view", Camera.view);
-        glDisable(GL_DEPTH_TEST);
-        glColorMask(false, false, false, false);
-        glDepthMask(false);
-        World.occlusion_render();
-        occlusion_shader.unbind();
-
+        if (occlusion) {
+            occlusion_shader.bind();
+            occlusion_shader.set_uniform("uniform_transform", world_transform.getTransform());
+            occlusion_shader.set_uniform("uniform_camera_projection", Camera.projection);
+            occlusion_shader.set_uniform("uniform_camera_view", Camera.view);
+            glDisable(GL_DEPTH_TEST);
+            glColorMask(false, false, false, false);
+            glDepthMask(false);
+            World.occlusion_render();
+            occlusion_shader.unbind();
+        }
 
         terrain_shader.bind();
         terrain_shader.set_uniform("uniform_transform", world_transform.getTransform());
@@ -75,7 +80,7 @@ public class Game {
         if (null != terrain_shader) {
             terrain_shader.dispose();
         }
-        if (null != occlusion_shader) {
+        if (occlusion && null != occlusion_shader) {
             occlusion_shader.dispose();
         }
         if (null != chunks_workers_executor_service) {
