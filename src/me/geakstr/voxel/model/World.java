@@ -118,8 +118,10 @@ public class World {
                             }
                         }
                     } else if (!Game.occlusion) {
-                        chunks_in_frame++;
-                        chunks[z][x][y].terrain_render();
+                    	if (Frustum.chunkInFrustum(x, y, z)) {
+                    		chunks_in_frame++;
+                    		chunks[z][x][y].terrain_render();
+                    	}
                     }
                 }
             }

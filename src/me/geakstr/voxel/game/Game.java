@@ -21,7 +21,7 @@ public class Game {
     public static void init() {
         ResourceUtil.load_textures("atlas.png");
 
-        Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 1000f);
+        Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 512f);
 
         terrain_shader = new Shader("terrain.vs", "terrain.fs").compile();
         terrain_shader.save_attr("attr_pos").save_attr("attr_tex_offset").save_attr("attr_tex_coord").save_attr("attr_color");
@@ -35,7 +35,7 @@ public class Game {
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(64, 1, 16, 16, 256);
+        World.init(32, 1, 16, 16, 32);
         World.gen();
     }
 
@@ -59,6 +59,7 @@ public class Game {
             glDepthMask(false);
             World.occlusion_render();
             occlusion_shader.unbind();
+            System.out.println("TEST");
         }
 
         terrain_shader.bind();
