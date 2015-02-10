@@ -48,7 +48,7 @@ public class World {
                             for (int zz = 0; zz < chunk_height; zz++) {
                                 chunks[z][x][y].blocks[xx][yy][zz] = new Block(
                                         new Vector3f(x * chunk_width + xx, y * chunk_length + yy, z * chunk_height + zz),
-                                        new Vector3f(x * chunk_width + xx + 2, y * chunk_length + yy + 2, z * chunk_height + zz + 2));
+                                        new Vector3f(x * chunk_width + xx + 1, y * chunk_length + yy + 1, z * chunk_height + zz + 1));
                             }
                         }
                     }

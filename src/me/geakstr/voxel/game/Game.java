@@ -80,12 +80,13 @@ public class Game {
                 p1.z / p0.w
         );
 
-        Vector3f ray_direction = Vector3f.sub(p1_norm, p0_norm, null);
+        Vector3f ray_direction = Vector3f.sub(new Vector3f(p1.x, p1.y, p1.z), new Vector3f(p0.x, p0.y, p0.z), null);
+        //ray_direction = ray_direction.normalise(ray_direction);
 
         ray = new Ray(ray_origin, ray_direction);
 
-        if (World.chunks[0][0][0].blocks[0][0][0].intersect(ray, 0, 0)) {
-            System.out.println(World.chunks[0][0][0].blocks[0][0][0].intersect(ray, 0, 0));
+        if (World.chunks[0][0][0].blocks[0][0][0].intersect(ray, -1, 1)) {
+            System.out.println(World.chunks[0][0][0].blocks[0][0][0].intersect(ray, -1, 1));
         }
     }
 
