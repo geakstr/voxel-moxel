@@ -5,7 +5,6 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 import me.geakstr.voxel.game.Game;
-import me.geakstr.voxel.render.Shader;
 import me.geakstr.voxel.util.ExtendedBufferUtil;
 
 public class AbstractMesh {
@@ -62,7 +61,7 @@ public class AbstractMesh {
 		glBindVertexArray(0);
 	}
 	
-	public void render(Shader shader) {
+	public void render() {
 		this.bind_vao();
         glDrawArrays(GL_TRIANGLES, 0, size);
         this.unbind_vao();

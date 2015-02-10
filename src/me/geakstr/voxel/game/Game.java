@@ -4,11 +4,11 @@ import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Frustum;
+import me.geakstr.voxel.render.Ray;
 import me.geakstr.voxel.render.Shader;
 import me.geakstr.voxel.render.Transform;
 import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
-
 import static org.lwjgl.opengl.GL11.*;
 
 public class Game {
@@ -17,6 +17,7 @@ public class Game {
     public static Transform world_transform;
     public static ChunksWorkersExecutorService chunks_workers_executor_service;
     public static Shader current_shader, terrain_shader, occlusion_shader;
+    public static Ray ray;
 
     public static void init() {
         ResourceUtil.load_textures("atlas.png");
@@ -36,6 +37,8 @@ public class Game {
         world_transform = new Transform();
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
+        
+        ray = new Ray(Camera.position, Camera.rotation);
 
         World.init(16, 1, 16, 16, 32);
         World.gen();
@@ -47,8 +50,6 @@ public class Game {
 
         Frustum.update();
     }
-
-    static boolean odd_frame = true;
 
     public static void render() {
         if (occlusion) {
