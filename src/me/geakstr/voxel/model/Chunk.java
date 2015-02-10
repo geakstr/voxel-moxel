@@ -13,7 +13,7 @@ import static org.lwjgl.opengl.GL15.glBeginQuery;
 import static org.lwjgl.opengl.GL15.glEndQuery;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
-public class Chunk extends Mesh {
+public class Chunk extends OccludedTexturedMesh {
     public int[][][] cubes; // [x][y][z]
 
     public boolean changed, updating, updated, empty;
@@ -35,11 +35,6 @@ public class Chunk extends Mesh {
         this.x_offset = x_chunk_pos * World.chunk_width;
         this.y_offset = y_chunk_pos * World.chunk_length;
         this.z_offset = z_chunk_pos * World.chunk_height;
-
-        this.vertices_size = World.chunk_volume * Cube.cube_side_vertices_size * 6;
-        this.textures_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
-        this.textures_offsets_size = World.chunk_volume * Cube.cube_side_texture_size * 6;
-
 
         this.cubes = new int[World.chunk_width][World.chunk_length][World.chunk_height];
         this.box = new Integer[]{
@@ -194,7 +189,7 @@ public class Chunk extends Mesh {
 
         if (updated && updating && !empty) {
             updating = false;
-            prepare_render(vertices, textures, textures_offsets, colors, box);
+            prepare(verts, colors, tex, tex_off, box);
         }
 
         changed = false;
@@ -258,10 +253,6 @@ public class Chunk extends Mesh {
                         coords_map.put(face, tmp);
                     }
 
-//                    if (x > 0 && mark[y][x - 1] == mark[y][x]) {
-//                        len++;
-//                    }
-
                     canDown = !(len > 0 && !canDown) && (y < (World.chunk_length - 1) && (Cube.unpack_type(cubes[x][y + 1][z]) == type));
 
                     if (canDown) {
@@ -313,19 +304,16 @@ public class Chunk extends Mesh {
             }
         }
 
-        this.vertices = vertices.toArray(new Integer[vertices.size()]);
-        this.textures = textures.toArray(new Integer[textures.size()]);
-        this.textures_offsets = textures_offsets.toArray(new Float[textures_offsets.size()]);
+        this.verts = vertices.toArray(new Integer[vertices.size()]);
+        this.tex = textures.toArray(new Integer[textures.size()]);
+        this.tex_off = textures_offsets.toArray(new Float[textures_offsets.size()]);
         this.colors = colors.toArray(new Float[colors.size()]);
-
-        this.vertices_size = this.vertices.length;
-        this.textures_size = this.textures.length;
-        this.textures_offsets_size = this.textures_offsets.length;
-        this.colors_size = this.colors.length;
+        
+        this.size = this.verts.length;
 
         this.updated = true;
 
-        this.empty = this.vertices_size == 0;
+        this.empty = this.size == 0;
     }
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
@@ -485,8 +473,8 @@ public class Chunk extends Mesh {
         }
         if (!empty && !waiting) {
             this.waiting = true;
-            glBeginQuery(GL_SAMPLES_PASSED_ARB, occlusion_query);
-            glBindVertexArray(occlusion_vao);
+            glBeginQuery(GL_SAMPLES_PASSED_ARB, o_query);
+            glBindVertexArray(o_vao);
             glDrawArrays(GL_TRIANGLES, 0, 108);
             glBindVertexArray(0);
             glEndQuery(GL_SAMPLES_PASSED_ARB);
@@ -498,10 +486,10 @@ public class Chunk extends Mesh {
             update();
         }
         if (!empty) {
-            glBindVertexArray(terrain_vao);
-            glDrawArrays(GL_TRIANGLES, 0, vertices_size);
+            glBindVertexArray(vao);
+            glDrawArrays(GL_TRIANGLES, 0, size);
             glBindVertexArray(0);
-            World.faces_in_frame += vertices_size / 3;
+            World.faces_in_frame += size / 3;
         }
     }
 

@@ -76,14 +76,6 @@ public class World {
                 }
             }
         }
-
-        for (int k = 0; k < world_height; k++) {
-            for (int i = 0; i < world_size; i++) {
-                for (int j = 0; j < world_size; j++) {
-                    chunks[k][i][j].gen_buffers();
-                }
-            }
-        }
     }
 
     public static void occlusion_render() {
@@ -107,10 +99,10 @@ public class World {
                 for (int y = 0; y < world_size; y++) {
                     if (Game.occlusion && !chunks[z][x][y].empty) {
                         if (chunks[z][x][y].waiting) {
-                            int result = glGetQueryObjectui(chunks[z][x][y].occlusion_query, GL_QUERY_RESULT_AVAILABLE);
+                            int result = glGetQueryObjectui(chunks[z][x][y].o_query, GL_QUERY_RESULT_AVAILABLE);
                             if (result == 1) {
                                 chunks[z][x][y].waiting = false;
-                                chunks[z][x][y].visible = glGetQueryObjectui(chunks[z][x][y].occlusion_query, GL_QUERY_RESULT_ARB) > 0;
+                                chunks[z][x][y].visible = glGetQueryObjectui(chunks[z][x][y].o_query, GL_QUERY_RESULT_ARB) > 0;
                             }
                             if (chunks[z][x][y].visible) {
                                 chunks_in_frame++;

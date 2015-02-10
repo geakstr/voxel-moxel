@@ -16,7 +16,7 @@ public class Game {
 
     public static Transform world_transform;
     public static ChunksWorkersExecutorService chunks_workers_executor_service;
-    public static Shader terrain_shader, occlusion_shader;
+    public static Shader current_shader, terrain_shader, occlusion_shader;
 
     public static void init() {
         ResourceUtil.load_textures("atlas.png");
@@ -30,12 +30,14 @@ public class Game {
             occlusion_shader = new Shader("occlusion.vs", "occlusion.fs").compile();
             occlusion_shader.save_attr("attr_pos");
         }
+        
+        current_shader = terrain_shader;
 
         world_transform = new Transform();
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(32, 1, 16, 16, 32);
+        World.init(16, 1, 16, 16, 32);
         World.gen();
     }
 
@@ -59,19 +61,15 @@ public class Game {
             glDepthMask(false);
             World.occlusion_render();
             occlusion_shader.unbind();
-            System.out.println("TEST");
         }
 
-        terrain_shader.bind();
-        terrain_shader.set_uniform("uniform_transform", world_transform.getTransform());
-        terrain_shader.set_uniform("uniform_camera_projection", Camera.projection);
-        terrain_shader.set_uniform("uniform_camera_view", Camera.view);
-        terrain_shader.set_uniform("uniform_texture", 0);
-        glEnable(GL_DEPTH_TEST);
-        glDepthMask(true);
-        glColorMask(true, true, true, true);
+        current_shader.bind();
+        current_shader.set_uniform("uniform_transform", world_transform.getTransform());
+        current_shader.set_uniform("uniform_camera_projection", Camera.projection);
+        current_shader.set_uniform("uniform_camera_view", Camera.view);
+        current_shader.set_uniform("uniform_texture", 0);
         World.render();
-        terrain_shader.unbind();
+        current_shader.unbind();
     }
 
     public static void after_render() {}
