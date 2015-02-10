@@ -1,4 +1,4 @@
-package me.geakstr.voxel.model;
+package me.geakstr.voxel.model.meshes;
 
 import static org.lwjgl.opengl.GL11.GL_INT;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;

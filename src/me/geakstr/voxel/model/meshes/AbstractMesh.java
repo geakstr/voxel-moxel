@@ -1,10 +1,11 @@
-package me.geakstr.voxel.model;
+package me.geakstr.voxel.model.meshes;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 import me.geakstr.voxel.game.Game;
+import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.util.ExtendedBufferUtil;
 
 public class AbstractMesh {

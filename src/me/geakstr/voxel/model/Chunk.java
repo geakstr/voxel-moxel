@@ -2,6 +2,7 @@ package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector2f;
+import me.geakstr.voxel.model.meshes.OccludedTexturedMesh;
 import me.geakstr.voxel.workers.ChunkWorker;
 
 import java.util.*;
@@ -14,13 +15,10 @@ import static org.lwjgl.opengl.GL15.glEndQuery;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public class Chunk extends OccludedTexturedMesh {
-    public int[][][] cubes; // [x][y][z]
+    public Block[][][] blocks; // [x][y][z]
 
-    public boolean changed, updating, updated, empty;
+    public boolean changed, updating, updated, empty, waiting, visible;
     public Integer[] box;
-
-    public boolean waiting;
-    public boolean visible;
 
     public int x_chunk_pos, y_chunk_pos, z_chunk_pos;
     public int x_offset, y_offset, z_offset;
@@ -36,140 +34,8 @@ public class Chunk extends OccludedTexturedMesh {
         this.y_offset = y_chunk_pos * World.chunk_length;
         this.z_offset = z_chunk_pos * World.chunk_height;
 
-        this.cubes = new int[World.chunk_width][World.chunk_length][World.chunk_height];
-        this.box = new Integer[]{
-                // 2 - 1 - 7
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-
-                // 4 - 2 - 7
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-
-                // 3 - 0 - 5
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-
-                // 6 - 3 - 5
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-
-                // 5 - 7 - 4
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-
-                // 5 - 4 - 6
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-
-                // 0 - 1 - 2
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-
-                // 0 - 2 - 3
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-
-                // 7 - 0 - 5
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-
-                // 7 - 1 - 0
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-
-                // 4 - 3 - 6
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length,
-
-                // 4 - 2 - 3
-                x_chunk_pos * World.chunk_width + World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length + World.chunk_height,
-                x_chunk_pos * World.chunk_width,
-                z_chunk_pos * World.chunk_height + World.chunk_height,
-                y_chunk_pos * World.chunk_length
-        };
+        this.blocks = new Block[World.chunk_width][World.chunk_length][World.chunk_height];
+        this.box = Box.get_box(x_chunk_pos, y_chunk_pos, z_chunk_pos, World.chunk_width, World.chunk_length, World.chunk_height);
 
         this.changed = true;
         this.waiting = false;
@@ -179,20 +45,6 @@ public class Chunk extends OccludedTexturedMesh {
         this.updated = true;
 
         this.empty = true;
-    }
-
-    public void update() {
-        if (changed && !updating && updated) {
-            updated = false;
-            Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
-        }
-
-        if (updated && updating && !empty) {
-            updating = false;
-            prepare(verts, colors, tex, tex_off, box);
-        }
-
-        changed = false;
     }
 
     public void rebuild() {
@@ -216,12 +68,11 @@ public class Chunk extends OccludedTexturedMesh {
                 boolean canDown = false;
                 int projFlag = -1;
                 for (int x = 0; x < World.chunk_width; x++) {
-                    int val = cubes[x][y][z];
-                    int type = Cube.unpack_type(val);
-                    if (type == 0) {
+                    if (blocks[x][y][z].type == 0) {
                         continue;
                     }
 
+                    int type = 1;
                     boolean update_coords = false;
 
                     if (proj[x] != -1) {
@@ -232,9 +83,8 @@ public class Chunk extends OccludedTexturedMesh {
                         } else {
                             len = 0;
                         }
-                        // len = 0;
                         update_coords = true;
-                    } else if (((x > 0) && (Cube.unpack_type(cubes[x - 1][y][z]) == type) && (projFlag != x - 1))) {
+                    } else if (((x > 0) && (blocks[x - 1][y][z].type == type) && (projFlag != x - 1))) {
                         mark[y][x] = mark[y][x - 1];
                         update_coords = true;
                         len++;
@@ -245,15 +95,14 @@ public class Chunk extends OccludedTexturedMesh {
                     }
 
                     if (update_coords) {
-                        int[] tmp = null;
                         int face = proj[x] != -1 ? proj[x] : mark[y][x - 1];
-                        tmp = coords_map.get(face);
+                        int[] tmp = coords_map.get(face);
                         tmp[2] = x;
                         tmp[3] = y;
                         coords_map.put(face, tmp);
                     }
 
-                    canDown = !(len > 0 && !canDown) && (y < (World.chunk_length - 1) && (Cube.unpack_type(cubes[x][y + 1][z]) == type));
+                    canDown = !(len > 0 && !canDown) && (y < (World.chunk_length - 1) && (blocks[x][y + 1][z].type == type));
 
                     if (canDown) {
                         proj[x] = mark[y][x];
@@ -276,13 +125,13 @@ public class Chunk extends OccludedTexturedMesh {
                 Vector2f tex = rnd.nextBoolean() ? TextureAtlas.get_coord("grass") : TextureAtlas.get_coord("dirt");
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        vertices.addAll(Arrays.asList(Cube.get_side(
+                        vertices.addAll(Arrays.asList(Block.get_side(
                                 side_idx,
                                 x0 + x_offset, y0 + y_offset,
                                 x1 + x_offset, y1 + y_offset,
                                 z + z_offset)));
 
-                        textures.addAll(Arrays.asList(Cube.get_texture(
+                        textures.addAll(Arrays.asList(Block.get_texture(
                                 side_idx, x0, y0, x1, y1)));
                         textures_offsets.addAll(Arrays.asList(
                                 tex.x, tex.y,
@@ -308,7 +157,7 @@ public class Chunk extends OccludedTexturedMesh {
         this.tex = textures.toArray(new Integer[textures.size()]);
         this.tex_off = textures_offsets.toArray(new Float[textures_offsets.size()]);
         this.colors = colors.toArray(new Float[colors.size()]);
-        
+
         this.size = this.verts.length;
 
         this.updated = true;
@@ -323,7 +172,7 @@ public class Chunk extends OccludedTexturedMesh {
             sides[0] = true;
         } else if (x0 > 0) {
             for (int y = y0; y <= y1; y++) {
-                if (Cube.unpack_type(cubes[x0 - 1][y][z]) == 0) {
+                if (blocks[x0 - 1][y][z].type == 0) {
                     sides[0] = true;
                     break;
                 }
@@ -333,7 +182,7 @@ public class Chunk extends OccludedTexturedMesh {
             sides[1] = true;
         } else if (x1 < World.chunk_width - 1) {
             for (int y = y0; y <= y1; y++) {
-                if (Cube.unpack_type(cubes[x1 + 1][y][z]) == 0) {
+                if (blocks[x1 + 1][y][z].type == 0) {
                     sides[1] = true;
                     break;
                 }
@@ -344,7 +193,7 @@ public class Chunk extends OccludedTexturedMesh {
             sides[3] = true;
         } else if (y0 > 0) {
             for (int x = x0; x <= x1; x++) {
-                if (Cube.unpack_type(cubes[x][y0 - 1][z]) == 0) {
+                if (blocks[x][y0 - 1][z].type == 0) {
                     sides[3] = true;
                     break;
                 }
@@ -355,7 +204,7 @@ public class Chunk extends OccludedTexturedMesh {
             sides[2] = true;
         } else if (y1 < World.chunk_length - 1) {
             for (int x = x0; x <= x1; x++) {
-                if (Cube.unpack_type(cubes[x][y1 + 1][z]) == 0) {
+                if (blocks[x][y1 + 1][z].type == 0) {
                     sides[2] = true;
                     break;
                 }
@@ -367,7 +216,7 @@ public class Chunk extends OccludedTexturedMesh {
         } else if (z > 0) {
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (Cube.unpack_type(cubes[x][y][z - 1]) == 0) {
+                    if (blocks[x][y][z - 1].type == 0) {
                         sides[4] = true;
                         break;
                     }
@@ -380,7 +229,7 @@ public class Chunk extends OccludedTexturedMesh {
         } else if (z < World.chunk_height - 1) {
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (Cube.unpack_type(cubes[x][y][z + 1]) == 0) {
+                    if (blocks[x][y][z + 1].type == 0) {
                         sides[5] = true;
                         break;
                     }
@@ -393,7 +242,7 @@ public class Chunk extends OccludedTexturedMesh {
                 x_chunk_pos != 0) {
             sides[0] = false;
             for (int y = y0; y <= y1; y++) {
-                if (Cube.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos - 1][y_chunk_pos].cubes[World.chunk_width - 1][y][z]) == 0) {
+                if (World.chunks[z_chunk_pos][x_chunk_pos - 1][y_chunk_pos].blocks[World.chunk_width - 1][y][z].type == 0) {
                     sides[0] = true;
                     break;
                 }
@@ -405,7 +254,7 @@ public class Chunk extends OccludedTexturedMesh {
                 x_chunk_pos != World.world_size - 1) {
             sides[1] = false;
             for (int y = y0; y <= y1; y++) {
-                if (Cube.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos + 1][y_chunk_pos].cubes[0][y][z]) == 0) {
+                if (World.chunks[z_chunk_pos][x_chunk_pos + 1][y_chunk_pos].blocks[0][y][z].type == 0) {
                     sides[1] = true;
                     break;
                 }
@@ -417,7 +266,7 @@ public class Chunk extends OccludedTexturedMesh {
                 y_chunk_pos != World.world_size - 1) {
             sides[2] = false;
             for (int x = x0; x <= x1; x++) {
-                if (Cube.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos + 1].cubes[x][0][z]) == 0) {
+                if (World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos + 1].blocks[x][0][z].type == 0) {
                     sides[2] = true;
                     break;
                 }
@@ -429,7 +278,7 @@ public class Chunk extends OccludedTexturedMesh {
                 y_chunk_pos != 0) {
             sides[3] = false;
             for (int x = x0; x <= x1; x++) {
-                if (Cube.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos - 1].cubes[x][World.chunk_length - 1][z]) == 0) {
+                if (World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos - 1].blocks[x][World.chunk_length - 1][z].type == 0) {
                     sides[3] = true;
                     break;
                 }
@@ -442,7 +291,7 @@ public class Chunk extends OccludedTexturedMesh {
             sides[4] = false;
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (Cube.unpack_type(World.chunks[z_chunk_pos - 1][x_chunk_pos][y_chunk_pos].cubes[x][y][World.chunk_height - 1]) == 0) {
+                    if (World.chunks[z_chunk_pos - 1][x_chunk_pos][y_chunk_pos].blocks[x][y][World.chunk_height - 1].type == 0) {
                         sides[4] = true;
                         break;
                     }
@@ -456,7 +305,7 @@ public class Chunk extends OccludedTexturedMesh {
             sides[5] = false;
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (Cube.unpack_type(World.chunks[z_chunk_pos + 1][x_chunk_pos][y_chunk_pos].cubes[x][y][0]) == 0) {
+                    if (World.chunks[z_chunk_pos + 1][x_chunk_pos][y_chunk_pos].blocks[x][y][0].type == 0) {
                         sides[5] = true;
                         break;
                     }
@@ -467,6 +316,20 @@ public class Chunk extends OccludedTexturedMesh {
         return sides;
     }
 
+    public void update() {
+        if (changed && !updating && updated) {
+            updated = false;
+            Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
+        }
+
+        if (updated && updating && !empty) {
+            updating = false;
+            prepare(verts, colors, tex, tex_off, box);
+        }
+
+        changed = false;
+    }
+
     public void occlusion_render() {
         if (changed || updating) {
             update();
@@ -475,7 +338,7 @@ public class Chunk extends OccludedTexturedMesh {
             this.waiting = true;
             glBeginQuery(GL_SAMPLES_PASSED_ARB, o_query);
             glBindVertexArray(o_vao);
-            glDrawArrays(GL_TRIANGLES, 0, 108);
+            glDrawArrays(GL_TRIANGLES, 0, Box.box_vertices_size);
             glBindVertexArray(0);
             glEndQuery(GL_SAMPLES_PASSED_ARB);
         }
@@ -486,9 +349,9 @@ public class Chunk extends OccludedTexturedMesh {
             update();
         }
         if (!empty) {
-            glBindVertexArray(vao);
+            bind_vao();
             glDrawArrays(GL_TRIANGLES, 0, size);
-            glBindVertexArray(0);
+            unbind_vao();
             World.faces_in_frame += size / 3;
         }
     }

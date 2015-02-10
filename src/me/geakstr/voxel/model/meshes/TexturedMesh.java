@@ -1,4 +1,4 @@
-package me.geakstr.voxel.model;
+package me.geakstr.voxel.model.meshes;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_INT;

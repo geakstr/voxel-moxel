@@ -2,13 +2,10 @@ package me.geakstr.voxel.game;
 
 import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.model.World;
-import me.geakstr.voxel.render.Camera;
-import me.geakstr.voxel.render.Frustum;
-import me.geakstr.voxel.render.Ray;
-import me.geakstr.voxel.render.Shader;
-import me.geakstr.voxel.render.Transform;
+import me.geakstr.voxel.render.*;
 import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
+
 import static org.lwjgl.opengl.GL11.*;
 
 public class Game {
@@ -29,15 +26,13 @@ public class Game {
 
         if (occlusion) {
             occlusion_shader = new Shader("occlusion.vs", "occlusion.fs").compile();
-            occlusion_shader.save_attr("attr_pos");
+            occlusion_shader.save_attr("attr_pos").save_attr("attr_color").save_attr("attr_tex_coord").save_attr("attr_tex_offset");
         }
-        
-        current_shader = terrain_shader;
 
         world_transform = new Transform();
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
-        
+
         ray = new Ray(Camera.position, Camera.rotation);
 
         World.init(16, 1, 16, 16, 32);
@@ -53,17 +48,19 @@ public class Game {
 
     public static void render() {
         if (occlusion) {
-            occlusion_shader.bind();
-            occlusion_shader.set_uniform("uniform_transform", world_transform.getTransform());
-            occlusion_shader.set_uniform("uniform_camera_projection", Camera.projection);
-            occlusion_shader.set_uniform("uniform_camera_view", Camera.view);
+            current_shader = occlusion_shader;
+            current_shader.bind();
+            current_shader.set_uniform("uniform_transform", world_transform.getTransform());
+            current_shader.set_uniform("uniform_camera_projection", Camera.projection);
+            current_shader.set_uniform("uniform_camera_view", Camera.view);
             glDisable(GL_DEPTH_TEST);
             glColorMask(false, false, false, false);
             glDepthMask(false);
             World.occlusion_render();
-            occlusion_shader.unbind();
+            current_shader.unbind();
         }
 
+        current_shader = terrain_shader;
         current_shader.bind();
         current_shader.set_uniform("uniform_transform", world_transform.getTransform());
         current_shader.set_uniform("uniform_camera_projection", Camera.projection);

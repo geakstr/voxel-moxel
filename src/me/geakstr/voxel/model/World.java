@@ -13,8 +13,7 @@ import static org.lwjgl.opengl.GL15.glGetQueryObjectui;
 public class World {
     public static int world_size;
     public static int world_height;
-    public static int world_volume; // world_size * world_size * world_height
-    // chunks
+    public static int world_volume; // world_size * world_size * world_height chunks
 
     public static int chunk_height; // z axis size
     public static int chunk_width; // x axis size
@@ -43,6 +42,13 @@ public class World {
             for (int y = 0; y < world_size; y++) {
                 for (int z = 0; z < world_height; z++) {
                     chunks[z][x][y] = new Chunk(x, y, z);
+                    for (int i = 0; i < chunk_width; i++) {
+                        for (int j = 0; j < chunk_length; j++) {
+                            for (int k = 0; k < chunk_height; k++) {
+                                chunks[z][x][y].blocks[i][j][k] = new Block();
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -50,8 +56,7 @@ public class World {
 
     public static void gen() {
         Random rnd = new Random();
-        OpenSimplexNoise noise = new OpenSimplexNoise(
-                rnd.nextInt(Integer.MAX_VALUE));
+        OpenSimplexNoise noise = new OpenSimplexNoise(rnd.nextInt(Integer.MAX_VALUE));
 
         for (int global_x = 0; global_x < world_size * chunk_width; global_x++) {
             for (int global_y = 0; global_y < world_size * chunk_length; global_y++) {
@@ -67,11 +72,10 @@ public class World {
                 for (int chunk_z = 0; chunk_z < chunk_vert_size; chunk_z++) {
                     Chunk chunk = chunks[chunk_z][chunk_x][chunk_y];
 
-                    int height = chunk_z == chunk_vert_size - 1 ? (int) (global_z % chunk_height)
-                            : chunk_height;
+                    int height = chunk_z == chunk_vert_size - 1 ? (int) (global_z % chunk_height) : chunk_height;
 
                     for (int cube_z = 0; cube_z < height; cube_z++) {
-                        chunk.cubes[cube_x][cube_y][cube_z] = Cube.pack_type(0, 1);
+                        chunk.blocks[cube_x][cube_y][cube_z] = new Block(1);
                     }
                 }
             }
@@ -110,10 +114,10 @@ public class World {
                             }
                         }
                     } else if (!Game.occlusion) {
-                    	if (Frustum.chunkInFrustum(x, y, z)) {
-                    		chunks_in_frame++;
-                    		chunks[z][x][y].terrain_render();
-                    	}
+                        if (Frustum.chunkInFrustum(x, y, z)) {
+                            chunks_in_frame++;
+                            chunks[z][x][y].terrain_render();
+                        }
                     }
                 }
             }
