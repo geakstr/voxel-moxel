@@ -64,6 +64,13 @@ public class Vector4f extends Vector implements Serializable, ReadableVector4f, 
         set(src);
     }
 
+    public Vector4f(Matrix4f m) {
+        this.x = m.m03;
+        this.y = m.m13;
+        this.z = m.m23;
+        this.w = m.m33;
+    }
+
     /**
      * Constructor
      */
@@ -166,6 +173,15 @@ public class Vector4f extends Vector implements Serializable, ReadableVector4f, 
             return new Vector4f(left.x - right.x, left.y - right.y, left.z - right.z, left.w - right.w);
         else {
             dest.set(left.x - right.x, left.y - right.y, left.z - right.z, left.w - right.w);
+            return dest;
+        }
+    }
+
+    public static Vector4f mul(Vector4f left, Vector4f right, Vector4f dest) {
+        if (dest == null)
+            return new Vector4f(left.x * right.x, left.y * right.y, left.z * right.z, left.w * right.w);
+        else {
+            dest.set(left.x * right.x, left.y * right.y, left.z * right.z, left.w * right.w);
             return dest;
         }
     }

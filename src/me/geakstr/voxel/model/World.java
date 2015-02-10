@@ -1,6 +1,7 @@
 package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.game.Game;
+import me.geakstr.voxel.math.Vector3f;
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.util.OpenSimplexNoise;
 
@@ -42,10 +43,12 @@ public class World {
             for (int y = 0; y < world_size; y++) {
                 for (int z = 0; z < world_height; z++) {
                     chunks[z][x][y] = new Chunk(x, y, z);
-                    for (int i = 0; i < chunk_width; i++) {
-                        for (int j = 0; j < chunk_length; j++) {
-                            for (int k = 0; k < chunk_height; k++) {
-                                chunks[z][x][y].blocks[i][j][k] = new Block();
+                    for (int xx = 0; xx < chunk_width; xx++) {
+                        for (int yy = 0; yy < chunk_length; yy++) {
+                            for (int zz = 0; zz < chunk_height; zz++) {
+                                chunks[z][x][y].blocks[xx][yy][zz] = new Block(
+                                        new Vector3f(x * chunk_width + xx, y * chunk_length + yy, z * chunk_height + zz),
+                                        new Vector3f(x * chunk_width + xx + 2, y * chunk_length + yy + 2, z * chunk_height + zz + 2));
                             }
                         }
                     }
@@ -56,11 +59,11 @@ public class World {
 
     public static void gen() {
         Random rnd = new Random();
-        OpenSimplexNoise noise = new OpenSimplexNoise(rnd.nextInt(Integer.MAX_VALUE));
+        OpenSimplexNoise noise = new OpenSimplexNoise(0);
 
         for (int global_x = 0; global_x < world_size * chunk_width; global_x++) {
             for (int global_y = 0; global_y < world_size * chunk_length; global_y++) {
-                double global_z = ((noise.eval(global_x / 128.0, global_y / 128.0, 1.0) + 1)) * world_height * chunk_height / 2;
+                double global_z = ((noise.eval(global_x / 1.0f, global_y / 1.0f, 1.0) + 1)) * world_height * chunk_height / 2;
 
                 int chunk_x = global_x / (chunk_width);
                 int chunk_y = global_y / (chunk_length);
@@ -75,7 +78,7 @@ public class World {
                     int height = chunk_z == chunk_vert_size - 1 ? (int) (global_z % chunk_height) : chunk_height;
 
                     for (int cube_z = 0; cube_z < height; cube_z++) {
-                        chunk.blocks[cube_x][cube_y][cube_z] = new Block(1);
+                        chunk.blocks[cube_x][cube_y][cube_z].type = 1;
                     }
                 }
             }

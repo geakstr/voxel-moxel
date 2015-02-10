@@ -1,6 +1,11 @@
 package me.geakstr.voxel.game;
 
+import me.geakstr.voxel.core.Input;
 import me.geakstr.voxel.core.Window;
+import me.geakstr.voxel.math.Matrix4f;
+import me.geakstr.voxel.math.Vector2f;
+import me.geakstr.voxel.math.Vector3f;
+import me.geakstr.voxel.math.Vector4f;
 import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.render.*;
 import me.geakstr.voxel.util.ResourceUtil;
@@ -33,9 +38,7 @@ public class Game {
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        ray = new Ray(Camera.position, Camera.rotation);
-
-        World.init(16, 1, 16, 16, 32);
+        World.init(1, 1, 1, 1, 2);
         World.gen();
     }
 
@@ -44,6 +47,46 @@ public class Game {
         Camera.apply();
 
         Frustum.update();
+
+        Vector2f mouse = Input.getMousePosition();
+        mouse.x = mouse.x / Window.width * 2f - 1f;
+        mouse.y = mouse.y / Window.height * 2f - 1f;
+
+        Matrix4f proj = new Matrix4f(Camera.projection);
+        Matrix4f model = new Matrix4f(Camera.view);
+
+        Matrix4f inverse_mvp = new Matrix4f();
+        Matrix4f.mul(proj, model, inverse_mvp);
+        inverse_mvp.invert();
+
+        Vector3f ray_origin = new Vector3f(
+                -model.m30,
+                -model.m31,
+                -model.m32
+        );
+
+        Vector4f p0 = Vector4f.mul(new Vector4f(inverse_mvp), new Vector4f(mouse.x, mouse.y, -1f, 1f), null);
+        Vector4f p1 = Vector4f.mul(new Vector4f(inverse_mvp), new Vector4f(mouse.x, mouse.y, 1f, 1f), null);
+
+        Vector3f p0_norm = new Vector3f(
+                p0.x / p0.w,
+                p0.y / p0.w,
+                p0.z / p0.w
+        );
+
+        Vector3f p1_norm = new Vector3f(
+                p1.x / p0.w,
+                p1.y / p0.w,
+                p1.z / p0.w
+        );
+
+        Vector3f ray_direction = Vector3f.sub(p1_norm, p0_norm, null);
+
+        ray = new Ray(ray_origin, ray_direction);
+
+        if (World.chunks[0][0][0].blocks[0][0][0].intersect(ray, 0, 0)) {
+            System.out.println(World.chunks[0][0][0].blocks[0][0][0].intersect(ray, 0, 0));
+        }
     }
 
     public static void render() {
