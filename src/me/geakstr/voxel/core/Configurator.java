@@ -21,6 +21,7 @@ public class Configurator {
             Window.vsync = (boolean) json.get("vsync");
 
             Game.occlusion = (boolean) json.get("occlusion");
+            Game.frustum = (boolean) json.get("frustum");
 
             TextureAtlas.fill((JSONObject) json.get("texture_atlas"));
         } catch (FileNotFoundException e) {

@@ -1,9 +1,6 @@
 package me.geakstr.voxel.util;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL14;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -26,6 +23,57 @@ public class ResourceUtil {
 
     public static void load_textures(String... names) {
         for (String name : names) load_texture(name);
+    }
+
+    public static void gen_colored_texture() {
+        int width = 4096, height = 4096;
+
+        ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * 3);
+
+        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        int r = 0, g = 0, b = 0;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                buffer.put((byte) r);
+                buffer.put((byte) g);
+                buffer.put((byte) b);
+
+                bufferedImage.setRGB(x, y, (r << 16) | (g << 8) | b);
+
+                r++;
+                if (r > 255) {
+                    r = 0;
+                    g++;
+                    if (g > 255) {
+                        g = 0;
+                        b++;
+                    }
+                }
+            }
+        }
+
+        File outputfile = new File("image.jpg");
+        try {
+            ImageIO.write(bufferedImage, "jpg", outputfile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        buffer.flip();
+
+        int texture_id = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texture_id);
+
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+
+        textures.put("_colors", texture_id);
     }
 
     public static int load_texture(String texture_name) {

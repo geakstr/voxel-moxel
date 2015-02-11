@@ -2,19 +2,15 @@ package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector2f;
-import me.geakstr.voxel.model.meshes.OccludedTexturedMesh;
+import me.geakstr.voxel.model.meshes.TexturedMesh;
 import me.geakstr.voxel.workers.ChunkWorker;
 
 import java.util.*;
 
-import static org.lwjgl.opengl.ARBOcclusionQuery.GL_SAMPLES_PASSED_ARB;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.glDrawArrays;
-import static org.lwjgl.opengl.GL15.glBeginQuery;
-import static org.lwjgl.opengl.GL15.glEndQuery;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
-public class Chunk extends OccludedTexturedMesh {
+public class Chunk extends TexturedMesh {
     public Block[][][] blocks; // [x][y][z]
 
     public boolean changed, updating, updated, empty, waiting, visible;
@@ -52,10 +48,18 @@ public class Chunk extends OccludedTexturedMesh {
 
         Random rnd = new Random();
 
-        List<Integer> vertices = new ArrayList<>();
-        List<Integer> textures = new ArrayList<>();
-        List<Float> textures_offsets = new ArrayList<>();
+        List<Integer> verts = new ArrayList<>();
+        List<Integer> tex = new ArrayList<>();
+        List<Float> tex_off = new ArrayList<>();
         List<Float> colors = new ArrayList<>();
+        List<Integer> colored_tex_repeat_number = new ArrayList<>();
+        List<Float> colored_tex_off = new ArrayList<>();
+
+        Queue<Vector2f> texs = new LinkedList<>();
+        texs.add(TextureAtlas.get_coord("grass"));
+        texs.add(TextureAtlas.get_coord("stone"));
+        texs.add(TextureAtlas.get_coord("cobblestone"));
+        texs.add(TextureAtlas.get_coord("wood_0"));
 
         int next_color = 512;
         for (int z = 0; z < World.chunk_height; z++) {
@@ -115,6 +119,11 @@ public class Chunk extends OccludedTexturedMesh {
                     }
                 }
             }
+
+            Vector2f texture = texs.poll();
+            texs.add(texture);
+
+            float colored_tex_offset = 0f;
             for (Map.Entry<Integer, int[]> e : coords_map.entrySet()) {
                 int[] coords = e.getValue();
                 int x0 = coords[0], y0 = coords[1];
@@ -122,25 +131,44 @@ public class Chunk extends OccludedTexturedMesh {
 
                 boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
 
-                Vector2f tex = rnd.nextBoolean() ? TextureAtlas.get_coord("grass") : TextureAtlas.get_coord("dirt");
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        vertices.addAll(Arrays.asList(Block.get_side(
+                        verts.addAll(Arrays.asList(Block.get_side(
                                 side_idx,
                                 x0 + x_offset, y0 + y_offset,
                                 x1 + x_offset, y1 + y_offset,
                                 z + z_offset)));
 
-                        textures.addAll(Arrays.asList(Block.get_texture(
+                        tex.addAll(Arrays.asList(Block.get_texture(
                                 side_idx, x0, y0, x1, y1)));
-                        textures_offsets.addAll(Arrays.asList(
-                                tex.x, tex.y,
-                                tex.x, tex.y,
-                                tex.x, tex.y,
-                                tex.x, tex.y,
-                                tex.x, tex.y,
-                                tex.x, tex.y));
 
+                        tex_off.addAll(Arrays.asList(
+                                texture.x, texture.y,
+                                texture.x, texture.y,
+                                texture.x, texture.y,
+                                texture.x, texture.y,
+                                texture.x, texture.y,
+                                texture.x, texture.y));
+
+                        int x_repeat = x1 - x0 + 1;
+                        int y_repeat = y1 - y0 + 1;
+
+                        colored_tex_repeat_number.addAll(Arrays.asList(
+                                x_repeat, y_repeat,
+                                x_repeat, y_repeat,
+                                x_repeat, y_repeat,
+                                x_repeat, y_repeat,
+                                x_repeat, y_repeat,
+                                x_repeat, y_repeat
+                        ));
+
+                        colored_tex_off.addAll(Arrays.asList(
+                                colored_tex_offset, colored_tex_offset,
+                                colored_tex_offset, colored_tex_offset,
+                                colored_tex_offset, colored_tex_offset,
+                                colored_tex_offset, colored_tex_offset,
+                                colored_tex_offset, colored_tex_offset,
+                                colored_tex_offset, colored_tex_offset));
                         float r = 1.0f, g = 1.0f, b = 1.0f;
                         if (side_idx >= 0 && side_idx <= 3) {
                             r = 0.7f;
@@ -150,13 +178,16 @@ public class Chunk extends OccludedTexturedMesh {
                         colors.addAll(Arrays.asList(r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b));
                     }
                 }
+                colored_tex_offset += 0.000244141f;
             }
         }
 
-        this.verts = vertices.toArray(new Integer[vertices.size()]);
-        this.tex = textures.toArray(new Integer[textures.size()]);
-        this.tex_off = textures_offsets.toArray(new Float[textures_offsets.size()]);
+        this.verts = verts.toArray(new Integer[verts.size()]);
+        this.tex = tex.toArray(new Integer[tex.size()]);
+        this.tex_off = tex_off.toArray(new Float[tex_off.size()]);
         this.colors = colors.toArray(new Float[colors.size()]);
+        this.colored_tex_repeat_number = colored_tex_repeat_number.toArray(new Integer[colored_tex_repeat_number.size()]);
+        this.colored_tex_off = colored_tex_off.toArray(new Float[colored_tex_off.size()]);
 
         this.size = this.verts.length;
 
@@ -324,32 +355,30 @@ public class Chunk extends OccludedTexturedMesh {
 
         if (updated && updating && !empty) {
             updating = false;
-            prepare(verts, colors, tex, tex_off, box);
+            prepare(verts, colors, colored_tex_repeat_number, colored_tex_off, tex, tex_off);
         }
 
         changed = false;
     }
 
-    public void occlusion_render() {
-        if (changed || updating) {
-            update();
-        }
-        if (!empty && !waiting) {
-            this.waiting = true;
-            glBeginQuery(GL_SAMPLES_PASSED_ARB, o_query);
-            glBindVertexArray(o_vao);
-            glDrawArrays(GL_TRIANGLES, 0, Box.box_vertices_size);
-            glBindVertexArray(0);
-            glEndQuery(GL_SAMPLES_PASSED_ARB);
-        }
-    }
-
-    public void terrain_render() {
+    public void render() {
         if (changed || updating) {
             update();
         }
         if (!empty) {
             bind_vao();
+            glDrawArrays(GL_TRIANGLES, 0, size);
+            unbind_vao();
+            World.faces_in_frame += size / 3;
+        }
+    }
+
+    public void colored_render() {
+        if (changed || updating) {
+            update();
+        }
+        if (!empty) {
+            bind_vao(colored_vao);
             glDrawArrays(GL_TRIANGLES, 0, size);
             unbind_vao();
             World.faces_in_frame += size / 3;

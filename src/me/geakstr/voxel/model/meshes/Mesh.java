@@ -8,21 +8,21 @@ import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.util.ExtendedBufferUtil;
 
-public class AbstractMesh {
+public class Mesh {
 	public Integer[] verts;
 	public int size;
 	
 	public int vao;
 	public int vbo; // vertices buffer
 	
-	public AbstractMesh() {
+	public Mesh() {
 		this.size = 0;
 		
 		this.vao = glGenVertexArrays();
 		this.vbo = glGenBuffers();
 	}
 	
-	public AbstractMesh prepare(Integer[] verts) {
+	public Mesh prepare(Integer[] verts) {
 		this.init_vbo(verts);
 		
 		this.bind_vao();
@@ -32,7 +32,7 @@ public class AbstractMesh {
 		return this;
 	}
 	
-	public AbstractMesh init_vbo(Integer[] verts) {
+	public Mesh init_vbo(Integer[] verts) {
 		this.size = verts.length;
 		
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -42,7 +42,7 @@ public class AbstractMesh {
 		return this;
 	}
 	
-	public AbstractMesh init_vao() {
+	public Mesh init_vao() {
 		glEnableVertexAttribArray(Game.current_shader.attr("attr_pos"));
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glVertexAttribPointer(Game.current_shader.attr("attr_pos"), 3, GL_INT, false, 0, 0);
@@ -60,6 +60,10 @@ public class AbstractMesh {
 	
 	public void unbind_vao() {
 		glBindVertexArray(0);
+	}
+
+	public static void bind_texture(int id) {
+		glBindTexture(GL_TEXTURE_2D, id);
 	}
 	
 	public void render() {

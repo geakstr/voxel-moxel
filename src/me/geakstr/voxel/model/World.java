@@ -1,15 +1,10 @@
 package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.game.Game;
-import me.geakstr.voxel.math.Vector3f;
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.util.OpenSimplexNoise;
 
 import java.util.Random;
-
-import static org.lwjgl.opengl.ARBOcclusionQuery.GL_QUERY_RESULT_ARB;
-import static org.lwjgl.opengl.GL15.GL_QUERY_RESULT_AVAILABLE;
-import static org.lwjgl.opengl.GL15.glGetQueryObjectui;
 
 public class World {
     public static int world_size;
@@ -46,9 +41,7 @@ public class World {
                     for (int xx = 0; xx < chunk_width; xx++) {
                         for (int yy = 0; yy < chunk_length; yy++) {
                             for (int zz = 0; zz < chunk_height; zz++) {
-                                chunks[z][x][y].blocks[xx][yy][zz] = new Block(
-                                        new Vector3f(x * chunk_width + xx, y * chunk_length + yy, z * chunk_height + zz),
-                                        new Vector3f(x * chunk_width + xx + 1, y * chunk_length + yy + 1, z * chunk_height + zz + 1));
+                                chunks[z][x][y].blocks[xx][yy][zz] = new Block();
                             }
                         }
                     }
@@ -85,18 +78,6 @@ public class World {
         }
     }
 
-    public static void occlusion_render() {
-        for (int z = 0; z < world_height; z++) {
-            for (int x = 0; x < world_size; x++) {
-                for (int y = 0; y < world_size; y++) {
-                    if (Frustum.chunkInFrustum(x, y, z)) {
-                        chunks[z][x][y].occlusion_render();
-                    }
-                }
-            }
-        }
-    }
-
     public static void render() {
         chunks_in_frame = 0;
         faces_in_frame = 0;
@@ -104,23 +85,25 @@ public class World {
         for (int z = 0; z < world_height; z++) {
             for (int x = 0; x < world_size; x++) {
                 for (int y = 0; y < world_size; y++) {
-                    if (Game.occlusion && !chunks[z][x][y].empty) {
-                        if (chunks[z][x][y].waiting) {
-                            int result = glGetQueryObjectui(chunks[z][x][y].o_query, GL_QUERY_RESULT_AVAILABLE);
-                            if (result == 1) {
-                                chunks[z][x][y].waiting = false;
-                                chunks[z][x][y].visible = glGetQueryObjectui(chunks[z][x][y].o_query, GL_QUERY_RESULT_ARB) > 0;
-                            }
-                            if (chunks[z][x][y].visible) {
-                                chunks_in_frame++;
-                                chunks[z][x][y].terrain_render();
-                            }
-                        }
-                    } else if (!Game.occlusion) {
-                        if (Frustum.chunkInFrustum(x, y, z)) {
-                            chunks_in_frame++;
-                            chunks[z][x][y].terrain_render();
-                        }
+                    if (!Game.frustum || Frustum.chunkInFrustum(x, y, z)) {
+                        chunks_in_frame++;
+                        chunks[z][x][y].render();
+                    }
+                }
+            }
+        }
+    }
+
+    public static void colored_render() {
+        chunks_in_frame = 0;
+        faces_in_frame = 0;
+
+        for (int z = 0; z < world_height; z++) {
+            for (int x = 0; x < world_size; x++) {
+                for (int y = 0; y < world_size; y++) {
+                    if (!Game.frustum || Frustum.chunkInFrustum(x, y, z)) {
+                        chunks_in_frame++;
+                        chunks[z][x][y].colored_render();
                     }
                 }
             }

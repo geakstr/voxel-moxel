@@ -1,7 +1,9 @@
 package me.geakstr.voxel.render;
 
 import me.geakstr.voxel.math.Matrix4f;
+import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.math.Vector3f;
+import me.geakstr.voxel.math.Vector4f;
 import me.geakstr.voxel.util.ExtendedBufferUtil;
 import me.geakstr.voxel.util.ResourceUtil;
 
@@ -62,12 +64,24 @@ public class Shader {
         glUniformMatrix4(glGetUniformLocation(program, name), false, ExtendedBufferUtil.create_flipped_buffer(value));
     }
 
+    public void set_uniform(String name, Vector2f value) {
+        glUniform2f(glGetUniformLocation(program, name), value.x, value.y);
+    }
+
     public void set_uniform(String name, Vector3f value) {
         glUniform3f(glGetUniformLocation(program, name), value.x, value.y, value.z);
     }
 
+    public void set_uniform(String name, Vector4f value) {
+        glUniform4f(glGetUniformLocation(program, name), value.x, value.y, value.z, value.w);
+    }
+
     public void set_uniform(String name, float value) {
         glUniform1f(glGetUniformLocation(program, name), value);
+    }
+
+    public void set_uniform(String name, int value) {
+        glUniform1i(glGetUniformLocation(program, name), value);
     }
 
     public Shader save_attr(String attr_name) {

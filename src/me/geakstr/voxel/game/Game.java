@@ -1,44 +1,56 @@
 package me.geakstr.voxel.game;
 
-import me.geakstr.voxel.core.Input;
 import me.geakstr.voxel.core.Window;
-import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.math.Vector2f;
-import me.geakstr.voxel.math.Vector3f;
-import me.geakstr.voxel.math.Vector4f;
+import me.geakstr.voxel.model.TextureAtlas;
 import me.geakstr.voxel.model.World;
-import me.geakstr.voxel.render.*;
+import me.geakstr.voxel.model.meshes.Mesh;
+import me.geakstr.voxel.render.Camera;
+import me.geakstr.voxel.render.Frustum;
+import me.geakstr.voxel.render.Shader;
+import me.geakstr.voxel.render.Transform;
 import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
 
-import static org.lwjgl.opengl.GL11.*;
-
 public class Game {
-    public static boolean occlusion;
+    public static boolean frustum, occlusion;
 
     public static Transform world_transform;
     public static ChunksWorkersExecutorService chunks_workers_executor_service;
-    public static Shader current_shader, terrain_shader, occlusion_shader;
-    public static Ray ray;
+    public static Shader current_shader, world_shader, colored_world_shader;
+
+    public static Vector2f textured_world_shader_texture_info = new Vector2f(TextureAtlas.atlas_size, TextureAtlas.crop_size);
+    public static Vector2f colored_world_shader_texture_info = new Vector2f(256, 1);
 
     public static void init() {
+        ResourceUtil.gen_colored_texture();
         ResourceUtil.load_textures("atlas.png");
 
         Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 512f);
 
-        terrain_shader = new Shader("terrain.vs", "terrain.fs").compile();
-        terrain_shader.save_attr("attr_pos").save_attr("attr_tex_offset").save_attr("attr_tex_coord").save_attr("attr_color");
+        world_shader = new Shader("world.vs", "world.fs").compile();
+        world_shader
+                .save_attr("attr_pos")
+                .save_attr("attr_tex_offset")
+                .save_attr("attr_tex_coord")
+                .save_attr("attr_color")
+                .save_attr("attr_colored_tex_off")
+                .save_attr("attr_colored_tex_repeat_number");
 
-        if (occlusion) {
-            occlusion_shader = new Shader("occlusion.vs", "occlusion.fs").compile();
-            occlusion_shader.save_attr("attr_pos").save_attr("attr_color").save_attr("attr_tex_coord").save_attr("attr_tex_offset");
-        }
+        colored_world_shader = new Shader("world.vs", "colored_world.fs").compile();
+        colored_world_shader
+                .save_attr("attr_pos")
+                .save_attr("attr_tex_offset")
+                .save_attr("attr_tex_coord")
+                .save_attr("attr_color")
+                .save_attr("attr_colored_tex_off")
+                .save_attr("attr_colored_tex_repeat_number");
 
         world_transform = new Transform();
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(1, 1, 1, 1, 2);
+        World.init(1, 1, 16, 16, 16);
         World.gen();
     }
 
@@ -47,70 +59,18 @@ public class Game {
         Camera.apply();
 
         Frustum.update();
-
-        Vector2f mouse = Input.getMousePosition();
-        mouse.x = mouse.x / Window.width * 2f - 1f;
-        mouse.y = mouse.y / Window.height * 2f - 1f;
-
-        Matrix4f proj = new Matrix4f(Camera.projection);
-        Matrix4f model = new Matrix4f(Camera.view);
-
-        Matrix4f inverse_mvp = new Matrix4f();
-        Matrix4f.mul(proj, model, inverse_mvp);
-        inverse_mvp.invert();
-
-        Vector3f ray_origin = new Vector3f(
-                -model.m30,
-                -model.m31,
-                -model.m32
-        );
-
-        Vector4f p0 = Vector4f.mul(new Vector4f(inverse_mvp), new Vector4f(mouse.x, mouse.y, -1f, 1f), null);
-        Vector4f p1 = Vector4f.mul(new Vector4f(inverse_mvp), new Vector4f(mouse.x, mouse.y, 1f, 1f), null);
-
-        Vector3f p0_norm = new Vector3f(
-                p0.x / p0.w,
-                p0.y / p0.w,
-                p0.z / p0.w
-        );
-
-        Vector3f p1_norm = new Vector3f(
-                p1.x / p0.w,
-                p1.y / p0.w,
-                p1.z / p0.w
-        );
-
-        Vector3f ray_direction = Vector3f.sub(new Vector3f(p1.x, p1.y, p1.z), new Vector3f(p0.x, p0.y, p0.z), null);
-        //ray_direction = ray_direction.normalise(ray_direction);
-
-        ray = new Ray(ray_origin, ray_direction);
-
-        if (World.chunks[0][0][0].blocks[0][0][0].intersect(ray, -1, 1)) {
-            System.out.println(World.chunks[0][0][0].blocks[0][0][0].intersect(ray, -1, 1));
-        }
     }
 
     public static void render() {
-        if (occlusion) {
-            current_shader = occlusion_shader;
-            current_shader.bind();
-            current_shader.set_uniform("uniform_transform", world_transform.getTransform());
-            current_shader.set_uniform("uniform_camera_projection", Camera.projection);
-            current_shader.set_uniform("uniform_camera_view", Camera.view);
-            glDisable(GL_DEPTH_TEST);
-            glColorMask(false, false, false, false);
-            glDepthMask(false);
-            World.occlusion_render();
-            current_shader.unbind();
-        }
-
-        current_shader = terrain_shader;
+        current_shader = colored_world_shader;
         current_shader.bind();
         current_shader.set_uniform("uniform_transform", world_transform.getTransform());
         current_shader.set_uniform("uniform_camera_projection", Camera.projection);
         current_shader.set_uniform("uniform_camera_view", Camera.view);
         current_shader.set_uniform("uniform_texture", 0);
-        World.render();
+        current_shader.set_uniform("uniform_texture_info", textured_world_shader_texture_info);
+        Mesh.bind_texture(ResourceUtil.texture_id("_colors"));
+        World.colored_render();
         current_shader.unbind();
     }
 
@@ -118,11 +78,8 @@ public class Game {
 
     public static void destroy() {
         World.destroy();
-        if (null != terrain_shader) {
-            terrain_shader.dispose();
-        }
-        if (occlusion && null != occlusion_shader) {
-            occlusion_shader.dispose();
+        if (null != world_shader) {
+            world_shader.dispose();
         }
         if (null != chunks_workers_executor_service) {
             chunks_workers_executor_service.es.shutdown();

@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TextureAtlas {
-    public static final int atlas_size = 80;
-    public static final int crop_size = 16;
+    public static final float atlas_size = 80;
+    public static final float crop_size = 16;
 
-    public static final float gl_pixel_size = (float) 1 / (float) atlas_size;
+    public static final float gl_pixel_size = 1.0f / atlas_size;
     public static final float gl_crop_size = gl_pixel_size * crop_size;
 
     public static final Map<String, Integer> atlas_title_id = new HashMap<>();
