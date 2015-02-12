@@ -62,6 +62,7 @@ public class Chunk extends TexturedMesh {
         texs.add(TextureAtlas.get_coord("wood_0"));
 
         int next_color = 512;
+        float colored_tex_offset = 0f;
         for (int z = 0; z < World.chunk_height; z++) {
             int[][] mark = new int[World.chunk_length][World.chunk_width];
             int[] proj = new int[mark[0].length];
@@ -123,7 +124,6 @@ public class Chunk extends TexturedMesh {
             Vector2f texture = texs.poll();
             texs.add(texture);
 
-            float colored_tex_offset = 0f;
             for (Map.Entry<Integer, int[]> e : coords_map.entrySet()) {
                 int[] coords = e.getValue();
                 int x0 = coords[0], y0 = coords[1];
@@ -152,6 +152,12 @@ public class Chunk extends TexturedMesh {
 
                         int x_repeat = x1 - x0 + 1;
                         int y_repeat = y1 - y0 + 1;
+
+                        if (side_idx == 0 || side_idx == 1) {
+                            int tmp = x_repeat;
+                            x_repeat = y_repeat;
+                            y_repeat = tmp;
+                        }
 
                         colored_tex_repeat_number.addAll(Arrays.asList(
                                 x_repeat, y_repeat,

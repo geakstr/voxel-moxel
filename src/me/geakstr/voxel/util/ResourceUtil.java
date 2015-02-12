@@ -52,14 +52,6 @@ public class ResourceUtil {
                 }
             }
         }
-
-        File outputfile = new File("image.jpg");
-        try {
-            ImageIO.write(bufferedImage, "jpg", outputfile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         buffer.flip();
 
         int texture_id = glGenTextures();
