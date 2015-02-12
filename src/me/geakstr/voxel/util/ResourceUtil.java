@@ -31,28 +31,42 @@ public class ResourceUtil {
         ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * 3);
 
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        
+        int[][] rgb_arr = new int[height][width];
+        int i = 0, j = 0;
+        for (int r = 0; r < 256; r++) {
+        	for (int g = 0; g < 256; g++) {
+        		for (int b = 0; b < 256; b++) {
+        			rgb_arr[i][j] = (r << 16) + (g << 8) + b;
+        			j++;
+        			if (j == width) {
+        				j = 0; 
+        				i++;
+        			}
+        		}
+        	}
+        }
 
-        int r = 0, g = 0, b = 0;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                buffer.put((byte) r);
-                buffer.put((byte) g);
-                buffer.put((byte) b);
+            	int rgb = rgb_arr[y][x];
+            	
+                buffer.put((byte) ((rgb >> 16) & 0xFF));
+                buffer.put((byte) ((rgb >> 8) & 0xFF));
+                buffer.put((byte) ((rgb) & 0xFF));
 
-                bufferedImage.setRGB(x, y, (r << 16) | (g << 8) | b);
+                bufferedImage.setRGB(y, x, rgb);
 
-                r++;
-                if (r > 255) {
-                    r = 0;
-                    g++;
-                    if (g > 255) {
-                        g = 0;
-                        b++;
-                    }
-                }
             }
         }
         buffer.flip();
+        
+        try {
+	        ImageIO.write(bufferedImage, "jpg", new File("image.jpg"));
+        } catch (IOException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
 
         int texture_id = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, texture_id);

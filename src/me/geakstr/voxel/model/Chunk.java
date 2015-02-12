@@ -62,7 +62,8 @@ public class Chunk extends TexturedMesh {
         texs.add(TextureAtlas.get_coord("wood_0"));
 
         int next_color = 512;
-        float colored_tex_offset = 0f;
+        float colored_tex_offset_x = 0f;
+        float colored_tex_offset_y = 0f;
         for (int z = 0; z < World.chunk_height; z++) {
             int[][] mark = new int[World.chunk_length][World.chunk_width];
             int[] proj = new int[mark[0].length];
@@ -130,6 +131,9 @@ public class Chunk extends TexturedMesh {
                 int x1 = coords[2], y1 = coords[3];
 
                 boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
+                
+                int x_repeat = x1 - x0 + 1;
+                int y_repeat = y1 - y0 + 1;
 
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
@@ -149,14 +153,15 @@ public class Chunk extends TexturedMesh {
                                 texture.x, texture.y,
                                 texture.x, texture.y,
                                 texture.x, texture.y));
-
-                        int x_repeat = x1 - x0 + 1;
-                        int y_repeat = y1 - y0 + 1;
-
+                        
                         if (side_idx == 0 || side_idx == 1) {
                             int tmp = x_repeat;
                             x_repeat = y_repeat;
                             y_repeat = tmp;
+                            
+//                            float tmp1 = colored_tex_offset_x;
+//                            colored_tex_offset_x = colored_tex_offset_y;
+//                            colored_tex_offset_y = tmp1;
                         }
 
                         colored_tex_repeat_number.addAll(Arrays.asList(
@@ -169,12 +174,13 @@ public class Chunk extends TexturedMesh {
                         ));
 
                         colored_tex_off.addAll(Arrays.asList(
-                                colored_tex_offset, colored_tex_offset,
-                                colored_tex_offset, colored_tex_offset,
-                                colored_tex_offset, colored_tex_offset,
-                                colored_tex_offset, colored_tex_offset,
-                                colored_tex_offset, colored_tex_offset,
-                                colored_tex_offset, colored_tex_offset));
+                                colored_tex_offset_x, colored_tex_offset_x,
+                                colored_tex_offset_x, colored_tex_offset_x,
+                                colored_tex_offset_x, colored_tex_offset_x,
+                                colored_tex_offset_x, colored_tex_offset_x,
+                                colored_tex_offset_x, colored_tex_offset_x,
+                                colored_tex_offset_x, colored_tex_offset_x));
+                        
                         float r = 1.0f, g = 1.0f, b = 1.0f;
                         if (side_idx >= 0 && side_idx <= 3) {
                             r = 0.7f;
@@ -184,7 +190,11 @@ public class Chunk extends TexturedMesh {
                         colors.addAll(Arrays.asList(r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b));
                     }
                 }
-                colored_tex_offset += 0.000244141f;
+                colored_tex_offset_x += 0.00024414062f;
+                if (colored_tex_offset_x >= 1.0f) {
+                	colored_tex_offset_x = 0.0f;
+                	colored_tex_offset_y += 0.00024414062f;
+                }
             }
         }
 

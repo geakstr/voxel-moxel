@@ -18,8 +18,8 @@ void main()
 
     float crop_size = pixel_size * 16.0;
 
-    tex_coord.x =  fract(tex_coord.x / out_colored_tex_repeat_number.x) * pixel_size * out_colored_tex_repeat_number.x + colored_tex_off.x;
-    tex_coord.y =  fract(tex_coord.y) * pixel_size;
+    tex_coord.x = fract(tex_coord.x / out_colored_tex_repeat_number.x) * pixel_size * out_colored_tex_repeat_number.x + colored_tex_off.x;
+    tex_coord.y = fract(tex_coord.x / out_colored_tex_repeat_number.x) * pixel_size * out_colored_tex_repeat_number.x + colored_tex_off.x;
 
     vec4 color = texture(uniform_texture, tex_coord);
 
