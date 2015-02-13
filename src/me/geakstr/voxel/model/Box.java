@@ -1,11 +1,23 @@
 package me.geakstr.voxel.model;
 
+import me.geakstr.voxel.math.Vector3f;
+
 import java.util.Arrays;
 
 public class Box {
     public static final int box_vertices_size = 108;
     public static final int box_side_vertices_size = 18;
     public static final int box_side_texture_size = 12;
+
+    public Vector3f[] corners;
+
+    public Box() {
+        this.corners = new Vector3f[2];
+    }
+
+    public Box(Vector3f min, Vector3f max) {
+        this.corners = new Vector3f[]{min, max};
+    }
 
     public static Integer[] get_side(int side_idx, int x0, int y0, int x1, int y1, int z) {
         Integer[] side = get_side(side_idx);

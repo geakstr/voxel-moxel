@@ -1,6 +1,7 @@
 package me.geakstr.voxel.model.meshes;
 
 import me.geakstr.voxel.game.Game;
+import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.util.ExtendedBufferUtil;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
@@ -25,13 +26,14 @@ public class TexturedMesh extends ColoredMesh {
 
         this.tbo = glGenBuffers();
         this.tobo = glGenBuffers();
+
+        this.bind_vao();
+        this.init_vao();
+        this.unbind_vao();
     }
 
     public Mesh prepare(Integer[] verts, Float[] colors, Integer[] tex, Float[] tex_off) {
         this.init_vbo(verts, colors,tex, tex_off);
-        this.bind_vao();
-        this.init_vao();
-        this.unbind_vao();
         return this;
     }
 
@@ -39,11 +41,13 @@ public class TexturedMesh extends ColoredMesh {
         super.init_vbo(verts, colors);
 
         glBindBuffer(GL_ARRAY_BUFFER, tbo);
-        glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(tex), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, Chunk.size, null, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(tex), GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glBindBuffer(GL_ARRAY_BUFFER, tobo);
-        glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(tex_off), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, Chunk.size, null, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(tex_off), GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         return this;

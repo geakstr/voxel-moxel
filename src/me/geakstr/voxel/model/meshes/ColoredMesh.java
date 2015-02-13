@@ -1,6 +1,7 @@
 package me.geakstr.voxel.model.meshes;
 
 import me.geakstr.voxel.game.Game;
+import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.util.ExtendedBufferUtil;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
@@ -17,15 +18,14 @@ public class ColoredMesh extends Mesh {
         super();
 
         this.cbo = glGenBuffers();
-    }
-
-    public Mesh prepare(Integer[] verts, Float[] colors) {
-        this.init_vbo(verts, colors);
 
         this.bind_vao();
         this.init_vao();
         this.unbind_vao();
+    }
 
+    public Mesh prepare(Integer[] verts, Float[] colors) {
+        this.init_vbo(verts, colors);
         return this;
     }
 
@@ -33,7 +33,8 @@ public class ColoredMesh extends Mesh {
         super.init_vbo(verts);
 
         glBindBuffer(GL_ARRAY_BUFFER, cbo);
-        glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(colors), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, Chunk.size, null, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(colors), GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         return this;

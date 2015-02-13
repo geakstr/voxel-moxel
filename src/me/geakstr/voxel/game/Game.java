@@ -2,20 +2,18 @@ package me.geakstr.voxel.game;
 
 import me.geakstr.voxel.core.Input;
 import me.geakstr.voxel.core.Window;
-import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.math.Vector3f;
-import me.geakstr.voxel.math.Vector4f;
+import me.geakstr.voxel.model.Block;
+import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.TextureAtlas;
 import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.model.meshes.Mesh;
-import me.geakstr.voxel.render.Camera;
-import me.geakstr.voxel.render.Frustum;
-import me.geakstr.voxel.render.Ray;
-import me.geakstr.voxel.render.Shader;
-import me.geakstr.voxel.render.Transform;
+import me.geakstr.voxel.render.*;
 import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
+
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class Game {
     public static boolean frustum, occlusion;
@@ -28,23 +26,19 @@ public class Game {
     public static Vector2f world_shader_texture_info = new Vector2f(TextureAtlas.atlas_size, TextureAtlas.crop_size);
 
     public static void init() {
-        //ResourceUtil.gen_colored_texture();
         ResourceUtil.load_textures("atlas.png");
 
         Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 512f);
 
         world_shader = new Shader("world.vs", "world.fs").compile();
-        world_shader
-                .save_attr("attr_pos")
-                .save_attr("attr_tex_offset")
-                .save_attr("attr_tex_coord")
-                .save_attr("attr_color");
+        world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color");
+        current_shader = world_shader;
 
         world_transform = new Transform();
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(1, 1, 16, 16, 16);
+        World.init(4, 1, 16, 16, 16);
         World.gen();
     }
 
@@ -56,8 +50,20 @@ public class Game {
 
         ray = new Ray(Camera.projection, Camera.view, Input.getMousePosition(), Window.width, Window.height);
 
-        if (World.chunks[0][0][0].blocks[0][0][0].intersect(ray, -100, 0)) {
-            System.out.println(World.chunks[0][0][0].blocks[0][0][0].intersect(ray, -100, 0));
+        if (Input.getMouse(GLFW_MOUSE_BUTTON_LEFT)) {
+            Block selected_block = World.mouse_selection();
+            if (selected_block != null) {
+                Chunk chunk = selected_block.chunk;
+                if (chunk != null && !chunk.updating) {
+                    Vector3f pos = selected_block.corners[0];
+
+                    int x = (int) pos.x % World.chunk_width;
+                    int y = (int) pos.y % World.chunk_length;
+                    int z = (int) pos.z % World.chunk_height;
+                    chunk.blocks[x][z][y].type = 0;
+                    chunk.changed = true;
+                }
+            }
         }
     }
 

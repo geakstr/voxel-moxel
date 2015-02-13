@@ -1,11 +1,12 @@
 package me.geakstr.voxel.model;
 
-import java.util.Random;
-
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector3f;
+import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.util.OpenSimplexNoise;
+
+import java.util.Random;
 
 public class World {
     public static int world_size;
@@ -38,13 +39,12 @@ public class World {
         for (int x = 0; x < world_size; x++) {
             for (int y = 0; y < world_size; y++) {
                 for (int z = 0; z < world_height; z++) {
-                    chunks[z][x][y] = new Chunk(x, y, z);
+                    Chunk chunk = new Chunk(x, y, z);
+                    chunks[z][x][y] = chunk;
                     for (int xx = 0; xx < chunk_width; xx++) {
                         for (int yy = 0; yy < chunk_length; yy++) {
                             for (int zz = 0; zz < chunk_height; zz++) {
-                            	chunks[z][x][y].blocks[xx][yy][zz] = new Block(
-                                        new Vector3f(x * chunk_width + xx, y * chunk_length + yy, z * chunk_height + zz),
-                                        new Vector3f(x * chunk_width + xx + 1, y * chunk_length + yy + 1, z * chunk_height + zz + 1));
+                                chunks[z][x][y].blocks[xx][yy][zz] = new Block(new Vector3f(xx, yy, zz), chunk);
                             }
                         }
                     }
@@ -59,7 +59,7 @@ public class World {
 
         for (int global_x = 0; global_x < world_size * chunk_width; global_x++) {
             for (int global_y = 0; global_y < world_size * chunk_length; global_y++) {
-                double global_z = ((noise.eval(global_x / 1.0f, global_y / 1.0f, 1.0) + 1)) * world_height * chunk_height / 2;
+                double global_z = ((noise.eval(global_x / 128.0f, global_y / 128.0f, 1.0) + 1)) * world_height * chunk_height / 2;
 
                 int chunk_x = global_x / (chunk_width);
                 int chunk_y = global_y / (chunk_length);
@@ -107,5 +107,35 @@ public class World {
                 }
             }
         }
+    }
+
+    public static Block mouse_selection() {
+        Block selection_block = null;
+
+        final Vector3f camera_position = Camera.position.negate(null);
+
+        float min_dist = Float.MAX_VALUE;
+        for (int chunk_z = 0; chunk_z < World.world_height; chunk_z++) {
+            for (int chunk_x = 0; chunk_x < World.world_size; chunk_x++) {
+                for (int chunk_y = 0; chunk_y < World.world_size; chunk_y++) {
+                    Chunk chunk = World.chunks[chunk_z][chunk_x][chunk_y];
+                    for (int block_x = 0; block_x < World.chunk_width; block_x++) {
+                        for (int block_y = 0; block_y < World.chunk_length; block_y++) {
+                            for (int block_z = 0; block_z < World.chunk_height; block_z++) {
+                                Block block = chunk.blocks[block_x][block_y][block_z];
+                                if (block.type != 0 && Game.ray.intersect(block, -100, -1)) {
+                                    float dist = Vector3f.dist(block.corners[0], camera_position);
+                                    if (dist < min_dist) {
+                                        selection_block = block;
+                                        min_dist = dist;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return selection_block;
     }
 }

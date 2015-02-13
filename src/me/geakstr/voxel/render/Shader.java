@@ -89,6 +89,13 @@ public class Shader {
         return this;
     }
 
+    public Shader save_attrs(String ... attrs_names) {
+        for (String attr_name : attrs_names) {
+            save_attr(attr_name);
+        }
+        return this;
+    }
+
     public int attr(String attr_name) {
         if (!attributes.containsKey(attr_name)) {
             try {

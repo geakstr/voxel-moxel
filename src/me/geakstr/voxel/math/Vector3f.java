@@ -369,4 +369,9 @@ public class Vector3f extends Vector implements Serializable, ReadableVector3f, 
 
         return false;
     }
+
+
+    public static float dist(Vector3f a, Vector3f b) {
+        return Vector3f.sub(a, b, null).length();
+    }
 }

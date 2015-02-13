@@ -19,6 +19,8 @@ public class Chunk extends TexturedMesh {
     public int x_chunk_pos, y_chunk_pos, z_chunk_pos;
     public int x_offset, y_offset, z_offset;
 
+    public static final int size = World.chunk_volume * 6 * 2 * 3 * 4;
+
     public Chunk(int x_chunk_pos, int y_chunk_pos, int z_chunk_pos) {
         super();
 
@@ -44,7 +46,9 @@ public class Chunk extends TexturedMesh {
     }
 
     public void rebuild() {
+        this.updated = false;
         this.updating = true;
+        this.changed = true;
 
         Random rnd = new Random();
 
@@ -129,9 +133,6 @@ public class Chunk extends TexturedMesh {
                 int x1 = coords[2], y1 = coords[3];
 
                 boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
-                
-                int x_repeat = x1 - x0 + 1;
-                int y_repeat = y1 - y0 + 1;
 
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
@@ -151,7 +152,7 @@ public class Chunk extends TexturedMesh {
                                 texture.x, texture.y,
                                 texture.x, texture.y,
                                 texture.x, texture.y));
-                        
+
                         float r = 1.0f, g = 1.0f, b = 1.0f;
                         if (side_idx >= 0 && side_idx <= 3) {
                             r = 0.7f;
@@ -163,12 +164,12 @@ public class Chunk extends TexturedMesh {
                 }
                 colored_tex_offset_x += 0.01;
                 if (colored_tex_offset_x > 1.0f) {
-                	colored_tex_offset_x = 0;
-                	colored_tex_offset_y += 0.01;
-                	if (colored_tex_offset_y > 1.0) {
-                		colored_tex_offset_y = 0;
-                		colored_tex_offset_x += 0.01;
-                	}
+                    colored_tex_offset_x = 0;
+                    colored_tex_offset_y += 0.01;
+                    if (colored_tex_offset_y > 1.0) {
+                        colored_tex_offset_y = 0;
+                        colored_tex_offset_x += 0.01;
+                    }
                 }
             }
         }
@@ -178,11 +179,10 @@ public class Chunk extends TexturedMesh {
         this.tex_off = tex_off.toArray(new Float[tex_off.size()]);
         this.colors = colors.toArray(new Float[colors.size()]);
 
-        this.size = this.verts.length;
 
         this.updated = true;
 
-        this.empty = this.size == 0;
+        this.empty = this.verts.length == 0;
     }
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
@@ -336,9 +336,10 @@ public class Chunk extends TexturedMesh {
         return sides;
     }
 
+    public static int cnt = 0;
+
     public void update() {
         if (changed && !updating && updated) {
-            updated = false;
             Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
         }
 
@@ -346,7 +347,6 @@ public class Chunk extends TexturedMesh {
             updating = false;
             prepare(verts, colors, tex, tex_off);
         }
-
         changed = false;
     }
 
@@ -356,18 +356,6 @@ public class Chunk extends TexturedMesh {
         }
         if (!empty) {
             bind_vao();
-            glDrawArrays(GL_TRIANGLES, 0, size);
-            unbind_vao();
-            World.faces_in_frame += size / 3;
-        }
-    }
-
-    public void colored_render() {
-        if (changed || updating) {
-            update();
-        }
-        if (!empty) {
-            bind_vao(colored_vao);
             glDrawArrays(GL_TRIANGLES, 0, size);
             unbind_vao();
             World.faces_in_frame += size / 3;
