@@ -52,8 +52,6 @@ public class Chunk extends TexturedMesh {
         List<Integer> tex = new ArrayList<>();
         List<Float> tex_off = new ArrayList<>();
         List<Float> colors = new ArrayList<>();
-        List<Integer> colored_tex_repeat_number = new ArrayList<>();
-        List<Float> colored_tex_off = new ArrayList<>();
 
         Queue<Vector2f> texs = new LinkedList<>();
         texs.add(TextureAtlas.get_coord("grass"));
@@ -62,8 +60,8 @@ public class Chunk extends TexturedMesh {
         texs.add(TextureAtlas.get_coord("wood_0"));
 
         int next_color = 512;
-        float colored_tex_offset_x = 0f;
-        float colored_tex_offset_y = 0f;
+        float colored_tex_offset_x = 0.0f;
+        float colored_tex_offset_y = 0.0f;
         for (int z = 0; z < World.chunk_height; z++) {
             int[][] mark = new int[World.chunk_length][World.chunk_width];
             int[] proj = new int[mark[0].length];
@@ -154,33 +152,6 @@ public class Chunk extends TexturedMesh {
                                 texture.x, texture.y,
                                 texture.x, texture.y));
                         
-                        if (side_idx == 0 || side_idx == 1) {
-                            int tmp = x_repeat;
-                            x_repeat = y_repeat;
-                            y_repeat = tmp;
-                            
-//                            float tmp1 = colored_tex_offset_x;
-//                            colored_tex_offset_x = colored_tex_offset_y;
-//                            colored_tex_offset_y = tmp1;
-                        }
-
-                        colored_tex_repeat_number.addAll(Arrays.asList(
-                                x_repeat, y_repeat,
-                                x_repeat, y_repeat,
-                                x_repeat, y_repeat,
-                                x_repeat, y_repeat,
-                                x_repeat, y_repeat,
-                                x_repeat, y_repeat
-                        ));
-
-                        colored_tex_off.addAll(Arrays.asList(
-                                colored_tex_offset_x, colored_tex_offset_x,
-                                colored_tex_offset_x, colored_tex_offset_x,
-                                colored_tex_offset_x, colored_tex_offset_x,
-                                colored_tex_offset_x, colored_tex_offset_x,
-                                colored_tex_offset_x, colored_tex_offset_x,
-                                colored_tex_offset_x, colored_tex_offset_x));
-                        
                         float r = 1.0f, g = 1.0f, b = 1.0f;
                         if (side_idx >= 0 && side_idx <= 3) {
                             r = 0.7f;
@@ -190,10 +161,14 @@ public class Chunk extends TexturedMesh {
                         colors.addAll(Arrays.asList(r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b));
                     }
                 }
-                colored_tex_offset_x += 0.00024414062f;
-                if (colored_tex_offset_x >= 1.0f) {
-                	colored_tex_offset_x = 0.0f;
-                	colored_tex_offset_y += 0.00024414062f;
+                colored_tex_offset_x += 0.01;
+                if (colored_tex_offset_x > 1.0f) {
+                	colored_tex_offset_x = 0;
+                	colored_tex_offset_y += 0.01;
+                	if (colored_tex_offset_y > 1.0) {
+                		colored_tex_offset_y = 0;
+                		colored_tex_offset_x += 0.01;
+                	}
                 }
             }
         }
@@ -202,8 +177,6 @@ public class Chunk extends TexturedMesh {
         this.tex = tex.toArray(new Integer[tex.size()]);
         this.tex_off = tex_off.toArray(new Float[tex_off.size()]);
         this.colors = colors.toArray(new Float[colors.size()]);
-        this.colored_tex_repeat_number = colored_tex_repeat_number.toArray(new Integer[colored_tex_repeat_number.size()]);
-        this.colored_tex_off = colored_tex_off.toArray(new Float[colored_tex_off.size()]);
 
         this.size = this.verts.length;
 
@@ -371,7 +344,7 @@ public class Chunk extends TexturedMesh {
 
         if (updated && updating && !empty) {
             updating = false;
-            prepare(verts, colors, colored_tex_repeat_number, colored_tex_off, tex, tex_off);
+            prepare(verts, colors, tex, tex_off);
         }
 
         changed = false;

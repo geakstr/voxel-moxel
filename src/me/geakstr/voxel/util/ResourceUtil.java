@@ -25,63 +25,6 @@ public class ResourceUtil {
         for (String name : names) load_texture(name);
     }
 
-    public static void gen_colored_texture() {
-        int width = 4096, height = 4096;
-
-        ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * 3);
-
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        
-        int[][] rgb_arr = new int[height][width];
-        int i = 0, j = 0;
-        for (int r = 0; r < 256; r++) {
-        	for (int g = 0; g < 256; g++) {
-        		for (int b = 0; b < 256; b++) {
-        			rgb_arr[i][j] = (r << 16) + (g << 8) + b;
-        			j++;
-        			if (j == width) {
-        				j = 0; 
-        				i++;
-        			}
-        		}
-        	}
-        }
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-            	int rgb = rgb_arr[y][x];
-            	
-                buffer.put((byte) ((rgb >> 16) & 0xFF));
-                buffer.put((byte) ((rgb >> 8) & 0xFF));
-                buffer.put((byte) ((rgb) & 0xFF));
-
-                bufferedImage.setRGB(y, x, rgb);
-
-            }
-        }
-        buffer.flip();
-        
-        try {
-	        ImageIO.write(bufferedImage, "jpg", new File("image.jpg"));
-        } catch (IOException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-        }
-
-        int texture_id = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texture_id);
-
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
-
-        textures.put("_colors", texture_id);
-    }
-
     public static int load_texture(String texture_name) {
         if (textures.containsKey(texture_name)) {
             return textures.get(texture_name);
