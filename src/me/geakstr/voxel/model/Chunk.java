@@ -2,24 +2,25 @@ package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector2f;
-import me.geakstr.voxel.model.meshes.TexturedMesh;
+import me.geakstr.voxel.model.meshes.ChunkMesh;
+import me.geakstr.voxel.util.ArraysUtil;
 import me.geakstr.voxel.workers.ChunkWorker;
 
 import java.util.*;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.glDrawArrays;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
-public class Chunk extends TexturedMesh {
-    public Block[][][] blocks; // [x][y][z]
+public class Chunk extends ChunkMesh {
+    public int[][][] blocks; // [x][y][z]
 
     public boolean changed, updating, updated, empty, waiting, visible;
-    public Integer[] box;
 
     public int x_chunk_pos, y_chunk_pos, z_chunk_pos;
     public int x_offset, y_offset, z_offset;
 
-    public static final int size = World.chunk_volume * 6 * 2 * 3 * 4;
+    public static int actual_verts_size = 0;
 
     public Chunk(int x_chunk_pos, int y_chunk_pos, int z_chunk_pos) {
         super();
@@ -32,8 +33,7 @@ public class Chunk extends TexturedMesh {
         this.y_offset = y_chunk_pos * World.chunk_length;
         this.z_offset = z_chunk_pos * World.chunk_height;
 
-        this.blocks = new Block[World.chunk_width][World.chunk_length][World.chunk_height];
-        this.box = Box.get_box(x_chunk_pos, y_chunk_pos, z_chunk_pos, World.chunk_width, World.chunk_length, World.chunk_height);
+        this.blocks = new int[World.chunk_width][World.chunk_length][World.chunk_height];
 
         this.changed = true;
         this.waiting = false;
@@ -46,11 +46,7 @@ public class Chunk extends TexturedMesh {
     }
 
     public void rebuild() {
-        this.updated = false;
         this.updating = true;
-        this.changed = true;
-
-        Random rnd = new Random();
 
         List<Integer> verts = new ArrayList<>();
         List<Integer> tex = new ArrayList<>();
@@ -64,8 +60,6 @@ public class Chunk extends TexturedMesh {
         texs.add(TextureAtlas.get_coord("wood_0"));
 
         int next_color = 512;
-        float colored_tex_offset_x = 0.0f;
-        float colored_tex_offset_y = 0.0f;
         for (int z = 0; z < World.chunk_height; z++) {
             int[][] mark = new int[World.chunk_length][World.chunk_width];
             int[] proj = new int[mark[0].length];
@@ -76,7 +70,7 @@ public class Chunk extends TexturedMesh {
                 boolean canDown = false;
                 int projFlag = -1;
                 for (int x = 0; x < World.chunk_width; x++) {
-                    if (blocks[x][y][z].type == 0) {
+                    if (Block.unpack_type(blocks[x][y][z]) == 0) {
                         continue;
                     }
 
@@ -92,7 +86,7 @@ public class Chunk extends TexturedMesh {
                             len = 0;
                         }
                         update_coords = true;
-                    } else if (((x > 0) && (blocks[x - 1][y][z].type == type) && (projFlag != x - 1))) {
+                    } else if (((x > 0) && (Block.unpack_type(blocks[x - 1][y][z]) == type) && (projFlag != x - 1))) {
                         mark[y][x] = mark[y][x - 1];
                         update_coords = true;
                         len++;
@@ -110,7 +104,7 @@ public class Chunk extends TexturedMesh {
                         coords_map.put(face, tmp);
                     }
 
-                    canDown = !(len > 0 && !canDown) && (y < (World.chunk_length - 1) && (blocks[x][y + 1][z].type == type));
+                    canDown = !(len > 0 && !canDown) && (y < (World.chunk_length - 1) && (Block.unpack_type(blocks[x][y + 1][z]) == type));
 
                     if (canDown) {
                         proj[x] = mark[y][x];
@@ -136,13 +130,13 @@ public class Chunk extends TexturedMesh {
 
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        verts.addAll(Arrays.asList(Block.get_side(
+                        verts.addAll(ArraysUtil.copy_ints(Block.get_side(
                                 side_idx,
                                 x0 + x_offset, y0 + y_offset,
                                 x1 + x_offset, y1 + y_offset,
                                 z + z_offset)));
 
-                        tex.addAll(Arrays.asList(Block.get_texture(
+                        tex.addAll(ArraysUtil.copy_ints(Block.get_texture(
                                 side_idx, x0, y0, x1, y1)));
 
                         tex_off.addAll(Arrays.asList(
@@ -162,25 +156,17 @@ public class Chunk extends TexturedMesh {
                         colors.addAll(Arrays.asList(r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b));
                     }
                 }
-                colored_tex_offset_x += 0.01;
-                if (colored_tex_offset_x > 1.0f) {
-                    colored_tex_offset_x = 0;
-                    colored_tex_offset_y += 0.01;
-                    if (colored_tex_offset_y > 1.0) {
-                        colored_tex_offset_y = 0;
-                        colored_tex_offset_x += 0.01;
-                    }
-                }
             }
         }
 
-        this.verts = verts.toArray(new Integer[verts.size()]);
-        this.tex = tex.toArray(new Integer[tex.size()]);
-        this.tex_off = tex_off.toArray(new Float[tex_off.size()]);
-        this.colors = colors.toArray(new Float[colors.size()]);
-
+        this.verts = ArraysUtil.copy_ints(verts);
+        this.tex_coords = ArraysUtil.copy_ints(tex);
+        this.tex_coords_offsets = ArraysUtil.copy_floats(tex_off);
+        this.colors = ArraysUtil.copy_floats(colors);
 
         this.updated = true;
+
+        actual_verts_size = this.verts.length;
 
         this.empty = this.verts.length == 0;
     }
@@ -192,7 +178,7 @@ public class Chunk extends TexturedMesh {
             sides[0] = true;
         } else if (x0 > 0) {
             for (int y = y0; y <= y1; y++) {
-                if (blocks[x0 - 1][y][z].type == 0) {
+                if (Block.unpack_type(blocks[x0 - 1][y][z]) == 0) {
                     sides[0] = true;
                     break;
                 }
@@ -202,7 +188,7 @@ public class Chunk extends TexturedMesh {
             sides[1] = true;
         } else if (x1 < World.chunk_width - 1) {
             for (int y = y0; y <= y1; y++) {
-                if (blocks[x1 + 1][y][z].type == 0) {
+                if (Block.unpack_type(blocks[x1 + 1][y][z]) == 0) {
                     sides[1] = true;
                     break;
                 }
@@ -213,7 +199,7 @@ public class Chunk extends TexturedMesh {
             sides[3] = true;
         } else if (y0 > 0) {
             for (int x = x0; x <= x1; x++) {
-                if (blocks[x][y0 - 1][z].type == 0) {
+                if (Block.unpack_type(blocks[x][y0 - 1][z]) == 0) {
                     sides[3] = true;
                     break;
                 }
@@ -224,7 +210,7 @@ public class Chunk extends TexturedMesh {
             sides[2] = true;
         } else if (y1 < World.chunk_length - 1) {
             for (int x = x0; x <= x1; x++) {
-                if (blocks[x][y1 + 1][z].type == 0) {
+                if (Block.unpack_type(blocks[x][y1 + 1][z]) == 0) {
                     sides[2] = true;
                     break;
                 }
@@ -236,7 +222,7 @@ public class Chunk extends TexturedMesh {
         } else if (z > 0) {
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (blocks[x][y][z - 1].type == 0) {
+                    if (Block.unpack_type(blocks[x][y][z - 1]) == 0) {
                         sides[4] = true;
                         break;
                     }
@@ -249,7 +235,7 @@ public class Chunk extends TexturedMesh {
         } else if (z < World.chunk_height - 1) {
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (blocks[x][y][z + 1].type == 0) {
+                    if (Block.unpack_type(blocks[x][y][z + 1]) == 0) {
                         sides[5] = true;
                         break;
                     }
@@ -262,7 +248,7 @@ public class Chunk extends TexturedMesh {
                 x_chunk_pos != 0) {
             sides[0] = false;
             for (int y = y0; y <= y1; y++) {
-                if (World.chunks[z_chunk_pos][x_chunk_pos - 1][y_chunk_pos].blocks[World.chunk_width - 1][y][z].type == 0) {
+                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos - 1][y_chunk_pos].blocks[World.chunk_width - 1][y][z]) == 0) {
                     sides[0] = true;
                     break;
                 }
@@ -274,7 +260,7 @@ public class Chunk extends TexturedMesh {
                 x_chunk_pos != World.world_size - 1) {
             sides[1] = false;
             for (int y = y0; y <= y1; y++) {
-                if (World.chunks[z_chunk_pos][x_chunk_pos + 1][y_chunk_pos].blocks[0][y][z].type == 0) {
+                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos + 1][y_chunk_pos].blocks[0][y][z]) == 0) {
                     sides[1] = true;
                     break;
                 }
@@ -286,7 +272,7 @@ public class Chunk extends TexturedMesh {
                 y_chunk_pos != World.world_size - 1) {
             sides[2] = false;
             for (int x = x0; x <= x1; x++) {
-                if (World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos + 1].blocks[x][0][z].type == 0) {
+                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos + 1].blocks[x][0][z]) == 0) {
                     sides[2] = true;
                     break;
                 }
@@ -298,7 +284,7 @@ public class Chunk extends TexturedMesh {
                 y_chunk_pos != 0) {
             sides[3] = false;
             for (int x = x0; x <= x1; x++) {
-                if (World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos - 1].blocks[x][World.chunk_length - 1][z].type == 0) {
+                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos - 1].blocks[x][World.chunk_length - 1][z]) == 0) {
                     sides[3] = true;
                     break;
                 }
@@ -311,7 +297,7 @@ public class Chunk extends TexturedMesh {
             sides[4] = false;
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (World.chunks[z_chunk_pos - 1][x_chunk_pos][y_chunk_pos].blocks[x][y][World.chunk_height - 1].type == 0) {
+                    if (Block.unpack_type(World.chunks[z_chunk_pos - 1][x_chunk_pos][y_chunk_pos].blocks[x][y][World.chunk_height - 1]) == 0) {
                         sides[4] = true;
                         break;
                     }
@@ -325,7 +311,7 @@ public class Chunk extends TexturedMesh {
             sides[5] = false;
             for (int x = x0; x <= x1; x++) {
                 for (int y = y0; y <= y1; y++) {
-                    if (World.chunks[z_chunk_pos + 1][x_chunk_pos][y_chunk_pos].blocks[x][y][0].type == 0) {
+                    if (Block.unpack_type(World.chunks[z_chunk_pos + 1][x_chunk_pos][y_chunk_pos].blocks[x][y][0]) == 0) {
                         sides[5] = true;
                         break;
                     }
@@ -336,16 +322,17 @@ public class Chunk extends TexturedMesh {
         return sides;
     }
 
-    public static int cnt = 0;
+    private static int cnt = 0;
 
     public void update() {
         if (changed && !updating && updated) {
+            updated = false;
             Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
         }
 
         if (updated && updating && !empty) {
             updating = false;
-            prepare(verts, colors, tex, tex_off);
+            update(verts, colors, tex_coords, tex_coords_offsets);
         }
         changed = false;
     }
@@ -355,10 +342,10 @@ public class Chunk extends TexturedMesh {
             update();
         }
         if (!empty) {
-            bind_vao();
-            glDrawArrays(GL_TRIANGLES, 0, size);
-            unbind_vao();
-            World.faces_in_frame += size / 3;
+            glBindVertexArray(vao);
+            glDrawArrays(GL_TRIANGLES, 0, actual_verts_size);
+            glBindVertexArray(0);
+            World.faces_in_frame += actual_verts_size / 3;
         }
     }
 

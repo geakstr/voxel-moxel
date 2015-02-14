@@ -26,4 +26,21 @@ public class Block extends Box {
     public Block(Vector3f pos, Chunk chunk) {
         this(0, pos, chunk);
     }
+
+    public static int unpack_type(int val) {
+        return ((val >> 16) & 511);
+    }
+
+    public static int pack_type(int val, int type) {
+        return val | ((type & 511) << 16);
+    }
+
+    public static int unpack_visibility(int val) {
+        return ((val >> 15) & 511) & 1;
+    }
+
+    public static int pack_visibility(int val, boolean visibility) {
+        int v = visibility ? 1 : 0;
+        return val | ((v & 511) << 15);
+    }
 }

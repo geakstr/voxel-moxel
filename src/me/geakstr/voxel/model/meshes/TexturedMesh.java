@@ -12,43 +12,36 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class TexturedMesh extends ColoredMesh {
-    public Integer[] tex;
-    public Float[] tex_off;
+    public int[] tex;
+    public float[] tex_off;
 
-    public int colored_vao;
     public int tbo; // textures buffer
     public int tobo; // textures offset buffer
 
     public TexturedMesh() {
         super();
 
-        this.colored_vao = glGenVertexArrays();
-
         this.tbo = glGenBuffers();
         this.tobo = glGenBuffers();
+    }
+
+    public Mesh prepare(int[] verts, float[] colors, int[] tex, float[] tex_off) {
+        this.init_vbo(verts, colors, tex, tex_off);
+        return this;
+    }
+
+    public Mesh init_vbo(int[] verts, float[] colors, int[] tex, float[] tex_off) {
+        super.init_vbo(verts, colors);
+
+        glBindBuffer(GL_ARRAY_BUFFER, tbo);
+        glBufferData(GL_ARRAY_BUFFER, tex.length * 4, ExtendedBufferUtil.create_flipped_byte_buffer(tex), GL_STREAM_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, tobo);
+        glBufferData(GL_ARRAY_BUFFER, tex_off.length * 4, ExtendedBufferUtil.create_flipped_byte_buffer(tex_off), GL_STREAM_DRAW);
 
         this.bind_vao();
         this.init_vao();
         this.unbind_vao();
-    }
-
-    public Mesh prepare(Integer[] verts, Float[] colors, Integer[] tex, Float[] tex_off) {
-        this.init_vbo(verts, colors,tex, tex_off);
-        return this;
-    }
-
-    public Mesh init_vbo(Integer[] verts, Float[] colors, Integer[] tex, Float[] tex_off) {
-        super.init_vbo(verts, colors);
-
-        glBindBuffer(GL_ARRAY_BUFFER, tbo);
-        glBufferData(GL_ARRAY_BUFFER, Chunk.size, null, GL_DYNAMIC_DRAW);
-        glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(tex), GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, tobo);
-        glBufferData(GL_ARRAY_BUFFER, Chunk.size, null, GL_DYNAMIC_DRAW);
-        glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(tex_off), GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         return this;
     }

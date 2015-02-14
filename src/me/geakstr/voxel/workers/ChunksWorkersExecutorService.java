@@ -7,7 +7,7 @@ public class ChunksWorkersExecutorService {
     public final ExecutorService es;
 
     public ChunksWorkersExecutorService() {
-        this.es = Executors.newFixedThreadPool(2);
+        this.es = Executors.newFixedThreadPool(1);
     }
 
     public void add_worker(ChunkWorker worker) {

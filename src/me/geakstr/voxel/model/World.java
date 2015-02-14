@@ -39,15 +39,7 @@ public class World {
         for (int x = 0; x < world_size; x++) {
             for (int y = 0; y < world_size; y++) {
                 for (int z = 0; z < world_height; z++) {
-                    Chunk chunk = new Chunk(x, y, z);
-                    chunks[z][x][y] = chunk;
-                    for (int xx = 0; xx < chunk_width; xx++) {
-                        for (int yy = 0; yy < chunk_length; yy++) {
-                            for (int zz = 0; zz < chunk_height; zz++) {
-                                chunks[z][x][y].blocks[xx][yy][zz] = new Block(new Vector3f(xx, yy, zz), chunk);
-                            }
-                        }
-                    }
+                    chunks[z][x][y] = new Chunk(x, y, z);
                 }
             }
         }
@@ -74,7 +66,7 @@ public class World {
                     int height = chunk_z == chunk_vert_size - 1 ? (int) (global_z % chunk_height) : chunk_height;
 
                     for (int cube_z = 0; cube_z < height; cube_z++) {
-                        chunk.blocks[cube_x][cube_y][cube_z].type = 1;
+                        chunk.blocks[cube_x][cube_y][cube_z] = Block.pack_type(0, 1);
                     }
                 }
             }
@@ -115,21 +107,39 @@ public class World {
         final Vector3f camera_position = Camera.position.negate(null);
 
         float min_dist = Float.MAX_VALUE;
+
+        Chunk chunk = null;
         for (int chunk_z = 0; chunk_z < World.world_height; chunk_z++) {
             for (int chunk_x = 0; chunk_x < World.world_size; chunk_x++) {
                 for (int chunk_y = 0; chunk_y < World.world_size; chunk_y++) {
-                    Chunk chunk = World.chunks[chunk_z][chunk_x][chunk_y];
-                    for (int block_x = 0; block_x < World.chunk_width; block_x++) {
-                        for (int block_y = 0; block_y < World.chunk_length; block_y++) {
-                            for (int block_z = 0; block_z < World.chunk_height; block_z++) {
-                                Block block = chunk.blocks[block_x][block_y][block_z];
-                                if (block.type != 0 && Game.ray.intersect(block, -100, -1)) {
-                                    float dist = Vector3f.dist(block.corners[0], camera_position);
-                                    if (dist < min_dist) {
-                                        selection_block = block;
-                                        min_dist = dist;
-                                    }
-                                }
+                    chunk = World.chunks[chunk_z][chunk_x][chunk_y];
+
+                    Box box = new Box(
+                            new Vector3f(chunk_x * World.chunk_width, chunk_z * World.chunk_height, chunk_y * World.chunk_length),
+                            new Vector3f(chunk_x * World.chunk_width + World.chunk_width, chunk_z * World.chunk_height + World.chunk_height, chunk_y * World.chunk_length + World.chunk_length));
+
+                    if (!chunk.empty && Game.ray.intersect(box, -100, -1)) {
+                        break;
+                    }
+                }
+            }
+        }
+
+
+
+        if (chunk != null) {
+            for (int block_x = 0; block_x < World.chunk_width; block_x++) {
+                for (int block_y = 0; block_y < World.chunk_length; block_y++) {
+                    for (int block_z = 0; block_z < World.chunk_height; block_z++) {
+                        int block_type = Block.unpack_type(chunk.blocks[block_x][block_y][block_z]);
+
+                        Block block = new Block(block_type, new Vector3f(block_x, block_y, block_z), chunk);
+                        if (block.type != 0 && Game.ray.intersect(block, -100, -1)) {
+                            System.out.println(block.corners[0]);
+                            float dist = Vector3f.dist(block.corners[0], camera_position);
+                            if (dist < min_dist) {
+                                selection_block = block;
+                                min_dist = dist;
                             }
                         }
                     }
