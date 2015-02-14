@@ -4,6 +4,7 @@ import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.model.meshes.ChunkMesh;
 import me.geakstr.voxel.util.ArraysUtil;
+import me.geakstr.voxel.util.ExtendedBufferUtil;
 import me.geakstr.voxel.workers.ChunkWorker;
 
 import java.util.*;
@@ -159,16 +160,21 @@ public class Chunk extends ChunkMesh {
             }
         }
 
-        this.verts = ArraysUtil.copy_ints(verts);
-        this.tex_coords = ArraysUtil.copy_ints(tex);
-        this.tex_coords_offsets = ArraysUtil.copy_floats(tex_off);
-        this.colors = ArraysUtil.copy_floats(colors);
+        this.verts.clear();
+        this.tex_coords.clear();
+        this.tex_coords_offsets.clear();
+        this.colors.clear();
+
+        this.verts.put(ExtendedBufferUtil.create_flipped_byte_buffer(ArraysUtil.copy_ints(verts)));
+        this.tex_coords.put(ExtendedBufferUtil.create_flipped_byte_buffer(ArraysUtil.copy_ints(tex)));
+        this.tex_coords_offsets.put(ExtendedBufferUtil.create_flipped_byte_buffer(ArraysUtil.copy_floats(tex_off)));
+        this.colors.put(ExtendedBufferUtil.create_flipped_byte_buffer(ArraysUtil.copy_floats(colors)));
 
         this.updated = true;
 
-        actual_verts_size = this.verts.length;
+        actual_verts_size = verts.size();
 
-        this.empty = this.verts.length == 0;
+        this.empty = actual_verts_size == 0;
     }
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
@@ -322,8 +328,6 @@ public class Chunk extends ChunkMesh {
         return sides;
     }
 
-    private static int cnt = 0;
-
     public void update() {
         if (changed && !updating && updated) {
             updated = false;
@@ -332,7 +336,6 @@ public class Chunk extends ChunkMesh {
 
         if (updated && updating && !empty) {
             updating = false;
-            update(verts, colors, tex_coords, tex_coords_offsets);
         }
         changed = false;
     }
@@ -345,6 +348,7 @@ public class Chunk extends ChunkMesh {
             glBindVertexArray(vao);
             glDrawArrays(GL_TRIANGLES, 0, actual_verts_size);
             glBindVertexArray(0);
+            World.chunks_in_frame++;
             World.faces_in_frame += actual_verts_size / 3;
         }
     }

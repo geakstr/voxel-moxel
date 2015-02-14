@@ -81,7 +81,6 @@ public class World {
             for (int x = 0; x < world_size; x++) {
                 for (int y = 0; y < world_size; y++) {
                     if (!Game.frustum || Frustum.chunkInFrustum(x, y, z)) {
-                        chunks_in_frame++;
                         chunks[z][x][y].render();
                     }
                 }

@@ -28,7 +28,7 @@ public class Game {
     public static void init() {
         ResourceUtil.load_textures("atlas.png");
 
-        Camera.init(100, (float) Window.width / (float) Window.height, 0.01f, 256f);
+        Camera.init(70, (float) Window.width / (float) Window.height, 0.01f, 256f);
 
         world_shader = new Shader("world.vs", "world.fs").compile();
         world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color");
@@ -38,7 +38,7 @@ public class Game {
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(64, 1, 16, 16, 16);
+        World.init(16, 4, 16, 16, 64);
         World.gen();
     }
 
