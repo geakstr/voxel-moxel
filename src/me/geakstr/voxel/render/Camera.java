@@ -23,7 +23,7 @@ public class Camera {
 
     private static float pitch = 0.0f;
 
-    public static final float MOVE_SPEED = 10f;
+    public static final float MOVE_SPEED = 50f;
     public static final float STRAFE_SPEED = MOVE_SPEED / 1.2f;
     public static final float SENSITIVITY_X = 0.33f;
     public static final float SENSITIVITY_Y = SENSITIVITY_X * 1.0f;

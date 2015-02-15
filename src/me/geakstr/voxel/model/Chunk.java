@@ -159,11 +159,25 @@ public class Chunk extends ChunkMesh {
             }
         }
 
-        this.verts = ArraysUtil.copy_ints(verts);
-        this.tex_coords = ArraysUtil.copy_ints(tex);
-        this.tex_coords_offsets = ArraysUtil.copy_floats(tex_off);
-        this.colors = ArraysUtil.copy_floats(colors);
 
+        List<Float> data = new ArrayList<>();
+        for (int v = 0, t = 0, to = 0, c = 0; v < verts.size(); v += 3, t += 2, to += 2, c += 3) {
+            data.add((float) verts.get(v));
+            data.add((float) verts.get(v + 1));
+            data.add((float) verts.get(v + 2));
+
+            data.add((float) tex.get(t));
+            data.add((float) tex.get(t + 1));
+
+            data.add((float) tex_off.get(to));
+            data.add((float) tex_off.get(to + 1));
+
+            data.add((float) colors.get(c));
+            data.add((float) colors.get(c + 1));
+            data.add((float) colors.get(c + 2));
+        }
+
+        this.data = ArraysUtil.copy_floats(data);
         this.updated = true;
 
         actual_verts_size = verts.size();
@@ -330,7 +344,7 @@ public class Chunk extends ChunkMesh {
 
         if (updated && updating && !empty) {
             updating = false;
-            update(verts, tex_coords, tex_coords_offsets, colors);
+            update(data);
         }
         changed = false;
     }
@@ -339,6 +353,7 @@ public class Chunk extends ChunkMesh {
         if (changed || updating) {
             update();
         }
+
         if (!empty) {
             glBindVertexArray(vao);
             glDrawArrays(GL_TRIANGLES, 0, actual_verts_size);

@@ -6,6 +6,8 @@ import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.util.OpenSimplexNoise;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 public class World {
