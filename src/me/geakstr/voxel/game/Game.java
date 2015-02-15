@@ -38,7 +38,7 @@ public class Game {
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(16, 4, 16, 16, 64);
+        World.init(4, 1, 16, 16, 16);
         World.gen();
     }
 
