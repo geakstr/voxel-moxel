@@ -3,50 +3,74 @@ package me.geakstr.voxel.model.meshes;
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.util.ExtendedBufferUtil;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
 public class ChunkMesh {
-    public float[] data;
+    private static final int mapping_flags = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
+    private static final int initial_capacity = 64;
 
-    public int vao;
-    public int vbo;
+    private int capacities[];
+    private int buffer_count, cur_buffer_idx;
 
-    private int capacity = 64;
+    private int[] vaos, vbos;
 
     public ChunkMesh() {
-        this.vao = glGenVertexArrays();
-        this.vbo = glGenBuffers();
+        this.buffer_count = 1;
+        this.cur_buffer_idx = 0;
 
-        this.init_vbo();
-        this.init_vao();
+        this.capacities = new int[buffer_count];
+
+        this.vaos = new int[buffer_count];
+        this.vbos = new int[buffer_count];
+
+        for (int buffer_idx = 0; buffer_idx < buffer_count; buffer_idx++) {
+            capacities[buffer_idx] = initial_capacity;
+            vaos[buffer_idx] = glGenVertexArrays();
+            vbos[buffer_idx] = glGenBuffers();
+            this.init_vbo(buffer_idx);
+            this.init_vao(buffer_idx);
+        }
     }
 
     public void update(float[] data) {
-        int bytes = data.length * 4;
-        boolean was = false;
-        while (bytes > capacity) {
-            capacity *= 2;
-            was = true;
+        int buffer_idx = (cur_buffer_idx + buffer_count - 1) % buffer_count;
+
+        int data_size = data.length * 4;
+
+        boolean orphan = false;
+        while (data_size > capacities[buffer_idx]) {
+            capacities[buffer_idx] *= 2;
+            orphan = true;
         }
-        if (was) {
-            init_vbo();
+        if (orphan) {
+            init_vbo(buffer_idx);
         }
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, bytes, ExtendedBufferUtil.create_flipped_byte_buffer(data));
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbos[buffer_idx]);
+        glMapBufferRange(GL_ARRAY_BUFFER, 0, capacities[buffer_idx], mapping_flags).put(ExtendedBufferUtil.create_flipped_byte_buffer(data));
+        glUnmapBuffer(GL_ARRAY_BUFFER);
     }
 
-    private void init_vbo() {
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, capacity, null, GL_DYNAMIC_DRAW);
+    public void draw(int count) {
+        glBindVertexArray(vaos[cur_buffer_idx]);
+        glDrawArrays(GL_TRIANGLES, 0, count);
+        glBindVertexArray(0);
+        cur_buffer_idx = (cur_buffer_idx + 1) % buffer_count;
     }
 
-    private void init_vao() {
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    private void init_vbo(int buffer_idx) {
+        glBindBuffer(GL_ARRAY_BUFFER, vbos[buffer_idx]);
+        glBufferData(GL_ARRAY_BUFFER, capacities[buffer_idx], null, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    private void init_vao(int buffer_idx) {
+        glBindVertexArray(vaos[buffer_idx]);
+        glBindBuffer(GL_ARRAY_BUFFER, vbos[buffer_idx]);
 
         glEnableVertexAttribArray(Game.current_shader.attr("attr_pos"));
         glEnableVertexAttribArray(Game.current_shader.attr("attr_tex_coord"));
@@ -62,9 +86,11 @@ public class ChunkMesh {
         glBindVertexArray(0);
     }
 
-
     public void destroy() {
-        glDeleteVertexArrays(vao);
-        glDeleteBuffers(vbo);
+        for (int buffer_idx = 0; buffer_idx < buffer_count; buffer_idx++) {
+            glDeleteVertexArrays(vaos[buffer_idx]);
+            glDeleteBuffers(vbos[buffer_idx]);
+        }
+
     }
 }

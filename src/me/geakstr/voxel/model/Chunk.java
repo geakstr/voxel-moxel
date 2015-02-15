@@ -8,10 +8,6 @@ import me.geakstr.voxel.workers.ChunkWorker;
 
 import java.util.*;
 
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-
 public class Chunk extends ChunkMesh {
     public int[][][] blocks; // [x][y][z]
 
@@ -20,7 +16,9 @@ public class Chunk extends ChunkMesh {
     public int x_chunk_pos, y_chunk_pos, z_chunk_pos;
     public int x_offset, y_offset, z_offset;
 
-    public static int actual_verts_size = 0;
+    public int actual_count = 0;
+
+    private float[] data;
 
     public Chunk(int x_chunk_pos, int y_chunk_pos, int z_chunk_pos) {
         super();
@@ -160,29 +158,26 @@ public class Chunk extends ChunkMesh {
         }
 
 
-        List<Float> data = new ArrayList<>();
-        for (int v = 0, t = 0, to = 0, c = 0; v < verts.size(); v += 3, t += 2, to += 2, c += 3) {
-            data.add((float) verts.get(v));
-            data.add((float) verts.get(v + 1));
-            data.add((float) verts.get(v + 2));
+        this.data = new float[verts.size() + tex.size() + tex_off.size() + colors.size()];
+        for (int i = 0, v = 0, t = 0, to = 0, c = 0; v < verts.size(); v += 3, t += 2, to += 2, c += 3) {
+            data[i++] = (float) verts.get(v);
+            data[i++] = (float) verts.get(v + 1);
+            data[i++] = (float) verts.get(v + 2);
 
-            data.add((float) tex.get(t));
-            data.add((float) tex.get(t + 1));
+            data[i++] = (float) tex.get(t);
+            data[i++] = (float) tex.get(t + 1);
 
-            data.add((float) tex_off.get(to));
-            data.add((float) tex_off.get(to + 1));
+            data[i++] = (float) tex_off.get(to);
+            data[i++] = (float) tex_off.get(to + 1);
 
-            data.add((float) colors.get(c));
-            data.add((float) colors.get(c + 1));
-            data.add((float) colors.get(c + 2));
+            data[i++] = (float) colors.get(c);
+            data[i++] = (float) colors.get(c + 1);
+            data[i++] = (float) colors.get(c + 2);
         }
 
-        this.data = ArraysUtil.copy_floats(data);
         this.updated = true;
-
-        actual_verts_size = verts.size();
-
-        this.empty = actual_verts_size == 0;
+        this.actual_count = verts.size();
+        this.empty = actual_count == 0;
     }
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
@@ -344,7 +339,6 @@ public class Chunk extends ChunkMesh {
 
         if (updated && updating && !empty) {
             updating = false;
-            update(data);
         }
         changed = false;
     }
@@ -353,13 +347,11 @@ public class Chunk extends ChunkMesh {
         if (changed || updating) {
             update();
         }
-
         if (!empty) {
-            glBindVertexArray(vao);
-            glDrawArrays(GL_TRIANGLES, 0, actual_verts_size);
-            glBindVertexArray(0);
+            update(data);
+            draw(actual_count);
             World.chunks_in_frame++;
-            World.faces_in_frame += actual_verts_size / 3;
+            World.faces_in_frame += actual_count / 3;
         }
     }
 
