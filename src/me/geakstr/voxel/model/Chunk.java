@@ -339,6 +339,7 @@ public class Chunk extends ChunkMesh {
 
         if (updated && updating && !empty) {
             updating = false;
+            update(data);
         }
         changed = false;
     }
@@ -348,7 +349,6 @@ public class Chunk extends ChunkMesh {
             update();
         }
         if (!empty) {
-            update(data);
             draw(actual_count);
             World.chunks_in_frame++;
             World.faces_in_frame += actual_count / 3;
