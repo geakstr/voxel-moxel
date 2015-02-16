@@ -1,4 +1,4 @@
-package me.geakstr.voxel.model.meshes;
+package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.util.ExtendedBufferUtil;
@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
-public class ChunkMesh {
+public class Mesh {
     private static final int mapping_flags = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
     private static final int initial_capacity = 512;
 
@@ -18,7 +18,7 @@ public class ChunkMesh {
 
     private int[] vaos, vbos;
 
-    public ChunkMesh() {
+    public Mesh() {
         this.buffer_count = 1;
         this.cur_buffer_idx = 0;
 
@@ -35,8 +35,12 @@ public class ChunkMesh {
             this.init_vao(buffer_idx);
         }
     }
+    
+    public static void bind_texture(int id) {
+        glBindTexture(GL_TEXTURE_2D, id);
+    }
 
-    public void update(float[] data) {
+    public void update_vbo(float[] data) {
         int buffer_idx = (cur_buffer_idx + buffer_count - 1) % buffer_count;
 
         int data_size = data.length * 4;
@@ -51,8 +55,7 @@ public class ChunkMesh {
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, vbos[buffer_idx]);
-        //glBufferSubData(GL_ARRAY_BUFFER, 0, ExtendedBufferUtil.create_flipped_byte_buffer(data));
-        glMapBufferRange(GL_ARRAY_BUFFER, 0, capacities[buffer_idx], mapping_flags).put(ExtendedBufferUtil.create_flipped_byte_buffer(data));
+        glMapBufferRange(GL_ARRAY_BUFFER, 0, data_size, mapping_flags).put(ExtendedBufferUtil.create_flipped_byte_buffer(data));
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
 
@@ -61,6 +64,13 @@ public class ChunkMesh {
         glDrawArrays(GL_TRIANGLES, 0, count);
         glBindVertexArray(0);
         cur_buffer_idx = (cur_buffer_idx + 1) % buffer_count;
+    }
+    
+    public void destroy() {
+        for (int buffer_idx = 0; buffer_idx < buffer_count; buffer_idx++) {
+            glDeleteVertexArrays(vaos[buffer_idx]);
+            glDeleteBuffers(vbos[buffer_idx]);
+        }
     }
 
     private void init_vbo(int buffer_idx) {
@@ -85,13 +95,5 @@ public class ChunkMesh {
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
-    }
-
-    public void destroy() {
-        for (int buffer_idx = 0; buffer_idx < buffer_count; buffer_idx++) {
-            glDeleteVertexArrays(vaos[buffer_idx]);
-            glDeleteBuffers(vbos[buffer_idx]);
-        }
-
     }
 }

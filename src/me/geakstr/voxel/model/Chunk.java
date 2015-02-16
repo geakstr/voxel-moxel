@@ -2,13 +2,12 @@ package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector2f;
-import me.geakstr.voxel.model.meshes.ChunkMesh;
 import me.geakstr.voxel.util.ArraysUtil;
 import me.geakstr.voxel.workers.ChunkWorker;
 
 import java.util.*;
 
-public class Chunk extends ChunkMesh {
+public class Chunk extends Mesh {
     public int[][][] blocks; // [x][y][z]
 
     public boolean changed, updating, updated, empty, waiting, visible;
@@ -339,7 +338,7 @@ public class Chunk extends ChunkMesh {
 
         if (updated && updating && !empty) {
             updating = false;
-            update(data);
+            update_vbo(data);
         }
         changed = false;
     }

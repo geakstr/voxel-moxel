@@ -51,7 +51,7 @@ public class World {
 
         for (int global_x = 0; global_x < world_size * chunk_width; global_x++) {
             for (int global_y = 0; global_y < world_size * chunk_length; global_y++) {
-                double global_z = ((noise.eval(global_x / 128.0f, global_y / 128.0f, 1.0) + 1)) * world_height * chunk_height / 2;
+                double global_z = ((noise.eval(global_x / 256.0f, global_y / 256.0f, 1.0) + 1)) * world_height * chunk_height / 2;
 
                 int chunk_x = global_x / (chunk_width);
                 int chunk_y = global_y / (chunk_length);

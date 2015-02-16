@@ -6,13 +6,12 @@ import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.math.Vector3f;
 import me.geakstr.voxel.model.Block;
 import me.geakstr.voxel.model.Chunk;
+import me.geakstr.voxel.model.Mesh;
 import me.geakstr.voxel.model.TextureAtlas;
 import me.geakstr.voxel.model.World;
-import me.geakstr.voxel.model.meshes.Mesh;
 import me.geakstr.voxel.render.*;
 import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
-
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class Game {
@@ -38,7 +37,7 @@ public class Game {
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(64, 4, 16, 16, 16);
+        World.init(16, 4, 16, 16, 16);
         World.gen();
     }
 
