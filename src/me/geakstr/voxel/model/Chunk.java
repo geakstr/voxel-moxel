@@ -15,8 +15,6 @@ public class Chunk extends Mesh {
     public int x_chunk_pos, y_chunk_pos, z_chunk_pos;
     public int x_offset, y_offset, z_offset;
 
-    public int actual_count = 0;
-
     public Chunk(int x_chunk_pos, int y_chunk_pos, int z_chunk_pos) {
         super();
 
@@ -158,8 +156,7 @@ public class Chunk extends Mesh {
         update_data(verts, tex, tex_off, colors);
 
         this.updated = true;
-        this.actual_count = verts.size() / 3;
-        this.empty = actual_count == 0;
+        this.empty = verts.size() == 0;
     }
 
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
@@ -331,9 +328,9 @@ public class Chunk extends Mesh {
             update();
         }
         if (!empty) {
-            draw(actual_count);
+            draw();
             World.chunks_in_frame++;
-            World.faces_in_frame += actual_count;
+            World.faces_in_frame += verts_size;
         }
     }
 

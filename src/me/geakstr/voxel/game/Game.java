@@ -15,7 +15,7 @@ public class Game {
 
     public static Transform world_transform;
     public static ChunksWorkersExecutorService chunks_workers_executor_service;
-    public static Shader current_shader, world_shader;
+    public static Shader current_shader, world_shader, gui_shader;
     
     public static Player player;
 
@@ -28,21 +28,27 @@ public class Game {
 
         world_shader = new Shader("world.vs", "world.fs").compile();
         world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color");
-        current_shader = world_shader;
 
+        gui_shader = new Shader("gui.vs", "gui.fs").compile();
+        gui_shader.save_attrs("attr_pos");
+        current_shader = gui_shader;
+        GUI.init();
+
+        current_shader = world_shader;
         world_transform = new Transform();
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(64, 1, 16, 16, 256);
+        World.init(2, 1, 16, 16, 16);
         World.gen();
+
         player = new Player();
     }
 
     private static boolean was_input = false;
     public static void before_render() {
         was_input = Camera.input();
-        
+
         if (was_input) {
 	        Camera.apply();
 	        Frustum.update();
@@ -58,13 +64,18 @@ public class Game {
         current_shader.set_uniform("uniform_camera_view", Camera.view);
         current_shader.set_uniform("uniform_texture", 0);
         current_shader.set_uniform("uniform_texture_info", world_shader_texture_info);
-        
+
         Mesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
         World.render();
         
-        //current_shader.set_uniform("uniform_transform", player.getTransform());
-        //player.render();
+//        current_shader.set_uniform("uniform_transform", player.getTransform());
+//        player.render();
         
+        current_shader.unbind();
+
+        current_shader = gui_shader;
+        current_shader.bind();
+        GUI.draw();
         current_shader.unbind();
     }
 

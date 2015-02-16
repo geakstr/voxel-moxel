@@ -45,11 +45,11 @@ public class Input {
     }
 
     public static boolean getMouseDown(int mouseButton) {
-        return getMouse(mouseButton) && !lastMouse[mouseButton];
+        return getMouse(mouseButton);
     }
 
     public static boolean getMouseUp(int mouseButton) {
-        return !getMouse(mouseButton) && lastMouse[mouseButton];
+        return !getMouse(mouseButton);
     }
 
     public static Vector2f getMousePosition() {

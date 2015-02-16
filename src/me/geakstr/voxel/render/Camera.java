@@ -5,6 +5,7 @@ import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.math.Vector3f;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Camera {
@@ -20,6 +21,9 @@ public class Camera {
     public static Ray ray;
 
     private static boolean mouse_locked;
+
+    private static boolean mouse_left_down = false;
+    private static boolean mouse_right_down = false;
 
     private static float pitch = 0.0f;
 
@@ -68,7 +72,7 @@ public class Camera {
             update_ray();
             was_input = true;
         }
-        
+
         if (Input.getKeyDown(GLFW_KEY_W)) {
             forward(MOVE_SPEED * 0.01f);
             was_input = true;
@@ -94,15 +98,25 @@ public class Camera {
             was_input = true;
         }
         if (Input.getKeyDown(GLFW_KEY_ESCAPE)) {
-        	System.exit(0);
+            System.exit(0);
         }
-        
-        if (Input.getMouse(GLFW_MOUSE_BUTTON_LEFT)) {
-            Picker.remove(ray);
+
+        if (Input.getMouseDown(GLFW_MOUSE_BUTTON_LEFT)) {
+            if (!mouse_left_down) {
+                mouse_left_down = true;
+                Picker.remove(ray);
+            }
+        } else {
+            mouse_left_down = false;
         }
-        
-        if (Input.getMouse(GLFW_MOUSE_BUTTON_RIGHT)) {
-            Picker.insert(ray);
+
+        if (Input.getMouseDown(GLFW_MOUSE_BUTTON_RIGHT)) {
+            if (!mouse_right_down) {
+                mouse_right_down = true;
+                Picker.insert(ray);
+            }
+        } else {
+            mouse_right_down = false;
         }
 
         return was_input;
@@ -161,8 +175,8 @@ public class Camera {
         position.z += amount * Math.sin(Math.toRadians(rotation.y + 90 * direction));
         position.x += amount * Math.cos(Math.toRadians(rotation.y + 90 * direction));
     }
-    
+
     public static void update_ray() {
-    	ray = new Ray(projection, view, center, Window.width, Window.height);
+        ray = new Ray(projection, view, center, Window.width, Window.height);
     }
 }
