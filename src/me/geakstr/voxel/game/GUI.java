@@ -1,5 +1,6 @@
 package me.geakstr.voxel.game;
 
+import me.geakstr.voxel.core.Configurator;
 import me.geakstr.voxel.core.Window;
 import org.lwjgl.BufferUtils;
 
@@ -14,7 +15,7 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
 public class GUI {
-    private static final int mapping_flags = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
+    private static final int mapping_flags = GL_MAP_WRITE_BIT | (Configurator.unsynchronized_buffering ? GL_MAP_UNSYNCHRONIZED_BIT : GL_MAP_INVALIDATE_RANGE_BIT);
 
     private static int vbo;
     private static int vao;

@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 public class Configurator {
+    public static boolean unsynchronized_buffering = true;
+
     public static void init(String path_to_config) {
         JSONObject json = null;
         try {
@@ -20,8 +22,8 @@ public class Configurator {
             Window.height = (int) ((long) screen_resolution.get(1));
             Window.vsync = (boolean) json.get("vsync");
 
-            Game.occlusion = (boolean) json.get("occlusion");
             Game.frustum = (boolean) json.get("frustum");
+            Configurator.unsynchronized_buffering = (boolean) json.get("unsynchronized_buffering");
 
             TextureAtlas.fill((JSONObject) json.get("texture_atlas"));
         } catch (FileNotFoundException e) {

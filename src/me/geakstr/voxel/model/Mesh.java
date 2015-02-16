@@ -1,5 +1,6 @@
 package me.geakstr.voxel.model;
 
+import me.geakstr.voxel.core.Configurator;
 import me.geakstr.voxel.game.Game;
 import org.lwjgl.BufferUtils;
 
@@ -16,7 +17,7 @@ public class Mesh {
     public ByteBuffer data;
     public int verts_size;
 
-    private static final int mapping_flags = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT;
+    private static final int mapping_flags = GL_MAP_WRITE_BIT | (Configurator.unsynchronized_buffering ? GL_MAP_UNSYNCHRONIZED_BIT : GL_MAP_INVALIDATE_RANGE_BIT);
     private static final int initial_capacity = 512;
 
     private int capacity;
