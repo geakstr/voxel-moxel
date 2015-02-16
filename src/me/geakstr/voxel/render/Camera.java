@@ -5,9 +5,6 @@ import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.math.Vector3f;
-import me.geakstr.voxel.model.Block;
-import me.geakstr.voxel.model.Chunk;
-import me.geakstr.voxel.model.World;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Camera {

@@ -1,8 +1,6 @@
 package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.game.Game;
-import me.geakstr.voxel.math.Vector3f;
-import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.util.OpenSimplexNoise;
 

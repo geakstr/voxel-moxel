@@ -50,9 +50,10 @@ public class Chunk extends Mesh {
 
         Queue<Vector2f> texs = new LinkedList<>();
         texs.add(TextureAtlas.get_coord("grass"));
+        texs.add(TextureAtlas.get_coord("moss_stone"));
         texs.add(TextureAtlas.get_coord("stone"));
-        texs.add(TextureAtlas.get_coord("cobblestone"));
         texs.add(TextureAtlas.get_coord("wood_0"));
+        texs.add(TextureAtlas.get_coord("sand"));
 
         int next_color = 512;
         for (int z = 0; z < World.chunk_height; z++) {
