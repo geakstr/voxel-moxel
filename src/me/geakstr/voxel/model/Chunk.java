@@ -176,7 +176,7 @@ public class Chunk extends ChunkMesh {
         }
 
         this.updated = true;
-        this.actual_count = verts.size();
+        this.actual_count = verts.size() / 3;
         this.empty = actual_count == 0;
     }
 
@@ -351,7 +351,7 @@ public class Chunk extends ChunkMesh {
         if (!empty) {
             draw(actual_count);
             World.chunks_in_frame++;
-            World.faces_in_frame += actual_count / 3;
+            World.faces_in_frame += actual_count;
         }
     }
 

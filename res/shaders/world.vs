@@ -1,4 +1,4 @@
-#version 330 core
+#version 330
 
 in vec3 attr_pos;
 in vec2 attr_tex_offset;

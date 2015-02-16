@@ -11,7 +11,7 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class ChunkMesh {
     private static final int mapping_flags = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
-    private static final int initial_capacity = 64;
+    private static final int initial_capacity = 512;
 
     private int capacities[];
     private int buffer_count, cur_buffer_idx;
@@ -51,6 +51,7 @@ public class ChunkMesh {
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, vbos[buffer_idx]);
+        //glBufferSubData(GL_ARRAY_BUFFER, 0, ExtendedBufferUtil.create_flipped_byte_buffer(data));
         glMapBufferRange(GL_ARRAY_BUFFER, 0, capacities[buffer_idx], mapping_flags).put(ExtendedBufferUtil.create_flipped_byte_buffer(data));
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }

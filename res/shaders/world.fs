@@ -1,4 +1,4 @@
-#version 330 core
+#version 330
 
 in vec2 out_tex_offset;
 in vec2 out_tex_coord;
