@@ -69,7 +69,6 @@ public class Camera {
         }
         if (rot_y || rot_x) {
             Input.setMousePosition(center);
-            update_ray();
             was_input = true;
         }
 
@@ -119,6 +118,10 @@ public class Camera {
             mouse_right_down = false;
         }
 
+        if (was_input) {
+            update_ray();
+        }
+        
         return was_input;
     }
 
