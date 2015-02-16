@@ -1,8 +1,12 @@
 #version 330
 
-in vec3 attr_pos;
+in vec2 attr_pos;
+in vec3 attr_color;
+
+out vec4 color;
 
 void main()
 {
-    gl_Position = vec4(attr_pos, 1.0);
+    color = vec4(attr_color, 1.0);
+    gl_Position = vec4(attr_pos, 0.0, 1.0);
 }

@@ -30,7 +30,7 @@ public class Game {
         world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color");
 
         gui_shader = new Shader("gui.vs", "gui.fs").compile();
-        gui_shader.save_attrs("attr_pos");
+        gui_shader.save_attrs("attr_pos").save_attr("attr_color");
         current_shader = gui_shader;
         GUI.init();
 
