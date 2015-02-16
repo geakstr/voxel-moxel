@@ -21,7 +21,7 @@ public class Game {
     public static Transform world_transform;
     public static ChunksWorkersExecutorService chunks_workers_executor_service;
     public static Shader current_shader, world_shader;
-    public static Ray ray;
+    
     public static Player player;
 
     public static Vector2f world_shader_texture_info = new Vector2f(TextureAtlas.atlas_size, TextureAtlas.crop_size);
@@ -44,29 +44,14 @@ public class Game {
         player = new Player();
     }
 
+    private static boolean was_input = false;
     public static void before_render() {
-        Camera.input();
-        Camera.apply();
-
-        Frustum.update();
-
-        ray = new Ray(Camera.projection, Camera.view, Input.getMousePosition(), Window.width, Window.height);
-
-        if (Input.getMouse(GLFW_MOUSE_BUTTON_LEFT)) {
-            Block selected_block = World.mouse_selection();
-            if (selected_block != null) {
-                Chunk chunk = selected_block.chunk;
-                if (chunk != null && !chunk.updating) {
-                    Vector3f pos = selected_block.corners[0];
-
-                    int x = (int) pos.x % World.chunk_width;
-                    int y = (int) pos.z % World.chunk_length;
-                    int z = (int) pos.y % World.chunk_height;
-                    chunk.blocks[x][y][z] = 0;
-
-                    chunk.changed = true;
-                }
-            }
+        was_input = Camera.input();
+        
+        if (was_input) {
+	        Camera.apply();
+	        Frustum.update();
+	        player.update();
         }
     }
 
@@ -81,8 +66,9 @@ public class Game {
         Mesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
         World.render();
         
-        player.update();
-        current_shader.set_uniform("uniform_transform", player.getTransform());
+        if (was_input) {
+        	current_shader.set_uniform("uniform_transform", player.getTransform());
+        }
         player.render();
         current_shader.unbind();
     }

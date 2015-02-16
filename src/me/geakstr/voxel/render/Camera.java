@@ -5,7 +5,9 @@ import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.math.Vector3f;
-
+import me.geakstr.voxel.model.Block;
+import me.geakstr.voxel.model.Chunk;
+import me.geakstr.voxel.model.World;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Camera {
@@ -18,6 +20,7 @@ public class Camera {
     public static Vector3f position, rotation;
 
     public static Vector2f center;
+    public static Ray ray;
 
     private static boolean mouse_locked;
 
@@ -65,6 +68,7 @@ public class Camera {
         }
         if (rot_y || rot_x) {
             Input.setMousePosition(center);
+            update_ray();
         }
 
         was_input = true;
@@ -95,6 +99,10 @@ public class Camera {
         }
         if (Input.getKeyDown(GLFW_KEY_ESCAPE)) {
         	System.exit(0);
+        }
+        
+        if (Input.getMouse(GLFW_MOUSE_BUTTON_LEFT)) {
+            Picker.remove(ray);
         }
 
         return was_input;
@@ -152,5 +160,9 @@ public class Camera {
     public static void move(float amount, float direction) {
         position.z += amount * Math.sin(Math.toRadians(rotation.y + 90 * direction));
         position.x += amount * Math.cos(Math.toRadians(rotation.y + 90 * direction));
+    }
+    
+    public static void update_ray() {
+    	ray = new Ray(projection, view, center, Window.width, Window.height);
     }
 }
