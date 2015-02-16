@@ -127,6 +127,25 @@ public class Picker {
 
                 chunk.changed = true;
 
+                if (x == 0 && chunk.x_chunk_pos != 0) {
+                    World.chunks[chunk.z_chunk_pos][chunk.x_chunk_pos - 1][chunk.y_chunk_pos].changed = true;
+                }
+                if (x == World.chunk_width - 1 && chunk.x_chunk_pos != World.world_size - 1) {
+                    World.chunks[chunk.z_chunk_pos][chunk.x_chunk_pos + 1][chunk.y_chunk_pos].changed = true;
+                }
+                if (y == 0 && chunk.y_chunk_pos != 0) {
+                    World.chunks[chunk.z_chunk_pos][chunk.x_chunk_pos][chunk.y_chunk_pos - 1].changed = true;
+                }
+                if (y == World.chunk_length - 1 && chunk.y_chunk_pos != World.world_size - 1) {
+                    World.chunks[chunk.z_chunk_pos][chunk.x_chunk_pos][chunk.y_chunk_pos + 1].changed = true;
+                }
+                if (z == 0 && chunk.z_chunk_pos != 0) {
+                    World.chunks[chunk.z_chunk_pos - 1][chunk.x_chunk_pos][chunk.y_chunk_pos].changed = true;
+                }
+                if (z == World.chunk_height - 1 && chunk.z_chunk_pos != World.world_height - 1) {
+                    World.chunks[chunk.z_chunk_pos + 1][chunk.x_chunk_pos][chunk.y_chunk_pos].changed = true;
+                }
+
                 return true;
             }
         }
@@ -150,41 +169,72 @@ public class Picker {
                 switch (selection.second) {
                     case FRONT:
                         if (y - 1 < 0) {
-                            return false;
+                            if (chunk.y_chunk_pos == 0) {
+                                return false;
+                            }
+                            chunk = World.chunks[chunk.z_chunk_pos][chunk.x_chunk_pos][chunk.y_chunk_pos - 1];
+                            chunk.blocks[x][World.chunk_length - 1][z] = Block.pack_type(0, 1);
+                        } else {
+                            chunk.blocks[x][y - 1][z] = Block.pack_type(0, 1);
                         }
-                        chunk.blocks[x][y - 1][z] = Block.pack_type(0, 1);
                         break;
                     case BACK:
                         if (y + 1 >= World.chunk_length) {
-                            return false;
+                            if (chunk.y_chunk_pos == World.world_size - 1) {
+                                return false;
+                            }
+                            chunk = World.chunks[chunk.z_chunk_pos][chunk.x_chunk_pos][chunk.y_chunk_pos + 1];
+                            chunk.blocks[x][0][z] = Block.pack_type(0, 1);
+                        } else {
+                            chunk.blocks[x][y + 1][z] = Block.pack_type(0, 1);
                         }
-                        chunk.blocks[x][y + 1][z] = Block.pack_type(0, 1);
                         break;
                     case RIGHT:
                         if (x - 1 < 0) {
-                            return false;
+                            if (chunk.x_chunk_pos == 0) {
+                                return false;
+                            }
+                            chunk = World.chunks[chunk.z_chunk_pos][chunk.x_chunk_pos - 1][chunk.y_chunk_pos];
+                            chunk.blocks[World.chunk_width - 1][y][z] = Block.pack_type(0, 1);
+                        } else {
+                            chunk.blocks[x - 1][y][z] = Block.pack_type(0, 1);
                         }
-                        chunk.blocks[x - 1][y][z] = Block.pack_type(0, 1);
                         break;
                     case LEFT:
                         if (x + 1 >= World.chunk_width) {
-                            return false;
+                            if (chunk.x_chunk_pos == World.world_size - 1) {
+                                return false;
+                            }
+                            chunk = World.chunks[chunk.z_chunk_pos][chunk.x_chunk_pos + 1][chunk.y_chunk_pos];
+                            chunk.blocks[0][y][z] = Block.pack_type(0, 1);
+                        } else {
+                            chunk.blocks[x + 1][y][z] = Block.pack_type(0, 1);
                         }
-                        chunk.blocks[x + 1][y][z] = Block.pack_type(0, 1);
-                        break;
-                    case TOP:
-                        if (z + 1 >= World.chunk_height) {
-                            return false;
-                        }
-                        chunk.blocks[x][y][z + 1] = Block.pack_type(0, 1);
                         break;
                     case BOTTOM:
                         if (z - 1 < 0) {
-                            return false;
+                            if (chunk.z_chunk_pos == 0) {
+                                return false;
+                            }
+                            chunk = World.chunks[chunk.z_chunk_pos - 1][chunk.x_chunk_pos][chunk.y_chunk_pos];
+                            chunk.blocks[x][y][World.chunk_height - 1] = Block.pack_type(0, 1);
+                        } else {
+                            chunk.blocks[x][y][z - 1] = Block.pack_type(0, 1);
                         }
-                        chunk.blocks[x][y][z - 1] = Block.pack_type(0, 1);
+                        break;
+                    case TOP:
+                        if (z + 1 >= World.chunk_height) {
+                            if (chunk.z_chunk_pos == World.world_height - 1) {
+                                return false;
+                            }
+                            chunk = World.chunks[chunk.z_chunk_pos + 1][chunk.x_chunk_pos][chunk.y_chunk_pos];
+                            chunk.blocks[x][y][0] = Block.pack_type(0, 1);
+                        } else {
+                            chunk.blocks[x][y][z + 1] = Block.pack_type(0, 1);
+                        }
                         break;
                 }
+                chunk.changed = true;
                 return true;
             }
         }

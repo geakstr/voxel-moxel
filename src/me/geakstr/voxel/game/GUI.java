@@ -47,7 +47,7 @@ public class GUI {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glBindVertexArray(vao);
-        glPointSize(2.0f);
+        glPointSize(1.25f);
         glDrawArrays(GL_POINTS, 0, 1);
         glBindVertexArray(0);
     }
