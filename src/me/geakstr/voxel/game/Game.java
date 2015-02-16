@@ -6,7 +6,10 @@ import me.geakstr.voxel.model.Mesh;
 import me.geakstr.voxel.model.Player;
 import me.geakstr.voxel.model.TextureAtlas;
 import me.geakstr.voxel.model.World;
-import me.geakstr.voxel.render.*;
+import me.geakstr.voxel.render.Camera;
+import me.geakstr.voxel.render.Frustum;
+import me.geakstr.voxel.render.Shader;
+import me.geakstr.voxel.render.Transform;
 import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
 
@@ -16,7 +19,7 @@ public class Game {
     public static Transform world_transform;
     public static ChunksWorkersExecutorService chunks_workers_executor_service;
     public static Shader current_shader, world_shader, gui_shader;
-    
+
     public static Player player;
 
     public static Vector2f world_shader_texture_info = new Vector2f(TextureAtlas.atlas_size, TextureAtlas.crop_size);
@@ -46,13 +49,14 @@ public class Game {
     }
 
     private static boolean was_input = false;
+
     public static void before_render() {
         was_input = Camera.input();
 
         if (was_input) {
-	        Camera.apply();
-	        Frustum.update();
-	        player.update();
+            Camera.apply();
+            Frustum.update();
+            player.update();
         }
     }
 
@@ -67,10 +71,10 @@ public class Game {
 
         Mesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
         World.render();
-        
+
 //        current_shader.set_uniform("uniform_transform", player.getTransform());
 //        player.render();
-        
+
         current_shader.unbind();
 
         current_shader = gui_shader;
