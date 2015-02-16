@@ -7,6 +7,8 @@ import me.geakstr.voxel.workers.ChunkWorker;
 
 import java.util.*;
 
+import org.lwjgl.BufferUtils;
+
 public class Chunk extends Mesh {
     public int[][][] blocks; // [x][y][z]
 
@@ -16,8 +18,6 @@ public class Chunk extends Mesh {
     public int x_offset, y_offset, z_offset;
 
     public int actual_count = 0;
-
-    private float[] data;
 
     public Chunk(int x_chunk_pos, int y_chunk_pos, int z_chunk_pos) {
         super();
@@ -156,23 +156,22 @@ public class Chunk extends Mesh {
             }
         }
 
+        this.data = BufferUtils.createByteBuffer(verts.size() * 4 + tex.size() * 4 + tex_off.size() * 4 + colors.size() * 4);
+        for (int v = 0, t = 0, to = 0, c = 0; v < verts.size(); v += 3, t += 2, to += 2, c += 3) {
+            data.putFloat(verts.get(v));
+            data.putFloat(verts.get(v + 1));
+            data.putFloat(verts.get(v + 2));
 
-        this.data = new float[verts.size() + tex.size() + tex_off.size() + colors.size()];
-        for (int i = 0, v = 0, t = 0, to = 0, c = 0; v < verts.size(); v += 3, t += 2, to += 2, c += 3) {
-            data[i++] = (float) verts.get(v);
-            data[i++] = (float) verts.get(v + 1);
-            data[i++] = (float) verts.get(v + 2);
+            data.putFloat(tex.get(t));
+            data.putFloat(tex.get(t + 1));
 
-            data[i++] = (float) tex.get(t);
-            data[i++] = (float) tex.get(t + 1);
-
-            data[i++] = (float) tex_off.get(to);
-            data[i++] = (float) tex_off.get(to + 1);
-
-            data[i++] = (float) colors.get(c);
-            data[i++] = (float) colors.get(c + 1);
-            data[i++] = (float) colors.get(c + 2);
+            data.putFloat(tex_off.get(to));
+            data.putFloat(tex_off.get(to + 1));
+            data.putFloat(colors.get(c));
+            data.putFloat(colors.get(c + 1));
+            data.putFloat(colors.get(c + 2));
         }
+        this.data.flip();
 
         this.updated = true;
         this.actual_count = verts.size() / 3;
@@ -338,7 +337,7 @@ public class Chunk extends Mesh {
 
         if (updated && updating && !empty) {
             updating = false;
-            update_vbo(data);
+            update_vbo();
         }
         changed = false;
     }

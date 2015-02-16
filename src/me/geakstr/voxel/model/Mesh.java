@@ -1,8 +1,9 @@
 package me.geakstr.voxel.model;
 
+import java.nio.ByteBuffer;
+
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.util.ExtendedBufferUtil;
-
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
@@ -10,6 +11,8 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
 public class Mesh {
+	public ByteBuffer data;
+	
     private static final int mapping_flags = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
     private static final int initial_capacity = 512;
 
@@ -40,10 +43,10 @@ public class Mesh {
         glBindTexture(GL_TEXTURE_2D, id);
     }
 
-    public void update_vbo(float[] data) {
+    public void update_vbo() {
         int buffer_idx = (cur_buffer_idx + buffer_count - 1) % buffer_count;
 
-        int data_size = data.length * 4;
+        int data_size = data.capacity();
 
         boolean orphan = false;
         while (data_size > capacities[buffer_idx]) {
@@ -55,7 +58,7 @@ public class Mesh {
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, vbos[buffer_idx]);
-        glMapBufferRange(GL_ARRAY_BUFFER, 0, data_size, mapping_flags).put(ExtendedBufferUtil.create_flipped_byte_buffer(data));
+        glMapBufferRange(GL_ARRAY_BUFFER, 0, data_size, mapping_flags).put(data);
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
 
