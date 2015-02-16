@@ -316,7 +316,7 @@ public class Chunk extends Mesh {
             Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
         }
 
-        if (updated && updating && !empty) {
+        if (updated && updating) {
             updating = false;
             update_vbo();
         }
