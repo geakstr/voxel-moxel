@@ -72,4 +72,29 @@ public class Picker {
         
 		return false;
 	}
+	
+	public static boolean insert(Ray ray) {
+        Block selected_block = select(ray);
+        
+        if (selected_block != null) {
+        	Chunk chunk = selected_block.chunk;
+            if (chunk != null && !chunk.updating) {
+                Vector3f pos = selected_block.corners[0];
+
+                int x = (int) pos.x % World.chunk_width;
+                int y = (int) pos.z % World.chunk_length;
+                int z = (int) pos.y % World.chunk_height;
+                if (z + 1 >= World.chunk_height) {
+                	return false;
+                }
+                chunk.blocks[x][y][z + 1] = Block.pack_type(0, 1);
+
+                chunk.changed = true;
+                
+                return true;
+            }
+        }
+        
+		return false;
+	}
 }

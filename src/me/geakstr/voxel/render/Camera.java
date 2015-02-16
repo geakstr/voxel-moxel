@@ -69,10 +69,9 @@ public class Camera {
         if (rot_y || rot_x) {
             Input.setMousePosition(center);
             update_ray();
+            was_input = true;
         }
-
-        was_input = true;
-
+        
         if (Input.getKeyDown(GLFW_KEY_W)) {
             forward(MOVE_SPEED * 0.01f);
             was_input = true;
@@ -103,6 +102,10 @@ public class Camera {
         
         if (Input.getMouse(GLFW_MOUSE_BUTTON_LEFT)) {
             Picker.remove(ray);
+        }
+        
+        if (Input.getMouse(GLFW_MOUSE_BUTTON_RIGHT)) {
+            Picker.insert(ray);
         }
 
         return was_input;

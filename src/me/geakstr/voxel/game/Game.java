@@ -1,11 +1,7 @@
 package me.geakstr.voxel.game;
 
-import me.geakstr.voxel.core.Input;
 import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.math.Vector2f;
-import me.geakstr.voxel.math.Vector3f;
-import me.geakstr.voxel.model.Block;
-import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.Mesh;
 import me.geakstr.voxel.model.Player;
 import me.geakstr.voxel.model.TextureAtlas;
@@ -13,7 +9,6 @@ import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.render.*;
 import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class Game {
     public static boolean frustum, occlusion;
@@ -39,7 +34,7 @@ public class Game {
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(16, 4, 16, 16, 16);
+        World.init(48, 1, 16, 16, 256);
         World.gen();
         player = new Player();
     }
@@ -63,13 +58,13 @@ public class Game {
         current_shader.set_uniform("uniform_camera_view", Camera.view);
         current_shader.set_uniform("uniform_texture", 0);
         current_shader.set_uniform("uniform_texture_info", world_shader_texture_info);
+        
         Mesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
         World.render();
         
-        if (was_input) {
-        	current_shader.set_uniform("uniform_transform", player.getTransform());
-        }
-        player.render();
+        //current_shader.set_uniform("uniform_transform", player.getTransform());
+        //player.render();
+        
         current_shader.unbind();
     }
 
