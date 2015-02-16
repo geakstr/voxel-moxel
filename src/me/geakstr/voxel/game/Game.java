@@ -7,6 +7,7 @@ import me.geakstr.voxel.math.Vector3f;
 import me.geakstr.voxel.model.Block;
 import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.Mesh;
+import me.geakstr.voxel.model.Player;
 import me.geakstr.voxel.model.TextureAtlas;
 import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.render.*;
@@ -21,6 +22,7 @@ public class Game {
     public static ChunksWorkersExecutorService chunks_workers_executor_service;
     public static Shader current_shader, world_shader;
     public static Ray ray;
+    public static Player player;
 
     public static Vector2f world_shader_texture_info = new Vector2f(TextureAtlas.atlas_size, TextureAtlas.crop_size);
 
@@ -39,6 +41,7 @@ public class Game {
 
         World.init(16, 4, 16, 16, 16);
         World.gen();
+        player = new Player();
     }
 
     public static void before_render() {
@@ -77,6 +80,10 @@ public class Game {
         current_shader.set_uniform("uniform_texture_info", world_shader_texture_info);
         Mesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
         World.render();
+        
+        player.update();
+        current_shader.set_uniform("uniform_transform", player.getTransform());
+        player.render();
         current_shader.unbind();
     }
 

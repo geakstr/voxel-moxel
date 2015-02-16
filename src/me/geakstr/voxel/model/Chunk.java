@@ -7,8 +7,6 @@ import me.geakstr.voxel.workers.ChunkWorker;
 
 import java.util.*;
 
-import org.lwjgl.BufferUtils;
-
 public class Chunk extends Mesh {
     public int[][][] blocks; // [x][y][z]
 
@@ -156,22 +154,7 @@ public class Chunk extends Mesh {
             }
         }
 
-        this.data = BufferUtils.createByteBuffer(verts.size() * 4 + tex.size() * 4 + tex_off.size() * 4 + colors.size() * 4);
-        for (int v = 0, t = 0, to = 0, c = 0; v < verts.size(); v += 3, t += 2, to += 2, c += 3) {
-            data.putFloat(verts.get(v));
-            data.putFloat(verts.get(v + 1));
-            data.putFloat(verts.get(v + 2));
-
-            data.putFloat(tex.get(t));
-            data.putFloat(tex.get(t + 1));
-
-            data.putFloat(tex_off.get(to));
-            data.putFloat(tex_off.get(to + 1));
-            data.putFloat(colors.get(c));
-            data.putFloat(colors.get(c + 1));
-            data.putFloat(colors.get(c + 2));
-        }
-        this.data.flip();
+        update_data(verts, tex, tex_off, colors);
 
         this.updated = true;
         this.actual_count = verts.size() / 3;

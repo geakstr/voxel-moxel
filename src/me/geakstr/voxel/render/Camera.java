@@ -93,6 +93,9 @@ public class Camera {
             upward(MOVE_SPEED * 0.01f);
             was_input = true;
         }
+        if (Input.getKeyDown(GLFW_KEY_ESCAPE)) {
+        	System.exit(0);
+        }
 
         return was_input;
     }

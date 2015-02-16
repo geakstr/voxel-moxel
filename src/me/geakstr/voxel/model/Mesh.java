@@ -1,9 +1,11 @@
 package me.geakstr.voxel.model;
 
 import java.nio.ByteBuffer;
+import java.util.List;
+
+import org.lwjgl.BufferUtils;
 
 import me.geakstr.voxel.game.Game;
-import me.geakstr.voxel.util.ExtendedBufferUtil;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
@@ -74,6 +76,44 @@ public class Mesh {
             glDeleteVertexArrays(vaos[buffer_idx]);
             glDeleteBuffers(vbos[buffer_idx]);
         }
+    }
+    
+    public void update_data(int[] verts, int[] tex, float[] tex_off, float[] colors) {
+    	data = BufferUtils.createByteBuffer(verts.length * 4 + tex.length * 4 + tex_off.length * 4 + colors.length * 4);
+        for (int v = 0, t = 0, to = 0, c = 0; v < verts.length; v += 3, t += 2, to += 2, c += 3) {
+            data.putFloat(verts[v]);
+            data.putFloat(verts[v + 1]);
+            data.putFloat(verts[v + 2]);
+
+            data.putFloat(tex[t]);
+            data.putFloat(tex[t + 1]);
+
+            data.putFloat(tex_off[to]);
+            data.putFloat(tex_off[to + 1]);
+            data.putFloat(colors[c]);
+            data.putFloat(colors[c + 1]);
+            data.putFloat(colors[c + 2]);
+        }
+        data.flip();
+    }
+    
+    public void update_data(List<Integer> verts, List<Integer> tex, List<Float> tex_off, List<Float> colors) {
+    	data = BufferUtils.createByteBuffer(verts.size() * 4 + tex.size() * 4 + tex_off.size() * 4 + colors.size() * 4);
+        for (int v = 0, t = 0, to = 0, c = 0; v < verts.size(); v += 3, t += 2, to += 2, c += 3) {
+            data.putFloat(verts.get(v));
+            data.putFloat(verts.get(v + 1));
+            data.putFloat(verts.get(v + 2));
+
+            data.putFloat(tex.get(t));
+            data.putFloat(tex.get(t + 1));
+
+            data.putFloat(tex_off.get(to));
+            data.putFloat(tex_off.get(to + 1));
+            data.putFloat(colors.get(c));
+            data.putFloat(colors.get(c + 1));
+            data.putFloat(colors.get(c + 2));
+        }
+        data.flip();
     }
 
     private void init_vbo(int buffer_idx) {
