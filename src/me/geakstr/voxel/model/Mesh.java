@@ -19,28 +19,19 @@ public class Mesh {
     private static final int mapping_flags = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT;
     private static final int initial_capacity = 512;
 
-    private int capacities[];
-    private int buffer_count, cur_buffer_idx;
-
-    private int[] vaos, vbos;
+    private int capacity;
+    private int vao, vbo;
 
     public Mesh() {
-        this.buffer_count = 1;
-        this.cur_buffer_idx = 0;
-
         this.verts_size = 0;
-        this.capacities = new int[buffer_count];
 
-        this.vaos = new int[buffer_count];
-        this.vbos = new int[buffer_count];
+        this.capacity = initial_capacity;
 
-        for (int buffer_idx = 0; buffer_idx < buffer_count; buffer_idx++) {
-            capacities[buffer_idx] = initial_capacity;
-            vaos[buffer_idx] = glGenVertexArrays();
-            vbos[buffer_idx] = glGenBuffers();
-            this.init_vbo(buffer_idx);
-            this.init_vao(buffer_idx);
-        }
+        this.vao = glGenVertexArrays();
+        this.vbo = glGenBuffers();
+
+        this.init_vbo();
+        this.init_vao();
     }
 
     public static void bind_texture(int id) {
@@ -48,29 +39,26 @@ public class Mesh {
     }
 
     public void update_vbo() {
-        int buffer_idx = (cur_buffer_idx + buffer_count - 1) % buffer_count;
-
         int data_size = data.capacity();
 
         boolean orphan = false;
-        while (data_size > capacities[buffer_idx]) {
-            capacities[buffer_idx] *= 2;
+        while (data_size > capacity) {
+            capacity *= 2;
             orphan = true;
         }
         if (orphan) {
-            init_vbo(buffer_idx);
+            init_vbo();
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbos[buffer_idx]);
-        glMapBufferRange(GL_ARRAY_BUFFER, 0, capacities[buffer_idx], mapping_flags).put(data);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glMapBufferRange(GL_ARRAY_BUFFER, 0, capacity, mapping_flags).put(data);
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
 
     public void draw() {
-        glBindVertexArray(vaos[cur_buffer_idx]);
+        glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, verts_size);
         glBindVertexArray(0);
-        cur_buffer_idx = (cur_buffer_idx + 1) % buffer_count;
     }
 
     public void update_data(int[] verts, int[] tex, float[] tex_off, float[] colors) {
@@ -114,21 +102,19 @@ public class Mesh {
     }
 
     public void destroy() {
-        for (int buffer_idx = 0; buffer_idx < buffer_count; buffer_idx++) {
-            glDeleteVertexArrays(vaos[buffer_idx]);
-            glDeleteBuffers(vbos[buffer_idx]);
-        }
+        glDeleteVertexArrays(vao);
+        glDeleteBuffers(vbo);
     }
 
-    private void init_vbo(int buffer_idx) {
-        glBindBuffer(GL_ARRAY_BUFFER, vbos[buffer_idx]);
-        glBufferData(GL_ARRAY_BUFFER, capacities[buffer_idx], null, GL_DYNAMIC_DRAW);
+    private void init_vbo() {
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, capacity, null, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    private void init_vao(int buffer_idx) {
-        glBindVertexArray(vaos[buffer_idx]);
-        glBindBuffer(GL_ARRAY_BUFFER, vbos[buffer_idx]);
+    private void init_vao() {
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
         glEnableVertexAttribArray(Game.current_shader.attr("attr_pos"));
         glEnableVertexAttribArray(Game.current_shader.attr("attr_tex_coord"));
