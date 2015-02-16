@@ -51,6 +51,8 @@ public class Camera {
 
         mouse_locked = false;
         center = new Vector2f(Window.width / 2, Window.height / 2);
+
+        update_ray();
     }
 
     public static boolean input() {

@@ -14,7 +14,7 @@ import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
 
 public class Game {
-    public static boolean frustum, occlusion;
+    public static boolean frustum;
 
     public static Transform world_transform;
     public static ChunksWorkersExecutorService chunks_workers_executor_service;
