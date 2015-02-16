@@ -1,10 +1,10 @@
 package me.geakstr.voxel.game;
 
 import me.geakstr.voxel.core.Window;
-import me.geakstr.voxel.util.ExtendedBufferUtil;
 import org.lwjgl.BufferUtils;
 
 import java.awt.*;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -18,18 +18,24 @@ public class GUI {
 
     private static int vbo;
     private static int vao;
+    private static int capacity;
+    private static int batch_size;
 
-    private static float[] cross_hair;
-    private static float cross_hair_size = 1.25f;
+    private static ByteBuffer cross_hair;
+    private static final float cross_hair_size = 1.25f;
 
     public static void init() {
         vao = glGenVertexArrays();
         vbo = glGenBuffers();
+        capacity = 20;
+        batch_size = 20;
+
+        cross_hair = BufferUtils.createByteBuffer(capacity);
 
         update_cross_hair();
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, ExtendedBufferUtil.create_flipped_buffer(cross_hair), GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, cross_hair, GL_STREAM_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glBindVertexArray(vao);
@@ -37,8 +43,8 @@ public class GUI {
         glEnableVertexAttribArray(Game.current_shader.attr("attr_pos"));
         glEnableVertexAttribArray(Game.current_shader.attr("attr_color"));
 
-        glVertexAttribPointer(Game.current_shader.attr("attr_pos"), 2, GL_FLOAT, false, 20, 0);
-        glVertexAttribPointer(Game.current_shader.attr("attr_color"), 3, GL_FLOAT, false, 20, 8);
+        glVertexAttribPointer(Game.current_shader.attr("attr_pos"), 2, GL_FLOAT, false, batch_size, 0);
+        glVertexAttribPointer(Game.current_shader.attr("attr_color"), 3, GL_FLOAT, false, batch_size, 8);
 
         glPointSize(cross_hair_size);
         glBindVertexArray(0);
@@ -48,7 +54,7 @@ public class GUI {
         update_cross_hair();
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glMapBufferRange(GL_ARRAY_BUFFER, 0, 20, mapping_flags).put(ExtendedBufferUtil.create_flipped_byte_buffer(cross_hair));
+        glMapBufferRange(GL_ARRAY_BUFFER, 0, capacity, mapping_flags).put(cross_hair);
         glUnmapBuffer(GL_ARRAY_BUFFER);
 
         glBindVertexArray(vao);
@@ -58,7 +64,13 @@ public class GUI {
 
     private static void update_cross_hair() {
         Color inv = invert_center_pixel();
-        cross_hair = new float[]{0, 0, inv.getRed(), inv.getGreen(), inv.getBlue()};
+        cross_hair.clear();
+        cross_hair.putFloat(0);
+        cross_hair.putFloat(0);
+        cross_hair.putFloat(inv.getRed());
+        cross_hair.putFloat(inv.getGreen());
+        cross_hair.putFloat(inv.getBlue());
+        cross_hair.flip();
     }
 
     private static Color invert_center_pixel() {
