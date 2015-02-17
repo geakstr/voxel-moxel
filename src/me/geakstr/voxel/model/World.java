@@ -1,10 +1,12 @@
 package me.geakstr.voxel.model;
 
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.util.OpenSimplexNoise;
-
-import java.util.Random;
 
 public class World {
     public static int world_size;
@@ -21,6 +23,8 @@ public class World {
     public static int chunks_in_frame = 0;
     public static int faces_in_frame = 0;
 
+    public static final int near_chunks_radius = 2;
+    
     public static void init(int _world_size, int _world_height,
                             int _chunk_width, int _chunk_length, int _chunk_height) {
         world_size = _world_size;
@@ -69,6 +73,34 @@ public class World {
                 }
             }
         }
+    }
+    
+    public static Chunk get_current_chunk(int global_x, int global_y, int global_z) {
+    	if (global_x < 0 || global_x >= World.world_size * World.chunk_width ||
+    			global_y < 0 || global_y >= World.world_size * World.chunk_length ||
+    			global_z < 0 || global_z >= World.world_height * World.chunk_height) {
+    		return null;
+    	}
+    	
+    	int chunk_x = global_x / (chunk_width);
+        int chunk_y = global_y / (chunk_length);
+        int chunk_z = global_z / (chunk_height);
+    	
+    	return chunks[chunk_z][chunk_x][chunk_y];
+    }
+    
+    public static Set<Chunk> get_nearest_chunks(int chunk_x, int chunk_y, int chunk_z, int r) {
+    	Set<Chunk> ret = new HashSet<Chunk>();
+    	
+    	for (int xx = Math.max(chunk_x - r, 0); xx <= Math.min(chunk_x + r, World.world_size - 1); xx++) {
+    		for (int yy = Math.max(chunk_y - r, 0); yy <= Math.min(chunk_y + r, World.world_size - 1 ); yy++) {
+    			for (int hh = 0; hh < World.world_height; hh++) {
+    				ret.add(chunks[hh][xx][yy]);
+    			}
+    		}
+    	}
+    	
+    	return ret;
     }
 
     public static void render() {

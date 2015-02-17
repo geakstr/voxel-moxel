@@ -1,5 +1,6 @@
 package me.geakstr.voxel.render;
 
+import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.helpers.Pair;
 import me.geakstr.voxel.math.Vector3f;
 import me.geakstr.voxel.model.Block;
@@ -11,19 +12,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Picker {
+	public static final int picker_length = -(World.world_size * World.near_chunks_radius + 1);
+	
     public static Pair<Block, Block.TYPE> select(Ray ray, boolean pick_side) {
         final Vector3f camera_position = Camera.position.negate(null);
 
         Set<Chunk> selection_chunks = new HashSet<>();
-        for (int chunk_z = 0; chunk_z < World.world_height; chunk_z++) {
-            for (int chunk_x = 0; chunk_x < World.world_size; chunk_x++) {
-                for (int chunk_y = 0; chunk_y < World.world_size; chunk_y++) {
-                    Vector3f min = new Vector3f(World.chunk_width * chunk_x, World.chunk_height * chunk_z, World.chunk_length * chunk_y);
-                    Vector3f max = new Vector3f(min.x + World.chunk_width, min.y + World.chunk_height, min.z + World.chunk_length);
-                    if (ray.intersect(new Box(min, max), -100, -1)) {
-                        selection_chunks.add(World.chunks[chunk_z][chunk_x][chunk_y]);
-                    }
-                }
+        for (Chunk chunk : Game.nearest_chunks) {
+        	int chunk_z = chunk.z_chunk_pos;
+        	int chunk_x = chunk.x_chunk_pos;
+        	int chunk_y = chunk.y_chunk_pos;
+        	Vector3f min = new Vector3f(World.chunk_width * chunk_x, World.chunk_height * chunk_z, World.chunk_length * chunk_y);
+            Vector3f max = new Vector3f(min.x + World.chunk_width, min.y + World.chunk_height, min.z + World.chunk_length);
+            if (ray.intersect(new Box(min, max), picker_length, -1)) {
+                selection_chunks.add(World.chunks[chunk_z][chunk_x][chunk_y]);
             }
         }
 
@@ -35,7 +37,7 @@ public class Picker {
                     for (int block_y = 0; block_y < World.chunk_length; block_y++) {
                         for (int block_z = 0; block_z < World.chunk_height; block_z++) {
                             Block block = new Block(new Vector3f(block_x, block_y, block_z), selection_chunk);
-                            if (Block.unpack_type(selection_chunk.blocks[block_x][block_y][block_z]) != 0 && ray.intersect(block, -100, -1)) {
+                            if (Block.unpack_type(selection_chunk.blocks[block_x][block_y][block_z]) != 0 && ray.intersect(block, picker_length, -1)) {
                                 float dist = Vector3f.dist(block.corners[0], camera_position);
                                 if (dist < min_dist) {
                                     selection.first = block;
@@ -59,14 +61,14 @@ public class Picker {
                 max = new Vector3f(min_c.x + 1, min_c.y + 1, min_c.z + 1);
                 if (-Camera.position.y >= max.y - 0.5) {
                     box = new Box(min, max);
-                    if (ray.intersect(box, -100, -1)) {
+                    if (ray.intersect(box, picker_length, -1)) {
                         selection.second = Block.TYPE.TOP;
                     }
                 } else {
                     min = new Vector3f(min_c.x, min_c.y, min_c.z);
                     max = new Vector3f(min_c.x + 1, min_c.y, min_c.z + 1);
                     box = new Box(min, max);
-                    if (ray.intersect(box, -100, -1)) {
+                    if (ray.intersect(box, picker_length, -1)) {
                         selection.second = Block.TYPE.BOTTOM;
                     }
                 }
@@ -75,7 +77,7 @@ public class Picker {
                     max = new Vector3f(min_c.x + 1, min_c.y + 1, min_c.z);
                     if (-Camera.position.z < max.z) {
                         box = new Box(min, max);
-                        if (ray.intersect(box, -100, -1)) {
+                        if (ray.intersect(box, picker_length, -1)) {
                             selection.second = Block.TYPE.FRONT;
                         }
                     } else {
@@ -83,7 +85,7 @@ public class Picker {
                         max = new Vector3f(min_c.x + 1, min_c.y + 1, min_c.z + 1);
                         if (-Camera.position.z > max.z) {
                             box = new Box(min, max);
-                            if (ray.intersect(box, -100, -1)) {
+                            if (ray.intersect(box, picker_length, -1)) {
                                 selection.second = Block.TYPE.BACK;
                             }
                         }
@@ -93,14 +95,14 @@ public class Picker {
                         max = new Vector3f(min_c.x, min_c.y + 1, min_c.z + 1);
                         if (-Camera.position.x < max.x) {
                             box = new Box(min, max);
-                            if (ray.intersect(box, -100, -1)) {
+                            if (ray.intersect(box, picker_length, -1)) {
                                 selection.second = Block.TYPE.RIGHT;
                             }
                         } else {
                             min = new Vector3f(min_c.x + 1, min_c.y, min_c.z);
                             max = new Vector3f(min_c.x + 1, min_c.y + 1, min_c.z + 1);
                             box = new Box(min, max);
-                            if (ray.intersect(box, -100, -1)) {
+                            if (ray.intersect(box, picker_length, -1)) {
                                 selection.second = Block.TYPE.LEFT;
                             }
                         }

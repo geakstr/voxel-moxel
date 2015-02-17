@@ -1,7 +1,11 @@
 package me.geakstr.voxel.game;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.math.Vector2f;
+import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.Mesh;
 import me.geakstr.voxel.model.Player;
 import me.geakstr.voxel.model.TextureAtlas;
@@ -24,6 +28,8 @@ public class Game {
 
     public static Vector2f world_shader_texture_info = new Vector2f(TextureAtlas.atlas_size, TextureAtlas.crop_size);
 
+    public static Set<Chunk> nearest_chunks = new HashSet<>();
+    
     public static void init() {
         ResourceUtil.load_textures("atlas.png");
 
@@ -42,7 +48,7 @@ public class Game {
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(8, 4, 32, 32, 64);
+        World.init(16, 4, 16, 16, 32);
         World.gen();
 
         player = new Player();
@@ -55,6 +61,12 @@ public class Game {
 
         if (was_input) {
             Camera.apply();
+            
+            Chunk current_chunk = World.get_current_chunk((int) -Camera.position.x, (int) -Camera.position.z, (int) -Camera.position.y);
+            if (null != current_chunk) {
+    	        nearest_chunks = World.get_nearest_chunks(current_chunk.x_chunk_pos, current_chunk.y_chunk_pos, current_chunk.z_chunk_pos, World.near_chunks_radius);
+            }
+            
             Frustum.update();
             player.update();
         }

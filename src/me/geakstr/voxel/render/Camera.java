@@ -103,19 +103,19 @@ public class Camera {
         }
 
         if (Input.getMouseDown(GLFW_MOUSE_BUTTON_LEFT)) {
-            //if (!mouse_left_down) {
+            if (!mouse_left_down) {
                 mouse_left_down = true;
                 Picker.remove(ray);
-            //}
+            }
         } else {
             mouse_left_down = false;
         }
 
         if (Input.getMouseDown(GLFW_MOUSE_BUTTON_RIGHT)) {
-            //if (!mouse_right_down) {
+            if (!mouse_right_down) {
                 mouse_right_down = true;
                 Picker.insert(ray);
-            //}
+            }
         } else {
             mouse_right_down = false;
         }

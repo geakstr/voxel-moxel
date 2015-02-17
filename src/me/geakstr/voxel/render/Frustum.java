@@ -1,6 +1,8 @@
 package me.geakstr.voxel.render;
 
+import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Matrix4f;
+import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.World;
 
 public class Frustum {
@@ -65,40 +67,20 @@ public class Frustum {
     }
 
     public static boolean chunkInFrustum(float x, float y, float z) {
-
-        float rot_y = Math.abs(Camera.rotation.y % 360);
-        float rot_x = Camera.rotation.x;
-
-        int pos_x = (int) Camera.position.x;
-        int pos_y = (int) Camera.position.y;
-        int pos_z = (int) Camera.position.z;
-
-        // 0 - right
-        // 1 - top
-        // 2 - left
-        // 3 - bottom
-        boolean[] hor_dirs = new boolean[4];
-        if (rot_y >= 315 && rot_y <= 45) {
-            hor_dirs[0] = true;
-        } else if (rot_y >= 45 && rot_y <= 135) {
-            hor_dirs[1] = true;
-        } else if (rot_y >= 135 && rot_y <= 225) {
-            hor_dirs[2] = true;
-        } else if (rot_y >= 225 && rot_y <= 315) {
-            hor_dirs[3] = true;
-        }
-
-        boolean[] vert_dirs = new boolean[2];
-
-
+    	if (Game.nearest_chunks.size() == 0) {
+    		return true;
+    	}
+    	for (Chunk chunk : Game.nearest_chunks) {
+    		if (chunk.x_chunk_pos == x && chunk.y_chunk_pos == y && chunk.z_chunk_pos == z) {
+    			return true;
+    		}
+    	}
+    	
         int width = World.chunk_width;
         int length = World.chunk_length;
         int height = World.chunk_height;
 
-        int half_width = width / 2;
-        int half_length = length / 2;
         int half_height = height / 2;
-        int half_half_height = half_height / 2;
 
         float x_mul_width = x * width;
         float y_mul_length = y * length;

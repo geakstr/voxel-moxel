@@ -23,7 +23,7 @@ public class GUI {
     private static int batch_size;
 
     private static ByteBuffer cross_hair;
-    private static final float cross_hair_size = 1.25f;
+    private static final float cross_hair_size = 1f;
 
     public static void init() {
         vao = glGenVertexArrays();
@@ -66,8 +66,8 @@ public class GUI {
     private static void update_cross_hair() {
         Color inv = invert_center_pixel();
         cross_hair.clear();
-        cross_hair.putFloat(0);
-        cross_hair.putFloat(0);
+        cross_hair.putFloat(-0.01f);
+        cross_hair.putFloat(-0.01f);
         cross_hair.putFloat(inv.getRed());
         cross_hair.putFloat(inv.getGreen());
         cross_hair.putFloat(inv.getBlue());
