@@ -20,20 +20,21 @@ public class GUI {
     private static int vbo;
     private static int vao;
     private static int capacity;
-    private static ByteBuffer cross_hair;
+    private static ByteBuffer data;
     private static final float cross_hair_size = 1f;
+    private static final int cross_hair_data_size = 20;
 
     public static void init() {
         vao = glGenVertexArrays();
         vbo = glGenBuffers();
-        capacity = 20;
+        capacity = 40;
 
-        cross_hair = BufferUtils.createByteBuffer(capacity);
+        data = BufferUtils.createByteBuffer(capacity);
 
         update_cross_hair();
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, cross_hair, GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, data, GL_STREAM_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glBindVertexArray(vao);
@@ -52,7 +53,7 @@ public class GUI {
         update_cross_hair();
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glMapBufferRange(GL_ARRAY_BUFFER, 0, capacity, mapping_flags).put(cross_hair);
+        glMapBufferRange(GL_ARRAY_BUFFER, 0, cross_hair_data_size, mapping_flags).put(data);
         glUnmapBuffer(GL_ARRAY_BUFFER);
 
         glBindVertexArray(vao);
@@ -62,13 +63,13 @@ public class GUI {
 
     private static void update_cross_hair() {
         Color inv = invert_center_pixel();
-        cross_hair.clear();
-        cross_hair.putFloat(-0.01f);
-        cross_hair.putFloat(-0.01f);
-        cross_hair.putFloat(inv.getRed());
-        cross_hair.putFloat(inv.getGreen());
-        cross_hair.putFloat(inv.getBlue());
-        cross_hair.flip();
+        data.clear();
+        data.putFloat(0);
+        data.putFloat(0);
+        data.putFloat(inv.getRed());
+        data.putFloat(inv.getGreen());
+        data.putFloat(inv.getBlue());
+        data.flip();
     }
 
     private static Color invert_center_pixel() {
