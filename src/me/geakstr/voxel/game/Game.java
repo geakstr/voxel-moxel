@@ -1,17 +1,16 @@
 package me.geakstr.voxel.game;
 
-import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.math.Vector2f;
-import me.geakstr.voxel.model.*;
+import me.geakstr.voxel.model.Mesh;
+import me.geakstr.voxel.model.Player;
+import me.geakstr.voxel.model.TextureAtlas;
+import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.render.Shader;
 import me.geakstr.voxel.render.Transform;
 import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class Game {
     public static boolean frustum;
@@ -24,38 +23,32 @@ public class Game {
 
     public static Vector2f world_shader_texture_info = new Vector2f(TextureAtlas.atlas_size, TextureAtlas.crop_size);
 
-    public static Set<Chunk> nearest_chunks = new HashSet<>();
-
     public static void init() {
-        ResourceUtil.load_textures("atlas.png");
+        chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        Camera.init(70, (float) Window.width / (float) Window.height, 0.01f, 512f);
+        ResourceUtil.load_textures("atlas.png");
 
         gui_shader = new Shader("gui.vs", "gui.fs").compile();
         gui_shader.save_attrs("attr_pos").save_attr("attr_color");
-        current_shader = gui_shader;
-        GUI.init();
 
         world_shader = new Shader("world.vs", "world.fs").compile();
         world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color");
-        current_shader = world_shader;
 
         world_transform = new Transform();
 
-        chunks_workers_executor_service = new ChunksWorkersExecutorService();
+        Camera.init();
 
-        World.init(16, 4, 16, 16, 32);
-        World.gen();
+        World.init();
+        world_transform = new Transform();
+
+        current_shader = gui_shader;
+        GUI.init();
 
         player = new Player();
     }
 
-    private static boolean was_input = false;
-
     public static void before_render() {
-        was_input = Camera.input();
-
-        if (was_input) {
+        if (Camera.input()) {
             Camera.update();
             World.update();
             Frustum.update();

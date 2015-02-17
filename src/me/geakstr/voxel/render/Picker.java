@@ -18,7 +18,7 @@ public class Picker {
         final Vector3f camera_position = Camera.position.negate(null);
 
         Set<Chunk> selection_chunks = new HashSet<>();
-        for (Chunk chunk : Game.nearest_chunks) {
+        for (Chunk chunk : World.nearest_chunks) {
         	int chunk_z = chunk.z_chunk_pos;
         	int chunk_x = chunk.x_chunk_pos;
         	int chunk_y = chunk.y_chunk_pos;

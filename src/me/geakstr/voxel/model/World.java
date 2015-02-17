@@ -26,18 +26,13 @@ public class World {
 
     public static final int near_chunks_radius = 2;
 
-    public static void init(int _world_size, int _world_height,
-                            int _chunk_width, int _chunk_length, int _chunk_height) {
-        world_size = _world_size;
-        world_height = _world_height;
+    public static Set<Chunk> nearest_chunks = new HashSet<>();
+
+    public static void init() {
         world_volume = world_size * world_size * world_height;
+        chunk_volume = chunk_height * chunk_width * chunk_length;
 
         chunks = new Chunk[world_height][world_size][world_size];
-
-        chunk_width = _chunk_width;
-        chunk_length = _chunk_length;
-        chunk_height = _chunk_height;
-        chunk_volume = _chunk_height * _chunk_width * _chunk_length;
 
         for (int x = 0; x < world_size; x++) {
             for (int y = 0; y < world_size; y++) {
@@ -64,30 +59,8 @@ public class World {
         return chunks[chunk_z][chunk_x][chunk_y];
     }
 
-    public static Set<Chunk> nearest_chunks(int chunk_x, int chunk_y, int r) {
-        Set<Chunk> ret = new HashSet<>();
-
-        for (int xx = Math.max(chunk_x - r, 0); xx <= Math.min(chunk_x + r, World.world_size - 1); xx++) {
-            for (int yy = Math.max(chunk_y - r, 0); yy <= Math.min(chunk_y + r, World.world_size - 1); yy++) {
-                for (int hh = 0; hh < World.world_height; hh++) {
-                    ret.add(chunks[hh][xx][yy]);
-                }
-            }
-        }
-
-        return ret;
-    }
-
-    public static Set<Chunk> nearest_chunks(int r) {
-        Chunk cur_chunk = chunk_by_global_coords((int) -Camera.position.x, (int) -Camera.position.z, (int) -Camera.position.y);
-        if (null == cur_chunk) {
-            return new HashSet<>();
-        }
-        return nearest_chunks(cur_chunk.x_chunk_pos, cur_chunk.z_chunk_pos, r);
-    }
-
     public static void update() {
-        nearest_chunks(near_chunks_radius);
+        nearest_chunks = nearest_chunks(near_chunks_radius);
     }
 
     public static void render() {
@@ -143,5 +116,27 @@ public class World {
                 }
             }
         }
+    }
+
+    private static Set<Chunk> nearest_chunks(int chunk_x, int chunk_y, int r) {
+        Set<Chunk> ret = new HashSet<>();
+
+        for (int xx = Math.max(chunk_x - r, 0); xx <= Math.min(chunk_x + r, World.world_size - 1); xx++) {
+            for (int yy = Math.max(chunk_y - r, 0); yy <= Math.min(chunk_y + r, World.world_size - 1); yy++) {
+                for (int hh = 0; hh < World.world_height; hh++) {
+                    ret.add(chunks[hh][xx][yy]);
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    private static Set<Chunk> nearest_chunks(int r) {
+        Chunk cur_chunk = chunk_by_global_coords((int) -Camera.position.x, (int) -Camera.position.z, (int) -Camera.position.y);
+        if (null == cur_chunk) {
+            return new HashSet<>();
+        }
+        return nearest_chunks(cur_chunk.x_chunk_pos, cur_chunk.z_chunk_pos, r);
     }
 }

@@ -67,10 +67,10 @@ public class Frustum {
     }
 
     public static boolean chunkInFrustum(float x, float y, float z) {
-    	if (Game.nearest_chunks.size() == 0) {
+    	if (World.nearest_chunks.size() == 0) {
     		return true;
     	}
-    	for (Chunk chunk : Game.nearest_chunks) {
+    	for (Chunk chunk : World.nearest_chunks) {
     		if (chunk.x_chunk_pos == x && chunk.y_chunk_pos == y && chunk.z_chunk_pos == z) {
     			return true;
     		}

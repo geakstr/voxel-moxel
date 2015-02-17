@@ -11,7 +11,6 @@ import static org.lwjgl.glfw.GLFW.*;
 public class Camera {
     public static float fov;
     public static float aspect;
-    public static float z_near;
     public static float z_far;
 
     public static Matrix4f projection, view;
@@ -34,16 +33,13 @@ public class Camera {
     public static final float ROT_SPEED_X = 70.0f;
 
     public static void init() {
-        init(70, (float) Window.width / (float) Window.height, 0.1f, 70f);
+        init((float) Window.width / (float) Window.height);
     }
 
-    public static void init(float _fov, float _aspect, float _z_near, float _z_far) {
-        fov = _fov;
+    public static void init(float _aspect) {
         aspect = _aspect;
-        z_near = _z_near;
-        z_far = _z_far;
 
-        projection = Matrix4f.createPerspectiveProjection(fov, aspect, z_near, z_far);
+        projection = Matrix4f.createPerspectiveProjection(fov, aspect, 0.01f, z_far);
         view = Matrix4f.createIdentityMatrix();
 
         position = new Vector3f(0, 0, 0);

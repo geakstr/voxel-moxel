@@ -1,6 +1,12 @@
 {
   "screen_resolution" : [800, 800],
   "vsync" : true,
+
+  "camera_fov" : 70,
+  "camera_z_far" : 512,
+
+  "world_sizes" : [16, 4, 16, 16, 32],
+
   "frustum" : true,
   "unsynchronized_buffering" : true,
   "texture_atlas" : {
