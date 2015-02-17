@@ -38,13 +38,13 @@ public class Game {
 
         Camera.init();
 
+        current_shader = world_shader;
         World.init();
         world_transform = new Transform();
+        player = new Player();
 
         current_shader = gui_shader;
         GUI.init();
-
-        player = new Player();
     }
 
     public static void before_render() {
