@@ -137,6 +137,6 @@ public class World {
         if (null == cur_chunk) {
             return new HashSet<>();
         }
-        return nearest_chunks(cur_chunk.x_chunk_pos, cur_chunk.z_chunk_pos, r);
+        return nearest_chunks(cur_chunk.x_chunk_pos, cur_chunk.y_chunk_pos, r);
     }
 }
