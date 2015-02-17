@@ -20,8 +20,6 @@ public class GUI {
     private static int vbo;
     private static int vao;
     private static int capacity;
-    private static int batch_size;
-
     private static ByteBuffer cross_hair;
     private static final float cross_hair_size = 1f;
 
@@ -29,7 +27,6 @@ public class GUI {
         vao = glGenVertexArrays();
         vbo = glGenBuffers();
         capacity = 20;
-        batch_size = 20;
 
         cross_hair = BufferUtils.createByteBuffer(capacity);
 
@@ -44,8 +41,8 @@ public class GUI {
         glEnableVertexAttribArray(Game.current_shader.attr("attr_pos"));
         glEnableVertexAttribArray(Game.current_shader.attr("attr_color"));
 
-        glVertexAttribPointer(Game.current_shader.attr("attr_pos"), 2, GL_FLOAT, false, batch_size, 0);
-        glVertexAttribPointer(Game.current_shader.attr("attr_color"), 3, GL_FLOAT, false, batch_size, 8);
+        glVertexAttribPointer(Game.current_shader.attr("attr_pos"), 2, GL_FLOAT, false, 20, 0);
+        glVertexAttribPointer(Game.current_shader.attr("attr_color"), 3, GL_FLOAT, false, 20, 8);
 
         glPointSize(cross_hair_size);
         glBindVertexArray(0);

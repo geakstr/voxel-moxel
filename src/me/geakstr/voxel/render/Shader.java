@@ -34,7 +34,7 @@ public class Shader {
         if (glGetProgrami(program, GL_LINK_STATUS) == GL_FALSE) {
             System.err.println("Unable to link shader program:");
             System.err.println(glGetProgramInfoLog(program, glGetShaderi(fragment_shader, GL_INFO_LOG_LENGTH)));
-            dispose();
+            destroy();
         }
 
         return this;
@@ -48,7 +48,7 @@ public class Shader {
         glUseProgram(0);
     }
 
-    public void dispose() {
+    public void destroy() {
         unbind();
 
         glDetachShader(program, vertex_shader);
@@ -101,7 +101,7 @@ public class Shader {
             try {
                 throw new Exception("This attribute not saved in map");
             } catch (Exception e) {
-                dispose();
+                destroy();
             }
         }
         return attributes.get(attr_name);
@@ -116,7 +116,7 @@ public class Shader {
         if (glGetShaderi(vertex_shader, GL_COMPILE_STATUS) == GL_FALSE) {
             System.err.println("Unable to create vertex shader:");
             System.err.println(glGetShaderInfoLog(vertex_shader, glGetShaderi(vertex_shader, GL_INFO_LOG_LENGTH)));
-            dispose();
+            destroy();
         }
 
         glAttachShader(program, vertex_shader);
@@ -131,7 +131,7 @@ public class Shader {
         if (glGetShaderi(fragment_shader, GL_COMPILE_STATUS) == GL_FALSE) {
             System.err.println("Unable to create fragment shader:");
             System.err.println(glGetShaderInfoLog(fragment_shader, glGetShaderi(fragment_shader, GL_INFO_LOG_LENGTH)));
-            dispose();
+            destroy();
         }
 
         glAttachShader(program, fragment_shader);

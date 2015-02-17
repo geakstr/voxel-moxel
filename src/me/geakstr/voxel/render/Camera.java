@@ -127,7 +127,7 @@ public class Camera {
         return was_input;
     }
 
-    public static void apply() {
+    public static void update() {
         view.setIdentity();
 
         Matrix4f.rotate((float) Math.toRadians(rotation.x), Vector3f.xAxis, view, view);
