@@ -5,11 +5,7 @@ import java.util.Set;
 
 import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.math.Vector2f;
-import me.geakstr.voxel.model.Chunk;
-import me.geakstr.voxel.model.Mesh;
-import me.geakstr.voxel.model.Player;
-import me.geakstr.voxel.model.TextureAtlas;
-import me.geakstr.voxel.model.World;
+import me.geakstr.voxel.model.*;
 import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.render.Shader;
@@ -48,7 +44,7 @@ public class Game {
 
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        World.init(16, 4, 16, 16, 32);
+        World.init(1, 2, 2, 1, 1);
         World.gen();
 
         player = new Player();
@@ -68,7 +64,9 @@ public class Game {
             }
             
             Frustum.update();
+
             player.update();
+            Collision.check(nearest_chunks, player.aabb);
         }
     }
 
@@ -84,8 +82,8 @@ public class Game {
         Mesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
         World.render();
 
-//        current_shader.set_uniform("uniform_transform", player.getTransform());
-//        player.render();
+        current_shader.set_uniform("uniform_transform", player.getTransform());
+        player.render();
 
         current_shader.unbind();
 
