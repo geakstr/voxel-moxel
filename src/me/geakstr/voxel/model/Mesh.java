@@ -2,6 +2,9 @@ package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.core.Configurator;
 import me.geakstr.voxel.game.Game;
+import me.geakstr.voxel.math.Vector2f;
+import me.geakstr.voxel.math.Vector3f;
+import me.geakstr.voxel.util.BitUtils;
 import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
@@ -62,7 +65,7 @@ public class Mesh {
         glBindVertexArray(0);
     }
 
-    public void update_data(int[] verts, int[] tex, float[] tex_off, float[] colors) {
+    public void update_data(float[] verts, float[] tex, float[] tex_off, float[] colors) {
         verts_size = verts.length / 3;
         data = BufferUtils.createByteBuffer(verts.length * 4 + tex.length * 4 + tex_off.length * 4 + colors.length * 4);
         for (int v = 0, t = 0, to = 0, c = 0; v < verts.length; v += 3, t += 2, to += 2, c += 3) {
@@ -75,7 +78,7 @@ public class Mesh {
 
             data.putFloat(tex_off[to]);
             data.putFloat(tex_off[to + 1]);
-            
+
             data.putFloat(colors[c]);
             data.putFloat(colors[c + 1]);
             data.putFloat(colors[c + 2]);
@@ -83,7 +86,7 @@ public class Mesh {
         data.flip();
     }
 
-    public void update_data(List<Integer> verts, List<Integer> tex, List<Float> tex_off, List<Float> colors) {
+    public void update_data(List<Float> verts, List<Float> tex, List<Float> tex_off, List<Float> colors) {
         verts_size = verts.size() / 3;
         data = BufferUtils.createByteBuffer(verts.size() * 4 + tex.size() * 4 + tex_off.size() * 4 + colors.size() * 4);
         for (int v = 0, t = 0, to = 0, c = 0; v < verts.size(); v += 3, t += 2, to += 2, c += 3) {
@@ -96,12 +99,19 @@ public class Mesh {
 
             data.putFloat(tex_off.get(to));
             data.putFloat(tex_off.get(to + 1));
-            
+
             data.putFloat(colors.get(c));
             data.putFloat(colors.get(c + 1));
             data.putFloat(colors.get(c + 2));
         }
         data.flip();
+    }
+
+    public void update_data(List<int[]> faces, List<Vector3f> verts, List<Vector2f> tex_coords) {
+        verts_size = verts.size();
+        for (int[] face : faces) {
+            //Vector3f vert = verts.
+        }
     }
 
     public void destroy() {

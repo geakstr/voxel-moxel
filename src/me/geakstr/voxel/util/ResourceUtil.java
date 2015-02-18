@@ -145,7 +145,7 @@ public class ResourceUtil {
         }
         reader.close();
         
-        models.put(model_name.split("/")[0], new Model(faces, verts, tex_coords, normals));
+        models.put(model_name.split("/")[0], new Model(faces, verts, tex_coords));
     }
 
 }

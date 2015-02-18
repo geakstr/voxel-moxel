@@ -19,8 +19,8 @@ public class Box {
         this.corners = new Vector3f[]{min, max};
     }
 
-    public static int[] get_side(int side_idx, int x0, int y0, int x1, int y1, int z) {
-        int[] side = get_side(side_idx);
+    public static float[] get_side(int side_idx, int x0, int y0, int x1, int y1, int z) {
+        float[] side = get_side(side_idx);
 
         if (side_idx == 0 || side_idx == 1) {
             if (side_idx == 1) {
@@ -109,8 +109,8 @@ public class Box {
         return side;
     }
 
-    public static int[] get_side(int side_idx) {
-        int[] side = new int[box_side_vertices_size];
+    public static float[] get_side(int side_idx) {
+        float[] side = new float[box_side_vertices_size];
         switch (side_idx) {
             case 0:
                 System.arraycopy(back_vertices, 0, side, 0, box_side_vertices_size);
@@ -134,8 +134,8 @@ public class Box {
         return side;
     }
 
-    public static int[] get_box(int x, int y, int z, int width, int length, int height) {
-        int[] box = new int[box_vertices_size];
+    public static float[] get_box(int x, int y, int z, int width, int length, int height) {
+        float[] box = new float[box_vertices_size];
 
         // 2 - 1 - 7
         box[0] = x * width;
@@ -272,8 +272,8 @@ public class Box {
         return box;
     }
 
-    public static int[] get_texture(int side_idx, int x0, int y0, int x1, int y1) {
-        int[] texture = new int[box_side_texture_size];
+    public static float[] get_texture(int side_idx, int x0, int y0, int x1, int y1) {
+        float[] texture = new float[box_side_texture_size];
         Arrays.fill(texture, 0);
 
         int xx = x1 - x0 + 1;
@@ -302,7 +302,7 @@ public class Box {
         return texture;
     }
 
-    public static final int[] box_vertices = new int[]{
+    public static final float[] box_vertices = new float[]{
             // 2 - 1 - 7
             0, 1, 1,
             0, 0, 1,
@@ -364,7 +364,7 @@ public class Box {
             0, 1, 0
     };
 
-    public static final int[] right_vertices = new int[]{
+    public static final float[] right_vertices = new float[]{
             // 2 - 1 - 7
             0, 1, 1,
             0, 0, 1,
@@ -376,7 +376,7 @@ public class Box {
             1, 0, 1
     };
 
-    public static final int[] left_vertices = new int[]{
+    public static final float[] left_vertices = new float[]{
             // 3 - 0 - 5
             0, 1, 0,
             0, 0, 0,
@@ -388,7 +388,7 @@ public class Box {
             1, 0, 0
     };
 
-    public static final int[] front_vertices = new int[]{
+    public static final float[] front_vertices = new float[]{
             // 5 - 7 - 4
             1, 0, 0,
             1, 0, 1,
@@ -400,7 +400,7 @@ public class Box {
             1, 1, 0
     };
 
-    public static final int[] back_vertices = new int[]{
+    public static final float[] back_vertices = new float[]{
             // 0 - 1 - 2
             0, 0, 0,
             0, 0, 1,
@@ -412,7 +412,7 @@ public class Box {
             0, 1, 0
     };
 
-    public static final int[] bottom_vertices = new int[]{
+    public static final float[] bottom_vertices = new float[]{
             // 7 - 0 - 5
             1, 0, 1,
             0, 0, 0,
@@ -424,7 +424,7 @@ public class Box {
             0, 0, 0
     };
 
-    public static final int[] top_vertices = new int[]{
+    public static final float[] top_vertices = new float[]{
             // 4 - 3 - 6
             1, 1, 1,
             0, 1, 0,
