@@ -25,14 +25,16 @@ public class Game {
 
     public static void init() {
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
+        
+        gui_shader = new Shader("gui").compile();
+        gui_shader.save_attrs("attr_pos", "attr_color");
 
-        ResourceUtil.load_textures("atlas.png");
-
-        gui_shader = new Shader("gui.vs", "gui.fs").compile();
-        gui_shader.save_attrs("attr_pos").save_attr("attr_color");
-
-        world_shader = new Shader("world.vs", "world.fs").compile();
+        world_shader = new Shader("world").compile();
         world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color");
+        
+        current_shader = world_shader;
+        ResourceUtil.load_textures("atlas.png");
+        ResourceUtil.load_models("axe");
 
         world_transform = new Transform();
 

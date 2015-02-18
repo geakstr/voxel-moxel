@@ -75,6 +75,7 @@ public class Mesh {
 
             data.putFloat(tex_off[to]);
             data.putFloat(tex_off[to + 1]);
+            
             data.putFloat(colors[c]);
             data.putFloat(colors[c + 1]);
             data.putFloat(colors[c + 2]);
@@ -95,6 +96,7 @@ public class Mesh {
 
             data.putFloat(tex_off.get(to));
             data.putFloat(tex_off.get(to + 1));
+            
             data.putFloat(colors.get(c));
             data.putFloat(colors.get(c + 1));
             data.putFloat(colors.get(c + 2));

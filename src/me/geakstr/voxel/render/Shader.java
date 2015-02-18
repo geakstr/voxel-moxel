@@ -20,12 +20,12 @@ public class Shader {
 
     public Map<String, Integer> attributes;
 
-    public Shader(String vertex_shader_name, String fragment_shader_name) {
+    public Shader(String shader_name) {
         this.program = glCreateProgram();
         this.attributes = new HashMap<>();
 
-        attach_vertex_shader(vertex_shader_name);
-        attach_fragment_shader(fragment_shader_name);
+        attach_vertex_shader(shader_name + ".vs");
+        attach_fragment_shader(shader_name + ".fs");
     }
 
     public Shader compile() {
