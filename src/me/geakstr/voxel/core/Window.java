@@ -69,6 +69,8 @@ public class Window {
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
 
         glViewport(0, 0, Math.max(Window.width, Window.height), Math.max(Window.width, Window.height));
 
