@@ -21,7 +21,8 @@ public class Game {
 
     public static Player player;
 
-    public static Vector2f world_shader_texture_info = new Vector2f(TextureAtlas.atlas_size, TextureAtlas.crop_size);
+    public static Vector2f chunk_shader_texture_info = new Vector2f(TextureAtlas.atlas_size, TextureAtlas.crop_size);
+    public static Vector2f model_shader_texture_info = new Vector2f(0, 0);
 
     public static void init() {
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
@@ -30,10 +31,10 @@ public class Game {
         gui_shader.save_attrs("attr_pos", "attr_color");
 
         world_shader = new Shader("world").compile();
-        world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color");
+        world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color", "attr_normal");
         
         current_shader = world_shader;
-        ResourceUtil.load_textures("atlas.png");
+        ResourceUtil.load_textures("atlas.png", "axe.png");
         ResourceUtil.load_models("axe");
 
         world_transform = new Transform();
@@ -48,7 +49,7 @@ public class Game {
         current_shader = gui_shader;
         GUI.init();
     }
-
+    
     public static void before_render() {
         if (Camera.input()) {
             Camera.update();
@@ -65,10 +66,14 @@ public class Game {
         current_shader.set_uniform("uniform_camera_projection", Camera.projection);
         current_shader.set_uniform("uniform_camera_view", Camera.view);
         current_shader.set_uniform("uniform_texture", 0);
-        current_shader.set_uniform("uniform_texture_info", world_shader_texture_info);
+        current_shader.set_uniform("uniform_texture_info", chunk_shader_texture_info);
 
         Mesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
         World.render();
+        
+        current_shader.set_uniform("uniform_texture_info", model_shader_texture_info);
+        Mesh.bind_texture(ResourceUtil.texture_id("axe.png"));
+        ResourceUtil.models.get("axe").draw();
 
 //        current_shader.set_uniform("uniform_transform", player.getTransform());
 //        player.render();

@@ -105,7 +105,6 @@ public class ResourceUtil {
     	List<int[]> faces = new ArrayList<>();
     	List<Vector3f> verts = new ArrayList<>();
         List<Vector2f> tex_coords = new ArrayList<>();
-        List<Vector3f> normals = new ArrayList<>();
         while (reader.ready()) {
         	String[] tokens = reader.tokens();
 
@@ -135,12 +134,7 @@ public class ResourceUtil {
             } else if ("vt".equals(tokens[0])) {
                 float u = Float.parseFloat(tokens[1]);
                 float v = Float.parseFloat(tokens[2]);
-                tex_coords.add(new Vector2f(u, v));
-            } else if ("vn".equals(tokens[0])) {
-                float x = Float.parseFloat(tokens[1]);
-                float y = Float.parseFloat(tokens[2]);
-                float z = Float.parseFloat(tokens[3]);
-                normals.add(new Vector3f(x, y, z));
+                tex_coords.add(new Vector2f(u, 1 - v));
             }
         }
         reader.close();

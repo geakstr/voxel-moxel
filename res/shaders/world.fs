@@ -12,14 +12,16 @@ out vec4 FragColor;
 void main()
 {
     vec2 tex_coord = out_tex_coord.xy;
-
-    float pixel_size = 1.0 / out_texture_info.x;
-
-    float crop_size = pixel_size * out_texture_info.y;
+	
+    if (out_texture_info.x != 0 && out_texture_info.y != 0) {
+    	float pixel_size = 1.0 / out_texture_info.x;
+   	    float crop_size = pixel_size * out_texture_info.y;
+   	    
+   	    tex_coord.x = fract(tex_coord.x) * crop_size + out_tex_offset.x;
+    	tex_coord.y = fract(tex_coord.y) * crop_size + out_tex_offset.y;
+    }
     
-    tex_coord.x = fract(tex_coord.x) * crop_size + out_tex_offset.x;
-    tex_coord.y = fract(tex_coord.y) * crop_size + out_tex_offset.y;
-
+    
     vec4 tex_color = texture(uniform_texture, tex_coord);
     vec4 color = vec4(tex_color.r * out_color.r, tex_color.g * out_color.g, tex_color.b * out_color.b, 1.0);
 
