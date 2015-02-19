@@ -21,9 +21,7 @@ void main()
     	tex_coord.y = fract(tex_coord.y) * crop_size + out_tex_offset.y;
     }
     
-    
     vec4 tex_color = texture(uniform_texture, tex_coord);
-    vec4 color = vec4(tex_color.r * out_color.r, tex_color.g * out_color.g, tex_color.b * out_color.b, 1.0);
 
-    FragColor = color;
+    FragColor = vec4(out_color, 1.0) * tex_color;
 }
