@@ -19,8 +19,7 @@ All sides was defined in CCW order
 */
 
 public class AABB extends MeshIndexed {
-    public static final int side_size = 12;
-    public static final int sides_size = 72;
+    public static final int side_size = 12, sides_size = 72;
 
     public Vector3f[] corners;
 
@@ -43,8 +42,12 @@ public class AABB extends MeshIndexed {
                 return Arrays.copyOf(front_side_vertices, side_size);
             }
 
-            public float[] get(int x, int y, int z) {
-                return null;
+            public float[] translate(int x, int y, int z) {
+                return translate_side(get(), x, y, z);
+            }
+
+            public float[] scale(int x0, int y0, int z0, int x1, int y1, int z1) {
+                return scale_side(get(), x0, y0, z0, x1, y1, z1);
             }
         },
         BACK {
@@ -52,8 +55,12 @@ public class AABB extends MeshIndexed {
                 return Arrays.copyOf(back_side_vertices, side_size);
             }
 
-            public float[] get(int x, int y, int z) {
-                return null;
+            public float[] translate(int x, int y, int z) {
+                return translate_side(get(), x, y, z);
+            }
+
+            public float[] scale(int x0, int y0, int z0, int x1, int y1, int z1) {
+                return scale_side(get(), x0, y0, z0, x1, y1, z1);
             }
         },
         LEFT {
@@ -61,8 +68,12 @@ public class AABB extends MeshIndexed {
                 return Arrays.copyOf(left_side_vertices, side_size);
             }
 
-            public float[] get(int x, int y, int z) {
-                return null;
+            public float[] translate(int x, int y, int z) {
+                return translate_side(get(), x, y, z);
+            }
+
+            public float[] scale(int x0, int y0, int z0, int x1, int y1, int z1) {
+                return scale_side(get(), x0, y0, z0, x1, y1, z1);
             }
         },
         RIGHT {
@@ -70,8 +81,12 @@ public class AABB extends MeshIndexed {
                 return Arrays.copyOf(right_side_vertices, side_size);
             }
 
-            public float[] get(int x, int y, int z) {
-                return null;
+            public float[] translate(int x, int y, int z) {
+                return translate_side(get(), x, y, z);
+            }
+
+            public float[] scale(int x0, int y0, int z0, int x1, int y1, int z1) {
+                return scale_side(get(), x0, y0, z0, x1, y1, z1);
             }
         },
         TOP {
@@ -79,8 +94,12 @@ public class AABB extends MeshIndexed {
                 return Arrays.copyOf(top_side_vertices, side_size);
             }
 
-            public float[] get(int x, int y, int z) {
-                return null;
+            public float[] translate(int x, int y, int z) {
+                return translate_side(get(), x, y, z);
+            }
+
+            public float[] scale(int x0, int y0, int z0, int x1, int y1, int z1) {
+                return scale_side(get(), x0, y0, z0, x1, y1, z1);
             }
         },
         BOTTOM {
@@ -88,8 +107,12 @@ public class AABB extends MeshIndexed {
                 return Arrays.copyOf(bottom_side_vertices, side_size);
             }
 
-            public float[] get(int x, int y, int z) {
-                return null;
+            public float[] translate(int x, int y, int z) {
+                return translate_side(get(), x, y, z);
+            }
+
+            public float[] scale(int x0, int y0, int z0, int x1, int y1, int z1) {
+                return scale_side(get(), x0, y0, z0, x1, y1, z1);
             }
         },
         ALL {
@@ -97,14 +120,40 @@ public class AABB extends MeshIndexed {
                 return Arrays.copyOf(sides_vertices, sides_size);
             }
 
-            public float[] get(int x, int y, int z) {
-                return null;
+            public float[] translate(int x, int y, int z) {
+                return translate_side(get(), x, y, z);
+            }
+
+            public float[] scale(int x0, int y0, int z0, int x1, int y1, int z1) {
+                return scale_side(get(), x0, y0, z0, x1, y1, z1);
             }
         };
 
         public abstract float[] get();
 
-        public abstract float[] get(int x, int y, int z);
+        public abstract float[] translate(int x, int y, int z);
+
+        public abstract float[] scale(int x0, int y0, int z0, int x1, int y1, int z1);
+    }
+
+    private static float[] translate_side(float[] side, int x, int y, int z) {
+        int size = side.length;
+
+        float[] ret = new float[size];
+        System.arraycopy(side, 0, ret, 0, size);
+
+        for (int i = 0; i < size; i += 3) {
+            ret[i] += x;
+            ret[i + 1] += y;
+            ret[i + 2] += z;
+        }
+
+        return ret;
+    }
+
+    private static float[] scale_side(float[] side, int x0, int y0, int z0, int x1, int y1, int z1) {
+        float[] ret = translate_side(side, x0, y0, z0);
+        return null;
     }
 
     private static final float[] sides_vertices = new float[]{
