@@ -12,7 +12,7 @@ public class Player extends Mesh {
     public float[] tex_off;
     public float[] colors;
     private Transform transform;
-    public float x, y, z;
+    public float x, y, z, rot_y, rot_z;
     public Box aabb;
 
     public Player() {
@@ -222,22 +222,26 @@ public class Player extends Mesh {
         this.tex = tex;
         this.tex_off = tex_off;
         transform = new Transform();
-        aabb = new Box(new Vector3f(x, z, y), new Vector3f(x + 1, z + 1, y + 1));
+        aabb = new Box(new Vector3f(x, y, z), new Vector3f(x + 1, y + 1, z + 1));
         update_data(verts, tex, tex_off, colors);
     }
 
     public void update() {
-        float camX = Camera.position.x + 0.5f, camY = Camera.position.y + 1.3f, camZ = Camera.position.z - 2;
-        aabb.corners[0].x = camX;
-        aabb.corners[0].y = camY;
-        aabb.corners[0].z = camZ;
-        aabb.corners[1].x = camX + 1;
-        aabb.corners[1].y = camY + 1;
-        aabb.corners[1].z = camZ + 1;
-        transform.translate(x - camX, y - camY, z - camZ);
-        x = camX;
-        y = camY;
-        z = camZ;
+        float cam_x = Camera.position.x + 0.5f, cam_y = Camera.position.y + 1.3f, cam_z = Camera.position.z - 2,
+              cam_rot_y = Camera.rotation.y, cam_rot_z = Camera.rotation.z;
+        aabb.corners[0].x = -cam_x;
+        aabb.corners[0].y = -cam_y;
+        aabb.corners[0].z = -cam_z;
+        aabb.corners[1].x = -cam_x + 1;
+        aabb.corners[1].y = -cam_y + 1;
+        aabb.corners[1].z = -cam_z + 1;
+        transform.translate(x - cam_x, y - cam_y, z - cam_z);
+        transform.rotate(0, rot_y - cam_rot_y, rot_z - cam_rot_z);
+        x = cam_x;
+        y = cam_y;
+        z = cam_z;
+        rot_y = cam_rot_y;
+        rot_z = cam_rot_z;
         update_vbo();
     }
 
