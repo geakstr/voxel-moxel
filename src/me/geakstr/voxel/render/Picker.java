@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Picker {
-	public static final int picker_length = -(World.world_size * World.near_chunks_radius + 1);
+	public static final int picker_length = -(World.chunk_width * (World.near_chunks_radius + 1));
 	
     public static Pair<Block, Block.TYPE> select(Ray ray, boolean pick_side) {
         final Vector3f camera_position = Camera.position.negate(null);

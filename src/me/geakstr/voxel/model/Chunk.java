@@ -41,8 +41,8 @@ public class Chunk extends Mesh {
     public void rebuild() {
         this.updating = true;
 
-        List<Integer> verts = new ArrayList<>();
-        List<Integer> tex = new ArrayList<>();
+        List<Float> verts = new ArrayList<>();
+        List<Float> tex = new ArrayList<>();
         List<Float> tex_off = new ArrayList<>();
         List<Float> colors = new ArrayList<>();
 
@@ -124,13 +124,13 @@ public class Chunk extends Mesh {
 
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        verts.addAll(ArraysUtil.copy_ints(Block.get_side(
+                        verts.addAll(ArraysUtil.copy_floats(Block.get_side(
                                 side_idx,
                                 x0 + x_offset, y0 + y_offset,
                                 x1 + x_offset, y1 + y_offset,
                                 z + z_offset)));
 
-                        tex.addAll(ArraysUtil.copy_ints(Block.get_texture(
+                        tex.addAll(ArraysUtil.copy_floats(Block.get_texture(
                                 side_idx, x0, y0, x1, y1)));
 
                         tex_off.addAll(Arrays.asList(

@@ -2,6 +2,8 @@ package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.core.Configurator;
 import me.geakstr.voxel.game.Game;
+import me.geakstr.voxel.math.Vector2f;
+import me.geakstr.voxel.math.Vector3f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
@@ -52,7 +54,7 @@ public class Mesh {
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glMapBufferRange(GL_ARRAY_BUFFER, 0, capacity, mapping_flags).put(data);
+        glMapBufferRange(GL_ARRAY_BUFFER, 0, data_size, mapping_flags).put(data);
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
 
@@ -62,20 +64,20 @@ public class Mesh {
         glBindVertexArray(0);
     }
 
-    public void update_data(int[] verts, int[] tex, float[] tex_off, float[] colors) {
+    public void update_data(float[] verts, float[] tex_coords, float[] tex_coords_offsets, float[] colors) {
         verts_size = verts.length / 3;
-        data = BufferUtils.createByteBuffer(verts.length * 4 + tex.length * 4 + tex_off.length * 4 + colors.length * 4);
+        data = BufferUtils.createByteBuffer(verts.length * 8 + tex_coords.length * 4 + tex_coords_offsets.length * 4 + colors.length * 4);
         for (int v = 0, t = 0, to = 0, c = 0; v < verts.length; v += 3, t += 2, to += 2, c += 3) {
             data.putFloat(verts[v]);
             data.putFloat(verts[v + 1]);
             data.putFloat(verts[v + 2]);
 
-            data.putFloat(tex[t]);
-            data.putFloat(tex[t + 1]);
+            data.putFloat(tex_coords[t]);
+            data.putFloat(tex_coords[t + 1]);
 
-            data.putFloat(tex_off[to]);
-            data.putFloat(tex_off[to + 1]);
-            
+            data.putFloat(tex_coords_offsets[to]);
+            data.putFloat(tex_coords_offsets[to + 1]);
+
             data.putFloat(colors[c]);
             data.putFloat(colors[c + 1]);
             data.putFloat(colors[c + 2]);
@@ -83,23 +85,49 @@ public class Mesh {
         data.flip();
     }
 
-    public void update_data(List<Integer> verts, List<Integer> tex, List<Float> tex_off, List<Float> colors) {
+    public void update_data(List<Float> verts, List<Float> tex_coords, List<Float> tex_coords_offsets, List<Float> colors) {
         verts_size = verts.size() / 3;
-        data = BufferUtils.createByteBuffer(verts.size() * 4 + tex.size() * 4 + tex_off.size() * 4 + colors.size() * 4);
+        data = BufferUtils.createByteBuffer(verts.size() * 8 + tex_coords.size() * 4 + tex_coords_offsets.size() * 4 + colors.size() * 4);
         for (int v = 0, t = 0, to = 0, c = 0; v < verts.size(); v += 3, t += 2, to += 2, c += 3) {
             data.putFloat(verts.get(v));
             data.putFloat(verts.get(v + 1));
             data.putFloat(verts.get(v + 2));
 
-            data.putFloat(tex.get(t));
-            data.putFloat(tex.get(t + 1));
+            data.putFloat(tex_coords.get(t));
+            data.putFloat(tex_coords.get(t + 1));
 
-            data.putFloat(tex_off.get(to));
-            data.putFloat(tex_off.get(to + 1));
-            
+            data.putFloat(tex_coords_offsets.get(to));
+            data.putFloat(tex_coords_offsets.get(to + 1));
+
             data.putFloat(colors.get(c));
             data.putFloat(colors.get(c + 1));
             data.putFloat(colors.get(c + 2));
+        }
+        data.flip();
+    }
+
+    public void update_data(List<int[]> faces, List<Vector3f> verts, List<Vector2f> tex_coords) {
+        verts_size = faces.size() * 3;
+        data = BufferUtils.createByteBuffer(faces.size() * 30 * 4);
+        for (int[] face : faces) {
+        	for (int i = 0; i < 3; i++) {
+        		Vector3f vert = verts.get(face[i]);
+        		Vector2f tex_coord = tex_coords.get(face[i + 3]);
+        		
+        		data.putFloat(vert.x);
+                data.putFloat(vert.y);
+                data.putFloat(vert.z);
+
+                data.putFloat(tex_coord.x);
+                data.putFloat(tex_coord.y);
+
+                data.putFloat(0);
+                data.putFloat(0);
+                
+                data.putFloat(1);
+                data.putFloat(1);
+                data.putFloat(1);
+        	}
         }
         data.flip();
     }

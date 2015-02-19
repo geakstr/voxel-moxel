@@ -6,15 +6,15 @@ import me.geakstr.voxel.render.Transform;
 
 public class Player extends Mesh {
 
-    public int[] verts;
-    public int[] tex;
+    public float[] verts;
+    public float[] tex;
     public float[] tex_off;
     public float[] colors;
     private Transform transform;
     public float x, y, z;
 
     public Player() {
-        int[] verts = {
+        float[] verts = {
                 // 2 - 1 - 7
                 0, 1, 1,
                 0, 0, 1,
@@ -76,7 +76,7 @@ public class Player extends Mesh {
                 0, 1, 0
 
         };
-        int[] tex = {
+        float[] tex = {
                 -1, 0,
                 0, 0,
                 0, -1,
