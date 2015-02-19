@@ -4,7 +4,6 @@ import me.geakstr.voxel.core.Configurator;
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.math.Vector3f;
-import me.geakstr.voxel.util.BitUtils;
 import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
@@ -55,7 +54,7 @@ public class Mesh {
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glMapBufferRange(GL_ARRAY_BUFFER, 0, capacity, mapping_flags).put(data);
+        glMapBufferRange(GL_ARRAY_BUFFER, 0, data_size, mapping_flags).put(data);
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
 
