@@ -1,6 +1,5 @@
 package me.geakstr.voxel.render;
 
-import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.World;
@@ -67,38 +66,37 @@ public class Frustum {
     }
 
     public static boolean chunkInFrustum(float x, float y, float z) {
-    	if (World.nearest_chunks.size() == 0) {
-    		return true;
-    	}
-    	for (Chunk chunk : World.nearest_chunks) {
-    		if (chunk.x_chunk_pos == x && chunk.y_chunk_pos == y && chunk.z_chunk_pos == z) {
-    			return true;
-    		}
-    	}
-    	
-        int width = World.chunk_width;
-        int length = World.chunk_length;
+        if (World.nearest_chunks.size() == 0) {
+            return true;
+        }
+        for (Chunk chunk : World.nearest_chunks) {
+            if (chunk.x_chunk_pos == x && chunk.y_chunk_pos == y && chunk.z_chunk_pos == z) {
+                return true;
+            }
+        }
+
+        int size = World.chunk_size;
         int height = World.chunk_height;
 
         int half_height = height / 2;
 
-        float x_mul_width = x * width;
-        float y_mul_length = y * length;
-        float z_mul_height = z * height;
+        float x_mul_size = x * size;
+        float y_mul_height = y * height;
+        float z_mul_size = z * size;
 
-        return pointInFrustum(x_mul_width - 1, z_mul_height - 1, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width - 1, z_mul_height - 1, y_mul_length + length + 1) ||
-                pointInFrustum(x_mul_width + width + 1, z_mul_height - 1, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width + width + 1, z_mul_height - 1, y_mul_length + length + 1) ||
+        return pointInFrustum(x_mul_size - 1, y_mul_height - 1, z_mul_size - 1) ||
+                pointInFrustum(x_mul_size - 1, y_mul_height - 1, z_mul_size + size + 1) ||
+                pointInFrustum(x_mul_size + size + 1, y_mul_height - 1, z_mul_size - 1) ||
+                pointInFrustum(x_mul_size + size + 1, y_mul_height - 1, z_mul_size + size + 1) ||
 
-                pointInFrustum(x_mul_width - 1, z_mul_height + half_height, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width - 1, z_mul_height + half_height, y_mul_length + length + 1) ||
-                pointInFrustum(x_mul_width + width + 1, z_mul_height + half_height, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width + width + 1, z_mul_height + half_height, y_mul_length + length + 1) ||
+                pointInFrustum(x_mul_size - 1, y_mul_height + half_height, z_mul_size - 1) ||
+                pointInFrustum(x_mul_size - 1, y_mul_height + half_height, z_mul_size + size + 1) ||
+                pointInFrustum(x_mul_size + size + 1, y_mul_height + half_height, z_mul_size - 1) ||
+                pointInFrustum(x_mul_size + size + 1, y_mul_height + half_height, z_mul_size + size + 1) ||
 
-                pointInFrustum(x_mul_width - 1, z_mul_height + height + 1, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width - 1, z_mul_height + height + 1, y_mul_length + length + 1) ||
-                pointInFrustum(x_mul_width + width + 1, z_mul_height + height + 1, y_mul_length - 1) ||
-                pointInFrustum(x_mul_width + width + 1, z_mul_height + height + 1, y_mul_length + length + 1);
+                pointInFrustum(x_mul_size - 1, y_mul_height + height + 1, z_mul_size - 1) ||
+                pointInFrustum(x_mul_size - 1, y_mul_height + height + 1, z_mul_size + size + 1) ||
+                pointInFrustum(x_mul_size + size + 1, y_mul_height + height + 1, z_mul_size - 1) ||
+                pointInFrustum(x_mul_size + size + 1, y_mul_height + height + 1, z_mul_size + size + 1);
     }
 }
