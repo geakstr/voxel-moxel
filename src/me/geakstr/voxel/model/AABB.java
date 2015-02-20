@@ -45,14 +45,14 @@ public class AABB extends MeshIndexed {
     public AABB(int x, int y, int z, int width, int height, int length) {
         super();
 
-        this.corners = new Vector3f[] {
-        		new Vector3f(x, y, z),
-        		new Vector3f(x + width, y + height, z + length)
+        this.corners = new Vector3f[]{
+                new Vector3f(x, y, z),
+                new Vector3f(x + width, y + height, z + length)
         };
     }
-    
+
     public AABB() {
-    	this(0, 0, 0, 1, 1, 1);
+        this(0, 0, 0, 1, 1, 1);
     }
 
     public static enum SIDE {
@@ -60,17 +60,9 @@ public class AABB extends MeshIndexed {
             public float[] verts() {
                 return Arrays.copyOf(front_side_vertices, side_vertices_size);
             }
-            
-            public float[] tex_coords(int u, int v) {
-            	float[] texture = new float[side_tex_coords_size];
-            	
-            	texture[0] = -v;
-                texture[5] = -1;
 
-                texture[7] = 1;
-                texture[8] = v;
-                
-                return texture;
+            public float[] tex_coords(int u, int v) {
+                return new float[]{0, 1, u, 1, 0, 0, u, 0};
             }
 
             public float[] translate(int x_pos, int y_pos, int z_pos) {
@@ -78,19 +70,19 @@ public class AABB extends MeshIndexed {
             }
 
             public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
-            	float[] side = translate(x_pos, y_pos, z_pos);
-            	
-            	side[3] += x_expand;
-            	side[9] += x_expand;
-            	
-            	side[7] += y_expand;
-            	side[10] += y_expand;
-            	
-            	side[2] += z_expand;
-            	side[5] += z_expand;
-            	side[8] += z_expand;
-            	side[11] += z_expand;
-            	
+                float[] side = translate(x_pos, y_pos, z_pos);
+
+                side[3] += x_expand;
+                side[9] += x_expand;
+
+                side[7] += y_expand;
+                side[10] += y_expand;
+
+                side[2] += z_expand;
+                side[5] += z_expand;
+                side[8] += z_expand;
+                side[11] += z_expand;
+
                 return side;
             }
         },
@@ -98,17 +90,9 @@ public class AABB extends MeshIndexed {
             public float[] verts() {
                 return Arrays.copyOf(back_side_vertices, side_vertices_size);
             }
-            
-            public float[] tex_coords(int u, int v) {
-            	float[] texture = new float[side_tex_coords_size];
-            	
-            	texture[0] = -v;
-                texture[5] = -1;
 
-                texture[7] = 1;
-                texture[8] = v;
-                
-                return texture;
+            public float[] tex_coords(int u, int v) {
+                return new float[]{0, 1, u, 1, 0, 0, u, 0};
             }
 
             public float[] translate(int x_pos, int y_pos, int z_pos) {
@@ -116,14 +100,14 @@ public class AABB extends MeshIndexed {
             }
 
             public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
-            	float[] side = translate(x_pos, y_pos, z_pos);
-            	
-            	side[0] += x_expand;
-            	side[6] += x_expand;
-            	
-            	side[7] += y_expand;
-            	side[10] += y_expand;
-            	
+                float[] side = translate(x_pos, y_pos, z_pos);
+
+                side[0] += x_expand;
+                side[6] += x_expand;
+
+                side[7] += y_expand;
+                side[10] += y_expand;
+
                 return side;
             }
         },
@@ -131,19 +115,9 @@ public class AABB extends MeshIndexed {
             public float[] verts() {
                 return Arrays.copyOf(left_side_vertices, side_vertices_size);
             }
-            
-            public float[] tex_coords(int u, int v) {
-            	float[] texture = new float[side_tex_coords_size];
-            	
-            	texture[3] = 1;
-                texture[4] = u;
-                texture[5] = 1;
 
-                texture[7] = -1;
-                texture[8] = -u;
-                texture[9] = -1;
-                
-                return texture;
+            public float[] tex_coords(int u, int v) {
+                return new float[]{v, 1, 0, 1, v, 0, 0, 0};
             }
 
             public float[] translate(int x_pos, int y_pos, int z_pos) {
@@ -151,34 +125,24 @@ public class AABB extends MeshIndexed {
             }
 
             public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_offset) {
-            	float[] side = translate(x_pos, y_pos, z_pos);
-            	
-            	side[7] += y_expand;
-            	side[10] += y_expand;
-            	
-            	side[5] += z_offset;
-            	side[11] += z_offset;
-            	
-            	return side;
+                float[] side = translate(x_pos, y_pos, z_pos);
+
+                side[7] += y_expand;
+                side[10] += y_expand;
+
+                side[5] += z_offset;
+                side[11] += z_offset;
+
+                return side;
             }
         },
         RIGHT {
             public float[] verts() {
                 return Arrays.copyOf(right_side_vertices, side_vertices_size);
             }
-            
-            public float[] tex_coords(int u, int v) {
-            	float[] texture = new float[side_tex_coords_size];
-            	
-            	texture[3] = 1;
-                texture[4] = u;
-                texture[5] = 1;
 
-                texture[7] = -1;
-                texture[8] = -u;
-                texture[9] = -1;
-                
-                return texture;
+            public float[] tex_coords(int u, int v) {
+                return new float[]{v, 1, 0, 1, v, 0, 0, 0};
             }
 
             public float[] translate(int x_pos, int y_pos, int z_pos) {
@@ -186,37 +150,29 @@ public class AABB extends MeshIndexed {
             }
 
             public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
-            	float[] side = translate(x_pos, y_pos, z_pos);
-            	
-            	side[0] += x_expand;
-            	side[3] += x_expand;
-            	side[6] += x_expand;
-            	side[9] += x_expand;
-            	
-            	side[7] += y_expand;
-            	side[10] += y_expand;
-            	
-            	side[2] += z_expand;
-            	side[8] += z_expand;
-            	
-            	return side;
+                float[] side = translate(x_pos, y_pos, z_pos);
+
+                side[0] += x_expand;
+                side[3] += x_expand;
+                side[6] += x_expand;
+                side[9] += x_expand;
+
+                side[7] += y_expand;
+                side[10] += y_expand;
+
+                side[2] += z_expand;
+                side[8] += z_expand;
+
+                return side;
             }
         },
         TOP {
             public float[] verts() {
                 return Arrays.copyOf(top_side_vertices, side_vertices_size);
             }
-            
-            public float[] tex_coords(int u, int v) {
-            	float[] texture = new float[side_tex_coords_size];
-            	
-            	texture[1] = v;
-                texture[2] = u;
 
-                texture[6] = -u;
-                texture[11] = -v;
-            	
-            	return texture;
+            public float[] tex_coords(int u, int v) {
+                return new float[]{0, v, u, v, 0, 0, u, 0};
             }
 
             public float[] translate(int x_pos, int y_pos, int z_pos) {
@@ -224,37 +180,29 @@ public class AABB extends MeshIndexed {
             }
 
             public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
-            	float[] side = translate(x_pos, y_pos, z_pos);
-            	
-            	side[3] += x_expand;
-            	side[9] += x_expand;
-            	
-            	side[1] += y_expand;
-            	side[4] += y_expand;
-            	side[7] += y_expand;
-            	side[10] += y_expand;
-            	
-            	side[2] += z_expand;
-            	side[5] += z_expand;
-            	
-            	return side;
+                float[] side = translate(x_pos, y_pos, z_pos);
+
+                side[3] += x_expand;
+                side[9] += x_expand;
+
+                side[1] += y_expand;
+                side[4] += y_expand;
+                side[7] += y_expand;
+                side[10] += y_expand;
+
+                side[2] += z_expand;
+                side[5] += z_expand;
+
+                return side;
             }
         },
         BOTTOM {
             public float[] verts() {
                 return Arrays.copyOf(bottom_side_vertices, side_vertices_size);
             }
-            
-            public float[] tex_coords(int u, int v) {
-            	float[] texture = new float[side_tex_coords_size];
-            	
-            	texture[1] = v;
-                texture[2] = u;
 
-                texture[6] = -u;
-                texture[11] = -v;
-            	
-            	return texture;
+            public float[] tex_coords(int u, int v) {
+                return new float[]{0, v, u, v, 0, 0, u, 0};
             }
 
             public float[] translate(int x_pos, int y_pos, int z_pos) {
@@ -262,26 +210,26 @@ public class AABB extends MeshIndexed {
             }
 
             public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
-            	float[] side = translate(x_pos, y_pos, z_pos);
-            	
-            	side[3] += x_expand;
-            	side[9] += x_expand;
-            	
-            	side[8] += z_expand;
-            	side[11] += z_expand;
-            	
-            	return side;
+                float[] side = translate(x_pos, y_pos, z_pos);
+
+                side[3] += x_expand;
+                side[9] += x_expand;
+
+                side[8] += z_expand;
+                side[11] += z_expand;
+
+                return side;
             }
         };
 
         public abstract float[] verts();
-        
+
         public abstract float[] tex_coords(int u, int v);
 
         public abstract float[] translate(int x_pos, int y_pos, int z_pos);
 
         public abstract float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand);
-        
+
         public static final SIDE[] values = values();
     }
 
@@ -289,9 +237,9 @@ public class AABB extends MeshIndexed {
         int size = side.length;
 
         for (int i = 0; i < size; i += 3) {
-        	side[i] += x_pos;
-        	side[i + 1] += y_pos;
-        	side[i + 2] += z_pos;
+            side[i] += x_pos;
+            side[i + 1] += y_pos;
+            side[i + 2] += z_pos;
         }
 
         return side;

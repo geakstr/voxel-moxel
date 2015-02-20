@@ -119,17 +119,17 @@ public class Chunk extends MeshIndexed {
                 int[] coords = e.getValue();
                 int x0 = coords[0], y0 = coords[1];
                 int x1 = coords[2], y1 = coords[3];
+                int xx = x1 - x0, yy = y1 - y0;
 
                 boolean[] renderable_sides = renderable_sides(x0, y0, x1, y1, z);
 
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        verts.addAll(ArraysUtil.copy_floats(AABB.SIDE.values[side_idx].translate_and_expand(
-                                x0, z, y0, 
-                                x1 - x0, 0, y1 - y0)));
+                        verts.addAll(ArraysUtil.copy_floats(
+                                AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, z + z_offset, y0 + y_offset, xx, 0, yy)));
 
-                        tex.addAll(ArraysUtil.copy_floats(Block.get_texture(
-                                side_idx, x0, y0, x1, y1)));
+                        tex.addAll(ArraysUtil.copy_floats(
+                                AABB.SIDE.values[side_idx].tex_coords(xx + 1, yy + 1)));
 
                         tex_off.addAll(Arrays.asList(
                                 texture.x, texture.y,
@@ -149,7 +149,7 @@ public class Chunk extends MeshIndexed {
             }
         }
 
-        update_data(ArraysUtil.copy_floats(verts), ArraysUtil.copy_floats(tex), ArraysUtil.copy_floats(tex_off), ArraysUtil.copy_floats(colors));
+        update_gl_buffers(verts, tex, tex_off, colors);
 
         this.updated = true;
         this.empty = verts.size() == 0;
@@ -158,61 +158,48 @@ public class Chunk extends MeshIndexed {
     public boolean[] renderable_sides(int x0, int y0, int x1, int y1, int z) {
         boolean[] sides = new boolean[6];
 
-        if (x0 == 0) {
+        if (y0 == 0) {
             sides[1] = true;
-        } else if (x0 > 0) {
-            for (int y = y0; y <= y1; y++) {
-                if (Block.unpack_type(blocks[x0 - 1][y][z]) == 0) {
+        } else if (y0 > 0) {
+            for (int x = x0; x <= x1; x++) {
+                if (Block.unpack_type(blocks[x][y0 - 1][z]) == 0) {
                     sides[1] = true;
                     break;
                 }
             }
         }
-        if (x1 == World.chunk_width - 1) {
+        if (y1 == World.chunk_length - 1) {
             sides[0] = true;
-        } else if (x1 < World.chunk_width - 1) {
-            for (int y = y0; y <= y1; y++) {
-                if (Block.unpack_type(blocks[x1 + 1][y][z]) == 0) {
+        } else if (y1 < World.chunk_length - 1) {
+            for (int x = x0; x <= x1; x++) {
+                if (Block.unpack_type(blocks[x][y1 + 1][z]) == 0) {
                     sides[0] = true;
                     break;
                 }
             }
         }
 
-        if (y0 == 0) {
+        if (x0 == 0) {
             sides[2] = true;
-        } else if (y0 > 0) {
-            for (int x = x0; x <= x1; x++) {
-                if (Block.unpack_type(blocks[x][y0 - 1][z]) == 0) {
+        } else if (x0 > 0) {
+            for (int y = y0; y <= y1; y++) {
+                if (Block.unpack_type(blocks[x0 - 1][y][z]) == 0) {
                     sides[2] = true;
                     break;
                 }
             }
         }
-
-        if (y1 == World.chunk_length - 1) {
+        if (x1 == World.chunk_width - 1) {
             sides[3] = true;
-        } else if (y1 < World.chunk_length - 1) {
-            for (int x = x0; x <= x1; x++) {
-                if (Block.unpack_type(blocks[x][y1 + 1][z]) == 0) {
+        } else if (x1 < World.chunk_width - 1) {
+            for (int y = y0; y <= y1; y++) {
+                if (Block.unpack_type(blocks[x1 + 1][y][z]) == 0) {
                     sides[3] = true;
                     break;
                 }
             }
         }
 
-        if (z == 0) {
-            sides[5] = true;
-        } else if (z > 0) {
-            for (int x = x0; x <= x1; x++) {
-                for (int y = y0; y <= y1; y++) {
-                    if (Block.unpack_type(blocks[x][y][z - 1]) == 0) {
-                        sides[5] = true;
-                        break;
-                    }
-                }
-            }
-        }
 
         if (z == World.chunk_height - 1) {
             sides[4] = true;
@@ -226,65 +213,62 @@ public class Chunk extends MeshIndexed {
                 }
             }
         }
+        if (z == 0) {
+            sides[5] = true;
+        } else if (z > 0) {
+            for (int x = x0; x <= x1; x++) {
+                for (int y = y0; y <= y1; y++) {
+                    if (Block.unpack_type(blocks[x][y][z - 1]) == 0) {
+                        sides[5] = true;
+                        break;
+                    }
+                }
+            }
+        }
 
+
+        if (sides[0] &&
+                y1 == World.chunk_length - 1 &&
+                y_chunk_pos != World.world_size - 1) {
+            sides[0] = false;
+            for (int x = x0; x <= x1; x++) {
+                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos + 1].blocks[x][0][z]) == 0) {
+                    sides[0] = true;
+                    break;
+                }
+            }
+        }
         if (sides[1] &&
-                x0 == 0 &&
-                x_chunk_pos != 0) {
+                y0 == 0 &&
+                y_chunk_pos != 0) {
             sides[1] = false;
-            for (int y = y0; y <= y1; y++) {
-                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos - 1][y_chunk_pos].blocks[World.chunk_width - 1][y][z]) == 0) {
+            for (int x = x0; x <= x1; x++) {
+                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos - 1].blocks[x][World.chunk_length - 1][z]) == 0) {
                     sides[1] = true;
                     break;
                 }
             }
         }
 
-        if (sides[0] &&
-                x1 == World.chunk_width - 1 &&
-                x_chunk_pos != World.world_size - 1) {
-            sides[0] = false;
-            for (int y = y0; y <= y1; y++) {
-                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos + 1][y_chunk_pos].blocks[0][y][z]) == 0) {
-                    sides[0] = true;
-                    break;
-                }
-            }
-        }
-
-        if (sides[3] &&
-                y1 == World.chunk_length - 1 &&
-                y_chunk_pos != World.world_size - 1) {
-            sides[3] = false;
-            for (int x = x0; x <= x1; x++) {
-                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos + 1].blocks[x][0][z]) == 0) {
-                    sides[3] = true;
-                    break;
-                }
-            }
-        }
-
         if (sides[2] &&
-                y0 == 0 &&
-                y_chunk_pos != 0) {
+                x0 == 0 &&
+                x_chunk_pos != 0) {
             sides[2] = false;
-            for (int x = x0; x <= x1; x++) {
-                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos][y_chunk_pos - 1].blocks[x][World.chunk_length - 1][z]) == 0) {
+            for (int y = y0; y <= y1; y++) {
+                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos - 1][y_chunk_pos].blocks[World.chunk_width - 1][y][z]) == 0) {
                     sides[2] = true;
                     break;
                 }
             }
         }
-
-        if (sides[5] &&
-                z == 0 &&
-                z_chunk_pos != 0) {
-            sides[5] = false;
-            for (int x = x0; x <= x1; x++) {
-                for (int y = y0; y <= y1; y++) {
-                    if (Block.unpack_type(World.chunks[z_chunk_pos - 1][x_chunk_pos][y_chunk_pos].blocks[x][y][World.chunk_height - 1]) == 0) {
-                        sides[5] = true;
-                        break;
-                    }
+        if (sides[3] &&
+                x1 == World.chunk_width - 1 &&
+                x_chunk_pos != World.world_size - 1) {
+            sides[3] = false;
+            for (int y = y0; y <= y1; y++) {
+                if (Block.unpack_type(World.chunks[z_chunk_pos][x_chunk_pos + 1][y_chunk_pos].blocks[0][y][z]) == 0) {
+                    sides[3] = true;
+                    break;
                 }
             }
         }
@@ -302,6 +286,20 @@ public class Chunk extends MeshIndexed {
                 }
             }
         }
+        if (sides[5] &&
+                z == 0 &&
+                z_chunk_pos != 0) {
+            sides[5] = false;
+            for (int x = x0; x <= x1; x++) {
+                for (int y = y0; y <= y1; y++) {
+                    if (Block.unpack_type(World.chunks[z_chunk_pos - 1][x_chunk_pos][y_chunk_pos].blocks[x][y][World.chunk_height - 1]) == 0) {
+                        sides[5] = true;
+                        break;
+                    }
+                }
+            }
+        }
+
 
         return sides;
     }
