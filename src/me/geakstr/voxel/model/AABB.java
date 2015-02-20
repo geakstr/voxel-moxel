@@ -44,25 +44,15 @@ public class AABB extends MeshIndexed {
 
     public AABB(int x, int y, int z, int width, int height, int length) {
         super();
-        
-        width--;
-        height--;
-        length--;
 
         this.corners = new Vector3f[] {
         		new Vector3f(x, y, z),
         		new Vector3f(x + width, y + height, z + length)
         };
-        
-        float[] d = new float[side_vertices_size * 6];
-        System.arraycopy(SIDE.BACK.translate_and_expand(x, y, z, width, height, length), 0, d, side_vertices_size * 0, side_vertices_size);
-        System.arraycopy(SIDE.FRONT.translate_and_expand(x, y, z, width, height, length), 0, d, side_vertices_size * 1, side_vertices_size);
-        System.arraycopy(SIDE.LEFT.translate_and_expand(x, y, z, width, height, length), 0, d, side_vertices_size * 2, side_vertices_size);
-        System.arraycopy(SIDE.RIGHT.translate_and_expand(x, y, z, width, height, length), 0, d, side_vertices_size * 3, side_vertices_size);
-        System.arraycopy(SIDE.TOP.translate_and_expand(x, y, z, width, height, length), 0, d, side_vertices_size * 4, side_vertices_size);
-        System.arraycopy(SIDE.BOTTOM.translate_and_expand(x, y, z, width, height, length), 0, d, side_vertices_size * 5, side_vertices_size);
-        this.update_data(d);
-        this.update_gl_buffers();
+    }
+    
+    public AABB() {
+    	this(0, 0, 0, 1, 1, 1);
     }
 
     public static enum SIDE {
@@ -292,7 +282,7 @@ public class AABB extends MeshIndexed {
 
         public abstract float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand);
         
-       // public static final SIDE values[] = values();
+        public static final SIDE[] values = values();
     }
 
     private static float[] translate_side(float[] side, int x_pos, int y_pos, int z_pos) {

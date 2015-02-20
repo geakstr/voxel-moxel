@@ -14,14 +14,12 @@ public class Game {
 
     public static Transform world_transform;
     public static ChunksWorkersExecutorService chunks_workers_executor_service;
-    public static Shader current_shader, world_shader, gui_shader, test_shader;
+    public static Shader current_shader, world_shader, gui_shader;
 
     public static Player player;
 
     public static Vector2f chunk_shader_texture_info = new Vector2f(TextureAtlas.atlas_size, TextureAtlas.crop_size);
     public static Vector2f model_shader_texture_info = new Vector2f(0, 0);
-
-    public static AABB box1, box2;
 
     public static void init() {
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
@@ -31,9 +29,6 @@ public class Game {
 
         world_shader = new Shader("world").compile();
         world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color", "attr_normal");
-
-        test_shader = new Shader("test").compile();
-        test_shader.save_attrs("attr_pos", "attr_tex_coord");
 
         current_shader = world_shader;
         ResourceUtil.load_textures("atlas.png", "axe.png");
@@ -50,11 +45,6 @@ public class Game {
 
         current_shader = gui_shader;
         GUI.init();
-
-
-        current_shader = test_shader;
-        box1 = new AABB(0, 0, 0, 1, 1, 1);
-        box2 = new AABB(5, 0, 5, 1, 1, 1);
     }
 
     public static void before_render() {
@@ -67,34 +57,34 @@ public class Game {
     }
 
     public static void render() {
-//        current_shader = world_shader;
-//        current_shader.bind();
-//        current_shader.set_uniform("uniform_transform", world_transform.getTransform());
-//        current_shader.set_uniform("uniform_camera_projection", Camera.projection);
-//        current_shader.set_uniform("uniform_camera_view", Camera.view);
-//        current_shader.set_uniform("uniform_texture", 0);
-//        current_shader.set_uniform("uniform_texture_info", chunk_shader_texture_info);
-//
-//        Mesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
-//        World.render();
-//
+        current_shader = world_shader;
+        current_shader.bind();
+        current_shader.set_uniform("uniform_transform", world_transform.getTransform());
+        current_shader.set_uniform("uniform_camera_projection", Camera.projection);
+        current_shader.set_uniform("uniform_camera_view", Camera.view);
+        current_shader.set_uniform("uniform_texture", 0);
+        current_shader.set_uniform("uniform_texture_info", chunk_shader_texture_info);
+
+        Mesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
+        World.render();
+
 //        current_shader.set_uniform("uniform_texture_info", model_shader_texture_info);
 //        Mesh.bind_texture(ResourceUtil.texture_id("axe.png"));
 //        ResourceUtil.models.get("axe").draw();
-//
+
 //        current_shader.set_uniform("uniform_transform", player.getTransform());
 //        player.render();
-//
-//        current_shader.unbind();
 
-        current_shader = test_shader;
-        current_shader.bind();
-        current_shader.set_uniform("uniform_transform", world_transform.getTransform());
-        current_shader.set_uniform("uniform_camera_view", Camera.view);
-        current_shader.set_uniform("uniform_camera_projection", Camera.projection);
-        box1.draw();
-        box2.draw();
         current_shader.unbind();
+
+//        current_shader = test_shader;
+//        current_shader.bind();
+//        current_shader.set_uniform("uniform_transform", world_transform.getTransform());
+//        current_shader.set_uniform("uniform_camera_view", Camera.view);
+//        current_shader.set_uniform("uniform_camera_projection", Camera.projection);
+//        box1.draw();
+//        box2.draw();
+//        current_shader.unbind();
 
         current_shader = gui_shader;
         current_shader.bind();

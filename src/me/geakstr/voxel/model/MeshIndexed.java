@@ -2,6 +2,7 @@ package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.core.Configurator;
 import me.geakstr.voxel.game.Game;
+
 import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
@@ -72,9 +73,9 @@ public class MeshIndexed {
         glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
     }
 
-    public void update_data(float[] vertices) {
+    public void update_data(float[] vertices, float[] tex_coords, float[] tex_coords_offsets, float[] colors) {
         this.count = vertices.length / 2;
-        this.vbo_data = BufferUtils.createByteBuffer(vertices.length * 4);
+        this.vbo_data = BufferUtils.createByteBuffer(vertices.length * 4 + tex_coords.length * 4 + tex_coords_offsets.length * 4 + colors.length * 4);
         this.ibo_data = BufferUtils.createByteBuffer(count * 4);
 
         for (int i = 0, bytes = 0; bytes < count; i += 4, bytes += 6) {
@@ -86,9 +87,21 @@ public class MeshIndexed {
             ibo_data.putInt(i + 3);
             ibo_data.putInt(i + 2);
         }
+        
+        for (int v = 0, t = 0, to = 0, c = 0; v < vertices.length; v += 3, t += 2, to += 2, c += 3) {
+        	vbo_data.putFloat(vertices[v]);
+        	vbo_data.putFloat(vertices[v + 1]);
+        	vbo_data.putFloat(vertices[v + 2]);
 
-        for (float coord : vertices) {
-            vbo_data.putFloat(coord);
+        	vbo_data.putFloat(tex_coords[t]);
+        	vbo_data.putFloat(tex_coords[t + 1]);
+        	
+        	vbo_data.putFloat(tex_coords_offsets[to]);
+        	vbo_data.putFloat(tex_coords_offsets[to + 1]);
+        	
+        	vbo_data.putFloat(colors[c]);
+        	vbo_data.putFloat(colors[c + 1]);
+        	vbo_data.putFloat(colors[c + 2]);
         }
         ibo_data.flip();
         vbo_data.flip();
@@ -123,7 +136,14 @@ public class MeshIndexed {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
         glEnableVertexAttribArray(Game.current_shader.attr("attr_pos"));
-        glVertexAttribPointer(Game.current_shader.attr("attr_pos"), 3, GL_FLOAT, false, 12, 0);
+        glEnableVertexAttribArray(Game.current_shader.attr("attr_tex_coord"));
+        glEnableVertexAttribArray(Game.current_shader.attr("attr_tex_offset"));
+        glEnableVertexAttribArray(Game.current_shader.attr("attr_color"));
+
+        glVertexAttribPointer(Game.current_shader.attr("attr_pos"), 3, GL_FLOAT, false, 40, 0);
+        glVertexAttribPointer(Game.current_shader.attr("attr_tex_coord"), 2, GL_FLOAT, false, 40, 12);
+        glVertexAttribPointer(Game.current_shader.attr("attr_tex_offset"), 2, GL_FLOAT, false, 40, 20);
+        glVertexAttribPointer(Game.current_shader.attr("attr_color"), 3, GL_FLOAT, false, 40, 28);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
