@@ -71,7 +71,8 @@ public class Window {
         glDepthFunc(GL_LEQUAL);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-
+        glFrontFace(GL_CW);
+        
         glViewport(0, 0, Math.max(Window.width, Window.height), Math.max(Window.width, Window.height));
 
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {

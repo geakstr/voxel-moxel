@@ -53,7 +53,7 @@ public class Game {
 
 
         current_shader = test_shader;
-        box = new AABB();
+        box = new AABB(0, 0, 0, 4, 0, 4);
     }
 
     public static void before_render() {

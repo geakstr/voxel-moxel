@@ -87,7 +87,6 @@ public class MeshIndexed {
             ibo_data.putInt(i + 2);
         }
 
-        System.out.println(ibo_data.toString());
         for (float coord : vertices) {
             vbo_data.putFloat(coord);
         }
