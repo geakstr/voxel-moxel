@@ -21,7 +21,7 @@ public class Game {
     public static Vector2f chunk_shader_texture_info = new Vector2f(TextureAtlas.atlas_size, TextureAtlas.crop_size);
     public static Vector2f model_shader_texture_info = new Vector2f(0, 0);
 
-    public static AABB box;
+    public static AABB box1, box2;
 
     public static void init() {
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
@@ -33,7 +33,7 @@ public class Game {
         world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color", "attr_normal");
 
         test_shader = new Shader("test").compile();
-        test_shader.save_attrs("attr_pos");
+        test_shader.save_attrs("attr_pos", "attr_tex_coord");
 
         current_shader = world_shader;
         ResourceUtil.load_textures("atlas.png", "axe.png");
@@ -53,7 +53,8 @@ public class Game {
 
 
         current_shader = test_shader;
-        box = new AABB(0, 0, 0, 4, 0, 4);
+        box1 = new AABB(0, 0, 0, 1, 1, 1);
+        box2 = new AABB(5, 0, 5, 1, 1, 1);
     }
 
     public static void before_render() {
@@ -91,7 +92,8 @@ public class Game {
         current_shader.set_uniform("uniform_transform", world_transform.getTransform());
         current_shader.set_uniform("uniform_camera_view", Camera.view);
         current_shader.set_uniform("uniform_camera_projection", Camera.projection);
-        box.draw();
+        box1.draw();
+        box2.draw();
         current_shader.unbind();
 
         current_shader = gui_shader;
