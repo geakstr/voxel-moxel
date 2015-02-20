@@ -1,6 +1,7 @@
 package me.geakstr.voxel.core;
 
 import me.geakstr.voxel.game.Game;
+import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.TextureAtlas;
 import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.render.Camera;
@@ -28,11 +29,10 @@ public class Configurator {
             Camera.z_far = (float) ((long) json.get("camera_z_far"));
 
             JSONArray world_sizes = (JSONArray) json.get("world_sizes");
-            World.world_size = (int) ((long) world_sizes.get(0));
-            World.world_height = (int) ((long) world_sizes.get(1));
-            World.chunk_width = (int) ((long) world_sizes.get(2));
-            World.chunk_length = (int) ((long) world_sizes.get(3));
-            World.chunk_height = (int) ((long) world_sizes.get(4));
+            World.size = (int) ((long) world_sizes.get(0));
+            World.height = (int) ((long) world_sizes.get(1));
+            Chunk.size = (int) ((long) world_sizes.get(2));
+            Chunk.height = (int) ((long) world_sizes.get(3));
 
             Game.frustum = (boolean) json.get("frustum");
             Configurator.unsynchronized_buffering = (boolean) json.get("unsynchronized_buffering");

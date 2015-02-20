@@ -69,7 +69,9 @@ public class Window {
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
-
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        
         glViewport(0, 0, Math.max(Window.width, Window.height), Math.max(Window.width, Window.height));
 
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
@@ -130,7 +132,7 @@ public class Window {
             glfwSetWindowTitle(window,
                     "Voxel Moxel | " +
                             fps + " fps; " +
-                            World.chunks_in_frame + "/" + World.world_volume + " chunks; " +
+                            World.chunks_in_frame + "/" + World.volume + " chunks; " +
                             World.faces_in_frame + " triangles"
             );
             fps = 0;

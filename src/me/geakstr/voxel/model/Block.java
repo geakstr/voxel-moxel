@@ -13,17 +13,17 @@ public class Block extends Box {
     public Block(int type, Vector3f pos, Chunk chunk) {
         super();
 
-        int chunk_x = chunk.x_chunk_pos * World.chunk_width;
-        int chunk_y = chunk.y_chunk_pos * World.chunk_length;
-        int chunk_z = chunk.z_chunk_pos * World.chunk_height;
+        int chunk_x = chunk.x_chunk_pos * Chunk.size;
+        int chunk_y = chunk.y_chunk_pos * Chunk.height;
+        int chunk_z = chunk.z_chunk_pos * Chunk.size;
 
         int x = (int) pos.x + chunk_x;
         int y = (int) pos.y + chunk_y;
         int z = (int) pos.z + chunk_z;
 
         this.type = type;
-        this.corners[0] = new Vector3f(x, z, y);
-        this.corners[1] = new Vector3f(x + 1, z + 1, y + 1);
+        this.corners[0] = new Vector3f(x, y, z);
+        this.corners[1] = new Vector3f(x + 1, y + 1, z + 1);
         this.chunk = chunk;
     }
 
