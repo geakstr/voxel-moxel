@@ -21,20 +21,20 @@ All works in CCW order
 
 This is OpenGL coordinate system. All coordinates applied this
                    ↑ Y
-                   |     /
-                   |    /
-                   |   /
-                   |  /
-                   | /
-                   |/
+                   |          .
+                   |        .
+                   |      .
+                   |    .
+                   |  .
+                   |.
 -------------------•-------------------→ X
-                  /|
-                 / |
-                /  |
-               /   |
-              /    |
-             /     |
-                           ↙  Z
+                .  |
+              .    |
+            .      |
+          .        |
+        .          |
+      .            |
+    ↙  Z          |
 */
 
 public class AABB extends MeshIndexed {
