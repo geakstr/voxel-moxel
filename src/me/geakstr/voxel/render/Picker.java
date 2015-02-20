@@ -24,7 +24,7 @@ public class Picker {
             Vector3f min = new Vector3f(chunk_x * World.chunk_size, chunk_y * World.chunk_height, chunk_z * World.chunk_size);
             Vector3f max = new Vector3f(min.x + World.chunk_size, min.y + World.chunk_height, min.z + World.chunk_size);
             if (ray.intersect(new Box(min, max), picker_length, -1)) {
-                selection_chunks.add(World.chunks[chunk_y][chunk_x][chunk_z]);
+                selection_chunks.add(World.chunk(chunk_x, chunk_y, chunk_z));
             }
         }
 
@@ -33,10 +33,10 @@ public class Picker {
             float min_dist = Float.MAX_VALUE;
             for (Chunk selection_chunk : selection_chunks) {
                 for (int block_x = 0; block_x < World.chunk_size; block_x++) {
-                    for (int block_y = 0; block_y < World.chunk_size; block_y++) {
-                        for (int block_z = 0; block_z < World.chunk_height; block_z++) {
+                    for (int block_z = 0; block_z < World.chunk_size; block_z++) {
+                        for (int block_y = 0; block_y < World.chunk_height; block_y++) {
                             Block block = new Block(new Vector3f(block_x, block_y, block_z), selection_chunk);
-                            if (Block.unpack_type(selection_chunk.blocks[block_x][block_y][block_z]) != 0 && ray.intersect(block, picker_length, -1)) {
+                            if (Block.unpack_type(selection_chunk.block(block_x, block_y, block_z)) != 0 && ray.intersect(block, picker_length, -1)) {
                                 float dist = Vector3f.dist(block.corners[0], camera_position);
                                 if (dist < min_dist) {
                                     selection.first = block;
@@ -48,7 +48,6 @@ public class Picker {
                 }
             }
         }
-        System.out.println("--------");
 
         if (pick_side) {
             if (null != selection.first) {
@@ -123,29 +122,29 @@ public class Picker {
                 Vector3f pos = selected_block.corners[0];
 
                 int x = (int) pos.x % World.chunk_size;
-                int y = (int) pos.z % World.chunk_size;
-                int z = (int) pos.y % World.chunk_height;
-                chunk.blocks[x][y][z] = 0;
+                int y = (int) pos.y % World.chunk_height;
+                int z = (int) pos.z % World.chunk_size;
+                chunk.block(0, x, y, z);
 
                 chunk.changed = true;
 
                 if (x == 0 && chunk.x_chunk_pos != 0) {
-                    World.chunks[chunk.y_chunk_pos][chunk.x_chunk_pos - 1][chunk.z_chunk_pos].changed = true;
+                    World.chunk(chunk.x_chunk_pos - 1, chunk.y_chunk_pos, chunk.z_chunk_pos).changed = true;
                 }
                 if (x == World.chunk_size - 1 && chunk.x_chunk_pos != World.world_size - 1) {
-                    World.chunks[chunk.y_chunk_pos][chunk.x_chunk_pos + 1][chunk.z_chunk_pos].changed = true;
+                    World.chunk(chunk.x_chunk_pos + 1, chunk.y_chunk_pos, chunk.z_chunk_pos).changed = true;
                 }
-                if (z == 0 && chunk.y_chunk_pos != 0) {
-                    World.chunks[chunk.y_chunk_pos - 1][chunk.x_chunk_pos][chunk.z_chunk_pos].changed = true;
+                if (y == 0 && chunk.y_chunk_pos != 0) {
+                    World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos - 1, chunk.z_chunk_pos).changed = true;
                 }
-                if (z == World.chunk_height - 1 && chunk.y_chunk_pos != World.world_height - 1) {
-                    World.chunks[chunk.y_chunk_pos + 1][chunk.x_chunk_pos][chunk.z_chunk_pos].changed = true;
+                if (y == World.chunk_height - 1 && chunk.y_chunk_pos != World.world_height - 1) {
+                    World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos + 1, chunk.z_chunk_pos).changed = true;
                 }
-                if (y == 0 && chunk.z_chunk_pos != 0) {
-                    World.chunks[chunk.y_chunk_pos][chunk.x_chunk_pos][chunk.z_chunk_pos - 1].changed = true;
+                if (z == 0 && chunk.z_chunk_pos != 0) {
+                    World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos - 1).changed = true;
                 }
-                if (y == World.chunk_size - 1 && chunk.z_chunk_pos != World.world_size - 1) {
-                    World.chunks[chunk.y_chunk_pos][chunk.x_chunk_pos][chunk.z_chunk_pos + 1].changed = true;
+                if (z == World.chunk_size - 1 && chunk.z_chunk_pos != World.world_size - 1) {
+                    World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos + 1).changed = true;
                 }
 
                 return true;
@@ -164,31 +163,31 @@ public class Picker {
                 Vector3f pos = selection.first.corners[0];
 
                 int x = (int) pos.x % World.chunk_size;
-                int y = (int) pos.z % World.chunk_size;
-                int z = (int) pos.y % World.chunk_height;
+                int y = (int) pos.y % World.chunk_height;
+                int z = (int) pos.z % World.chunk_size;
 
                 chunk.changed = true;
                 switch (selection.second) {
                     case FRONT:
-                        if (y - 1 < 0) {
+                        if (z - 1 < 0) {
                             if (chunk.z_chunk_pos == 0) {
                                 return false;
                             }
-                            chunk = World.chunks[chunk.y_chunk_pos][chunk.x_chunk_pos][chunk.z_chunk_pos - 1];
-                            chunk.blocks[x][World.chunk_size - 1][z] = Block.pack_type(0, 1);
+                            chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos - 1);
+                            chunk.block(Block.pack_type(0, 1), x, y, World.chunk_size - 1);
                         } else {
-                            chunk.blocks[x][y - 1][z] = Block.pack_type(0, 1);
+                            chunk.block(Block.pack_type(0, 1), x, y, z - 1);
                         }
                         break;
                     case BACK:
-                        if (y + 1 >= World.chunk_size) {
+                        if (z + 1 >= World.chunk_size) {
                             if (chunk.z_chunk_pos == World.world_size - 1) {
                                 return false;
                             }
-                            chunk = World.chunks[chunk.y_chunk_pos][chunk.x_chunk_pos][chunk.z_chunk_pos + 1];
-                            chunk.blocks[x][0][z] = Block.pack_type(0, 1);
+                            chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos + 1);
+                            chunk.block(Block.pack_type(0, 1), x, y, 0);
                         } else {
-                            chunk.blocks[x][y + 1][z] = Block.pack_type(0, 1);
+                            chunk.block(Block.pack_type(0, 1), x, y, z + 1);
                         }
                         break;
                     case RIGHT:
@@ -196,10 +195,10 @@ public class Picker {
                             if (chunk.x_chunk_pos == 0) {
                                 return false;
                             }
-                            chunk = World.chunks[chunk.y_chunk_pos][chunk.x_chunk_pos - 1][chunk.z_chunk_pos];
-                            chunk.blocks[World.chunk_size - 1][y][z] = Block.pack_type(0, 1);
+                            chunk = World.chunk(chunk.x_chunk_pos - 1, chunk.y_chunk_pos, chunk.z_chunk_pos);
+                            chunk.block(Block.pack_type(0, 1), World.chunk_size - 1, y, z);
                         } else {
-                            chunk.blocks[x - 1][y][z] = Block.pack_type(0, 1);
+                            chunk.block(Block.pack_type(0, 1), x - 1, y, z);
                         }
                         break;
                     case LEFT:
@@ -207,32 +206,32 @@ public class Picker {
                             if (chunk.x_chunk_pos == World.world_size - 1) {
                                 return false;
                             }
-                            chunk = World.chunks[chunk.y_chunk_pos][chunk.x_chunk_pos + 1][chunk.z_chunk_pos];
-                            chunk.blocks[0][y][z] = Block.pack_type(0, 1);
+                            chunk = World.chunk(chunk.x_chunk_pos + 1, chunk.y_chunk_pos, chunk.z_chunk_pos);
+                            chunk.block(Block.pack_type(0, 1), 0, y, z);
                         } else {
-                            chunk.blocks[x + 1][y][z] = Block.pack_type(0, 1);
+                            chunk.block(Block.pack_type(0, 1), x + 1, y, z);
                         }
                         break;
                     case BOTTOM:
-                        if (z - 1 < 0) {
+                        if (y - 1 < 0) {
                             if (chunk.y_chunk_pos == 0) {
                                 return false;
                             }
-                            chunk = World.chunks[chunk.y_chunk_pos - 1][chunk.x_chunk_pos][chunk.z_chunk_pos];
-                            chunk.blocks[x][y][World.chunk_height - 1] = Block.pack_type(0, 1);
+                            chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos - 1, chunk.z_chunk_pos);
+                            chunk.block(Block.pack_type(0, 1), x, World.chunk_height - 1, z);
                         } else {
-                            chunk.blocks[x][y][z - 1] = Block.pack_type(0, 1);
+                            chunk.block(Block.pack_type(0, 1), x, y - 1, z);
                         }
                         break;
                     case TOP:
-                        if (z + 1 >= World.chunk_height) {
+                        if (y + 1 >= World.chunk_height) {
                             if (chunk.y_chunk_pos == World.world_height - 1) {
                                 return false;
                             }
-                            chunk = World.chunks[chunk.y_chunk_pos + 1][chunk.x_chunk_pos][chunk.z_chunk_pos];
-                            chunk.blocks[x][y][0] = Block.pack_type(0, 1);
+                            chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos + 1, chunk.z_chunk_pos);
+                            chunk.block(Block.pack_type(0, 1), x, 0, z);
                         } else {
-                            chunk.blocks[x][y][z + 1] = Block.pack_type(0, 1);
+                            chunk.block(Block.pack_type(0, 1), x, y + 1, z);
                         }
                         break;
                 }

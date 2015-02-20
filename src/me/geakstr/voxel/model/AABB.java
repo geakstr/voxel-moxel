@@ -70,6 +70,9 @@ public class AABB extends MeshIndexed {
             }
 
             public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+                x_expand--;
+                y_expand--;
+                z_expand--;
                 float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[3] += x_expand;
@@ -100,6 +103,9 @@ public class AABB extends MeshIndexed {
             }
 
             public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+                x_expand--;
+                y_expand--;
+                z_expand--;
                 float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[0] += x_expand;
@@ -124,14 +130,17 @@ public class AABB extends MeshIndexed {
                 return translate_side(verts(), x_pos, y_pos, z_pos);
             }
 
-            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_offset) {
+            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+                x_expand--;
+                y_expand--;
+                z_expand--;
                 float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[7] += y_expand;
                 side[10] += y_expand;
 
-                side[5] += z_offset;
-                side[11] += z_offset;
+                side[5] += z_expand;
+                side[11] += z_expand;
 
                 return side;
             }
@@ -150,6 +159,9 @@ public class AABB extends MeshIndexed {
             }
 
             public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+                x_expand--;
+                y_expand--;
+                z_expand--;
                 float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[0] += x_expand;
@@ -180,6 +192,9 @@ public class AABB extends MeshIndexed {
             }
 
             public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+                x_expand--;
+                y_expand--;
+                z_expand--;
                 float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[3] += x_expand;
@@ -210,6 +225,9 @@ public class AABB extends MeshIndexed {
             }
 
             public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+                x_expand--;
+                y_expand--;
+                z_expand--;
                 float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[3] += x_expand;
