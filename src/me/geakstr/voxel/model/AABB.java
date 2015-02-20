@@ -37,7 +37,7 @@ This is OpenGL coordinate system. All coordinates applied this
     ↙  Z          |
 */
 
-public class AABB extends MeshIndexed {
+public class AABB extends IndexedMesh {
     public static final int side_vertices_size = 12, side_tex_coords_size = 8, sides_size = 72;
 
     public Vector3f[] corners;

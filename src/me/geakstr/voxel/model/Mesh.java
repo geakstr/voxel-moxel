@@ -15,6 +15,7 @@ import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
+@Deprecated
 public class Mesh {
     public ByteBuffer data;
     public int verts_size;
@@ -110,11 +111,11 @@ public class Mesh {
         verts_size = faces.size() * 3;
         data = BufferUtils.createByteBuffer(faces.size() * 30 * 4);
         for (int[] face : faces) {
-        	for (int i = 0; i < 3; i++) {
-        		Vector3f vert = verts.get(face[i]);
-        		Vector2f tex_coord = tex_coords.get(face[i + 3]);
-        		
-        		data.putFloat(vert.x);
+            for (int i = 0; i < 3; i++) {
+                Vector3f vert = verts.get(face[i]);
+                Vector2f tex_coord = tex_coords.get(face[i + 3]);
+
+                data.putFloat(vert.x);
                 data.putFloat(vert.y);
                 data.putFloat(vert.z);
 
@@ -123,11 +124,11 @@ public class Mesh {
 
                 data.putFloat(0);
                 data.putFloat(0);
-                
+
                 data.putFloat(1);
                 data.putFloat(1);
                 data.putFloat(1);
-        	}
+            }
         }
         data.flip();
     }

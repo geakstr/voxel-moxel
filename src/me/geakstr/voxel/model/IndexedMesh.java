@@ -5,7 +5,6 @@ import me.geakstr.voxel.game.Game;
 import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -14,7 +13,7 @@ import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
-public class MeshIndexed {
+public class IndexedMesh {
     public int count;
 
     public ByteBuffer vbo_data, ibo_data;
@@ -25,7 +24,7 @@ public class MeshIndexed {
     private int vbo_capacity, ibo_capacity;
     private int vao, vbo, ibo;
 
-    public MeshIndexed() {
+    public IndexedMesh() {
         this.count = 0;
 
         this.vbo_capacity = vbo_initial_capacity;
@@ -74,7 +73,7 @@ public class MeshIndexed {
         glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
     }
 
-    public void update_gl_buffers(float[] vertices, float[] tex_coords, float[] tex_coords_offsets, float[] colors) {
+    public void update_gl_data(float[] vertices, float[] tex_coords, float[] tex_coords_offsets, float[] colors) {
         this.vbo_data = BufferUtils.createByteBuffer(vertices.length * 4 + tex_coords.length * 4 + tex_coords_offsets.length * 4 + colors.length * 4);
         for (int v = 0, t = 0, to = 0, c = 0; v < vertices.length; v += 3, t += 2, to += 2, c += 3) {
             vbo_data.putFloat(vertices[v]);
@@ -96,7 +95,7 @@ public class MeshIndexed {
         this.update_ibo(vertices.length / 2);
     }
 
-    public void update_gl_buffers(List<Float> vertices, List<Float> tex_coords, List<Float> tex_coords_offsets, List<Float> colors) {
+    public void update_gl_data(List<Float> vertices, List<Float> tex_coords, List<Float> tex_coords_offsets, List<Float> colors) {
         this.vbo_data = BufferUtils.createByteBuffer(vertices.size() * 4 + tex_coords.size() * 4 + tex_coords_offsets.size() * 4 + colors.size() * 4);
         for (int v = 0, t = 0, to = 0, c = 0; v < vertices.size(); v += 3, t += 2, to += 2, c += 3) {
             vbo_data.putFloat(vertices.get(v));

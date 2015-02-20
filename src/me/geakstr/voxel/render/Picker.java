@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Picker {
-    public static final int picker_length = -(World.chunk_size * (World.near_chunks_radius + 1));
+    public static final int picker_length = -(Chunk.size * (World.near_chunks_radius + 1));
 
     public static Pair<Block, Block.TYPE> select(Ray ray, boolean pick_side) {
         final Vector3f camera_position = Camera.position.negate(null);
@@ -21,8 +21,8 @@ public class Picker {
             int chunk_x = chunk.x_chunk_pos;
             int chunk_y = chunk.y_chunk_pos;
             int chunk_z = chunk.z_chunk_pos;
-            Vector3f min = new Vector3f(chunk_x * World.chunk_size, chunk_y * World.chunk_height, chunk_z * World.chunk_size);
-            Vector3f max = new Vector3f(min.x + World.chunk_size, min.y + World.chunk_height, min.z + World.chunk_size);
+            Vector3f min = new Vector3f(chunk_x * Chunk.size, chunk_y * Chunk.height, chunk_z * Chunk.size);
+            Vector3f max = new Vector3f(min.x + Chunk.size, min.y + Chunk.height, min.z + Chunk.size);
             if (ray.intersect(new Box(min, max), picker_length, -1)) {
                 selection_chunks.add(World.chunk(chunk_x, chunk_y, chunk_z));
             }
@@ -32,9 +32,9 @@ public class Picker {
         if (selection_chunks.size() != 0) {
             float min_dist = Float.MAX_VALUE;
             for (Chunk selection_chunk : selection_chunks) {
-                for (int block_x = 0; block_x < World.chunk_size; block_x++) {
-                    for (int block_z = 0; block_z < World.chunk_size; block_z++) {
-                        for (int block_y = 0; block_y < World.chunk_height; block_y++) {
+                for (int block_x = 0; block_x < Chunk.size; block_x++) {
+                    for (int block_z = 0; block_z < Chunk.size; block_z++) {
+                        for (int block_y = 0; block_y < Chunk.height; block_y++) {
                             Block block = new Block(new Vector3f(block_x, block_y, block_z), selection_chunk);
                             if (Block.unpack_type(selection_chunk.block(block_x, block_y, block_z)) != 0 && ray.intersect(block, picker_length, -1)) {
                                 float dist = Vector3f.dist(block.corners[0], camera_position);
@@ -121,9 +121,9 @@ public class Picker {
             if (chunk != null && !chunk.updating) {
                 Vector3f pos = selected_block.corners[0];
 
-                int x = (int) pos.x % World.chunk_size;
-                int y = (int) pos.y % World.chunk_height;
-                int z = (int) pos.z % World.chunk_size;
+                int x = (int) pos.x % Chunk.size;
+                int y = (int) pos.y % Chunk.height;
+                int z = (int) pos.z % Chunk.size;
                 chunk.block(0, x, y, z);
 
                 chunk.changed = true;
@@ -131,19 +131,19 @@ public class Picker {
                 if (x == 0 && chunk.x_chunk_pos != 0) {
                     World.chunk(chunk.x_chunk_pos - 1, chunk.y_chunk_pos, chunk.z_chunk_pos).changed = true;
                 }
-                if (x == World.chunk_size - 1 && chunk.x_chunk_pos != World.world_size - 1) {
+                if (x == Chunk.size - 1 && chunk.x_chunk_pos != World.size - 1) {
                     World.chunk(chunk.x_chunk_pos + 1, chunk.y_chunk_pos, chunk.z_chunk_pos).changed = true;
                 }
                 if (y == 0 && chunk.y_chunk_pos != 0) {
                     World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos - 1, chunk.z_chunk_pos).changed = true;
                 }
-                if (y == World.chunk_height - 1 && chunk.y_chunk_pos != World.world_height - 1) {
+                if (y == Chunk.height - 1 && chunk.y_chunk_pos != World.height - 1) {
                     World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos + 1, chunk.z_chunk_pos).changed = true;
                 }
                 if (z == 0 && chunk.z_chunk_pos != 0) {
                     World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos - 1).changed = true;
                 }
-                if (z == World.chunk_size - 1 && chunk.z_chunk_pos != World.world_size - 1) {
+                if (z == Chunk.size - 1 && chunk.z_chunk_pos != World.size - 1) {
                     World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos + 1).changed = true;
                 }
 
@@ -162,9 +162,9 @@ public class Picker {
             if (chunk != null && !chunk.updating) {
                 Vector3f pos = selection.first.corners[0];
 
-                int x = (int) pos.x % World.chunk_size;
-                int y = (int) pos.y % World.chunk_height;
-                int z = (int) pos.z % World.chunk_size;
+                int x = (int) pos.x % Chunk.size;
+                int y = (int) pos.y % Chunk.height;
+                int z = (int) pos.z % Chunk.size;
 
                 chunk.changed = true;
                 switch (selection.second) {
@@ -174,14 +174,14 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos - 1);
-                            chunk.block(Block.pack_type(0, 1), x, y, World.chunk_size - 1);
+                            chunk.block(Block.pack_type(0, 1), x, y, Chunk.size - 1);
                         } else {
                             chunk.block(Block.pack_type(0, 1), x, y, z - 1);
                         }
                         break;
                     case BACK:
-                        if (z + 1 >= World.chunk_size) {
-                            if (chunk.z_chunk_pos == World.world_size - 1) {
+                        if (z + 1 >= Chunk.size) {
+                            if (chunk.z_chunk_pos == World.size - 1) {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos + 1);
@@ -196,14 +196,14 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos - 1, chunk.y_chunk_pos, chunk.z_chunk_pos);
-                            chunk.block(Block.pack_type(0, 1), World.chunk_size - 1, y, z);
+                            chunk.block(Block.pack_type(0, 1), Chunk.size - 1, y, z);
                         } else {
                             chunk.block(Block.pack_type(0, 1), x - 1, y, z);
                         }
                         break;
                     case LEFT:
-                        if (x + 1 >= World.chunk_size) {
-                            if (chunk.x_chunk_pos == World.world_size - 1) {
+                        if (x + 1 >= Chunk.size) {
+                            if (chunk.x_chunk_pos == World.size - 1) {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos + 1, chunk.y_chunk_pos, chunk.z_chunk_pos);
@@ -218,14 +218,14 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos - 1, chunk.z_chunk_pos);
-                            chunk.block(Block.pack_type(0, 1), x, World.chunk_height - 1, z);
+                            chunk.block(Block.pack_type(0, 1), x, Chunk.height - 1, z);
                         } else {
                             chunk.block(Block.pack_type(0, 1), x, y - 1, z);
                         }
                         break;
                     case TOP:
-                        if (y + 1 >= World.chunk_height) {
-                            if (chunk.y_chunk_pos == World.world_height - 1) {
+                        if (y + 1 >= Chunk.height) {
+                            if (chunk.y_chunk_pos == World.height - 1) {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos + 1, chunk.z_chunk_pos);
