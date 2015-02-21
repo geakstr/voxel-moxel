@@ -38,7 +38,7 @@ This is OpenGL coordinate system. All coordinates applied this
 */
 
 public class AABB extends IndexedMesh {
-    public static final int side_vertices_size = 12, side_tex_coords_size = 8, sides_size = 72;
+    public static final int side_vertices_size = 12, side_tex_coords_size = 8, sides_vertices_size = 72;
 
     public Vector3f[] corners;
 
@@ -238,6 +238,23 @@ public class AABB extends IndexedMesh {
 
                 return side;
             }
+        },
+        ALL {
+            public float[] verts() {
+                return Arrays.copyOf(all_sides_vertices, sides_vertices_size);
+            }
+
+            public float[] tex_coords(int u, int v) {
+                return null;
+            }
+
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
+                return translate_side(verts(), x_pos, y_pos, z_pos);
+            }
+
+            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+                return null;
+            }
         };
 
         public abstract float[] verts();
@@ -262,6 +279,44 @@ public class AABB extends IndexedMesh {
 
         return side;
     }
+
+    private static final float[] all_sides_vertices = new float[]{
+            // front
+            0, 0, 1, // v2
+            1, 0, 1, // v3
+            0, 1, 1, // v1
+            1, 1, 1, // v4
+
+            // back
+            1, 0, 0, // v7
+            0, 0, 0, // v8
+            1, 1, 0, // v6
+            0, 1, 0, // v5
+
+            // left
+            0, 0, 0, // v8
+            0, 0, 1, // v2
+            0, 1, 0, // v5
+            0, 1, 1, // v1
+
+            // right
+            1, 0, 1, // v3
+            1, 0, 0, // v7
+            1, 1, 1, // v4
+            1, 1, 0, // v6
+
+            // top
+            0, 1, 1, // v1
+            1, 1, 1, // v4
+            0, 1, 0, // v5
+            1, 1, 0, // v6
+
+            // bottom
+            0, 0, 0, // v8
+            1, 0, 0, // v7
+            0, 0, 1, // v2
+            1, 0, 1, // v3
+    };
 
     private static final float[] front_side_vertices = new float[]{
             0, 0, 1, // v2

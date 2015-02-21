@@ -162,7 +162,8 @@ public class Chunk extends IndexedMesh {
         update_gl_data(verts, tex, tex_off, colors);
 
         this.updated = true;
-        this.empty = verts.size() == 0;
+        this.faces = verts.size();
+        this.empty = faces == 0;
     }
 
     public boolean[] renderable_sides(int x0, int z0, int x1, int z1, int y) {
@@ -332,7 +333,7 @@ public class Chunk extends IndexedMesh {
         if (!empty) {
             draw();
             World.chunks_in_frame++;
-            World.faces_in_frame += count;
+            World.faces_in_frame += faces;
         }
     }
 

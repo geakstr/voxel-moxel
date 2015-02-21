@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
 public class IndexedMesh {
-    public int count;
+    public int count, faces;
 
     public ByteBuffer vbo_data, ibo_data;
 
@@ -26,6 +26,7 @@ public class IndexedMesh {
 
     public IndexedMesh() {
         this.count = 0;
+        this.faces = 0;
 
         this.vbo_capacity = vbo_initial_capacity;
         this.ibo_capacity = ibo_initial_capacity;
