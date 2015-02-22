@@ -44,6 +44,12 @@ public class IndexedMesh {
         glBindTexture(GL_TEXTURE_2D, id);
     }
 
+    public void init_gl_buffers() {
+        this.init_vbo();
+        this.init_ibo();
+        this.init_vao();
+    }
+
     public void update_gl_buffers() {
         int vbo_data_size = vbo_data.capacity();
         boolean vbo_orphan = false;

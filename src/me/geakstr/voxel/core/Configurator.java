@@ -1,44 +1,43 @@
 package me.geakstr.voxel.core;
 
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.TextureAtlas;
 import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.render.Camera;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 
 public class Configurator {
     public static boolean unsynchronized_buffering = true;
 
     public static void init(String path_to_config) {
-        JSONObject json = null;
+        JsonObject json = null;
         try {
-            json = (JSONObject) JSONValue.parse(new FileReader(path_to_config));
+            json = JsonObject.readFrom(new FileReader(path_to_config));
 
-            JSONArray screen_resolution = (JSONArray) json.get("screen_resolution");
-            Window.width = (int) ((long) screen_resolution.get(0));
-            Window.height = (int) ((long) screen_resolution.get(1));
-            Window.vsync = (boolean) json.get("vsync");
+            JsonArray screen_resolution = json.get("screen_resolution").asArray();
+            Window.width = screen_resolution.get(0).asInt();
+            Window.height = screen_resolution.get(1).asInt();
+            Window.vsync = json.get("vsync").asBoolean();
 
-            Camera.fov = (float) ((long) json.get("camera_fov"));
-            Camera.z_far = (float) ((long) json.get("camera_z_far"));
+            Camera.fov = json.get("camera_fov").asFloat();
+            Camera.z_far = json.get("camera_z_far").asFloat();
 
-            JSONArray world_sizes = (JSONArray) json.get("world_sizes");
-            World.size = (int) ((long) world_sizes.get(0));
-            World.height = (int) ((long) world_sizes.get(1));
-            Chunk.size = (int) ((long) world_sizes.get(2));
-            Chunk.height = (int) ((long) world_sizes.get(3));
+            JsonArray world_sizes = json.get("world_sizes").asArray();
+            World.size = world_sizes.get(0).asInt();
+            World.height = world_sizes.get(1).asInt();
+            Chunk.size = world_sizes.get(2).asInt();
+            Chunk.height = world_sizes.get(3).asInt();
 
-            Game.frustum = (boolean) json.get("frustum");
-            Configurator.unsynchronized_buffering = (boolean) json.get("unsynchronized_buffering");
+            Game.frustum = json.get("frustum").asBoolean();
+            Configurator.unsynchronized_buffering = json.get("unsynchronized_buffering").asBoolean();
 
-            TextureAtlas.fill((JSONObject) json.get("texture_atlas"));
-        } catch (FileNotFoundException e) {
+            TextureAtlas.fill(json.get("texture_atlas").asObject());
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

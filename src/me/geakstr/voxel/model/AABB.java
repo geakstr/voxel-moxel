@@ -272,49 +272,49 @@ public class AABB {
                 side[11] += z_expand;
 
                 // back
-                side[0 + 12] += x_expand;
-                side[6 + 12] += x_expand;
+                side[12] += x_expand;
+                side[18] += x_expand;
 
-                side[7 + 12] += y_expand;
-                side[10 + 12] += y_expand;
+                side[19] += y_expand;
+                side[22] += y_expand;
 
                 // left
-                side[7 + 24] += y_expand;
-                side[10 + 24] += y_expand;
+                side[31] += y_expand;
+                side[34] += y_expand;
 
-                side[5 + 24] += z_expand;
-                side[11 + 24] += z_expand;
+                side[29] += z_expand;
+                side[35] += z_expand;
 
                 // right
-                side[0 + 36] += x_expand;
-                side[3 + 36] += x_expand;
-                side[6 + 36] += x_expand;
-                side[9 + 36] += x_expand;
+                side[36] += x_expand;
+                side[39] += x_expand;
+                side[42] += x_expand;
+                side[45] += x_expand;
 
-                side[7 + 36] += y_expand;
-                side[10 + 36] += y_expand;
+                side[43] += y_expand;
+                side[46] += y_expand;
 
-                side[2 + 36] += z_expand;
-                side[8 + 36] += z_expand;
+                side[38] += z_expand;
+                side[44] += z_expand;
 
                 // top
-                side[3 + 48] += x_expand;
-                side[9 + 48] += x_expand;
+                side[51] += x_expand;
+                side[57] += x_expand;
 
-                side[1 + 48] += y_expand;
-                side[4 + 48] += y_expand;
-                side[7 + 48] += y_expand;
-                side[10 + 48] += y_expand;
+                side[49] += y_expand;
+                side[52] += y_expand;
+                side[55] += y_expand;
+                side[58] += y_expand;
 
-                side[2 + 48] += z_expand;
-                side[5 + 48] += z_expand;
+                side[50] += z_expand;
+                side[53] += z_expand;
 
                 // bottom
-                side[3 + 60] += x_expand;
-                side[9 + 60] += x_expand;
+                side[63] += x_expand;
+                side[69] += x_expand;
 
-                side[8 + 60] += z_expand;
-                side[11 + 60] += z_expand;
+                side[68] += z_expand;
+                side[71] += z_expand;
 
                 return side;
             }

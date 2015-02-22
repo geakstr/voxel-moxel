@@ -162,7 +162,7 @@ public class Chunk extends IndexedMesh {
         update_gl_data(verts, tex, tex_off, colors);
 
         this.updated = true;
-        this.faces = verts.size();
+        this.faces = verts.size() / 3;
         this.empty = faces == 0;
     }
 
