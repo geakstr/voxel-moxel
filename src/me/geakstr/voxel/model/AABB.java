@@ -331,6 +331,87 @@ public class AABB {
         public static final SIDE[] values = values();
     }
 
+    public static enum VERTEX {
+        V1 {
+            public float[] coords() {
+                return Arrays.copyOf(v1_vertex, 3);
+            }
+
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
+                return translate_vertex(coords(), x_pos, y_pos, z_pos);
+            }
+        },
+        V2 {
+            public float[] coords() {
+                return Arrays.copyOf(v2_vertex, 3);
+            }
+
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
+                return translate_vertex(coords(), x_pos, y_pos, z_pos);
+            }
+        },
+        V3 {
+            public float[] coords() {
+                return Arrays.copyOf(v3_vertex, 3);
+            }
+
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
+                return translate_vertex(coords(), x_pos, y_pos, z_pos);
+            }
+        },
+        V4 {
+            public float[] coords() {
+                return Arrays.copyOf(v4_vertex, 3);
+            }
+
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
+                return translate_vertex(coords(), x_pos, y_pos, z_pos);
+            }
+        },
+        V5 {
+            public float[] coords() {
+                return Arrays.copyOf(v5_vertex, 3);
+            }
+
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
+                return translate_vertex(coords(), x_pos, y_pos, z_pos);
+            }
+        },
+        V6 {
+            public float[] coords() {
+                return Arrays.copyOf(v6_vertex, 3);
+            }
+
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
+                return translate_vertex(coords(), x_pos, y_pos, z_pos);
+            }
+        },
+        V7 {
+            public float[] coords() {
+                return Arrays.copyOf(v7_vertex, 3);
+            }
+
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
+                return translate_vertex(coords(), x_pos, y_pos, z_pos);
+            }
+        },
+        V8 {
+            public float[] coords() {
+                return Arrays.copyOf(v8_vertex, 3);
+            }
+
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
+                return translate_vertex(coords(), x_pos, y_pos, z_pos);
+            }
+        };
+
+        public abstract float[] coords();
+
+        public abstract float[] translate(int x_pos, int y_pos, int z_pos);
+
+        public static final VERTEX[] values = values();
+    }
+
     private static float[] translate_side(float[] side, int x_pos, int y_pos, int z_pos) {
         int size = side.length;
 
@@ -341,6 +422,13 @@ public class AABB {
         }
 
         return side;
+    }
+
+    private static float[] translate_vertex(float[] vertex, int x_pos, int y_pos, int z_pos) {
+        vertex[0] += x_pos;
+        vertex[1] += y_pos;
+        vertex[2] += z_pos;
+        return vertex;
     }
 
     private static final float[] all_sides_vertices = new float[]{

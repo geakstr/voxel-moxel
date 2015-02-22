@@ -75,7 +75,7 @@ public class Game {
 
         current_shader.bind();
         current_shader.set_uniform("uniform_transform", player.getTransform());
-//        player.render();
+        player.render();
         current_shader.unbind();
 
         current_shader = gui_shader;
