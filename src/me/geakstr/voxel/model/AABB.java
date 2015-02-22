@@ -37,13 +37,12 @@ This is OpenGL coordinate system. All coordinates applied this
     ↙  Z          |
 */
 
-public class AABB extends IndexedMesh {
+public class AABB {
     public static final int side_vertices_size = 12, side_tex_coords_size = 8, sides_vertices_size = 72;
 
     public Vector3f[] corners;
 
-    public AABB(int x, int y, int z, int width, int height, int length) {
-        super();
+    public AABB(float x, float y, float z, float width, float height, float length) {
 
         this.corners = new Vector3f[]{
                 new Vector3f(x, y, z),

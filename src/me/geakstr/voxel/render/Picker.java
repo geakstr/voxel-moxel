@@ -3,7 +3,7 @@ package me.geakstr.voxel.render;
 import me.geakstr.voxel.helpers.Pair;
 import me.geakstr.voxel.math.Vector3f;
 import me.geakstr.voxel.model.Block;
-import me.geakstr.voxel.model.Box;
+import me.geakstr.voxel.model.AABB;
 import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.World;
 
@@ -21,9 +21,7 @@ public class Picker {
             int chunk_x = chunk.x_chunk_pos;
             int chunk_y = chunk.y_chunk_pos;
             int chunk_z = chunk.z_chunk_pos;
-            Vector3f min = new Vector3f(chunk_x * Chunk.size, chunk_y * Chunk.height, chunk_z * Chunk.size);
-            Vector3f max = new Vector3f(min.x + Chunk.size, min.y + Chunk.height, min.z + Chunk.size);
-            if (ray.intersect(new Box(min, max), picker_length, -1)) {
+            if (ray.intersect(new AABB(chunk_x * Chunk.size, chunk_y * Chunk.height, chunk_z * Chunk.size, Chunk.size, Chunk.height, Chunk.size), picker_length, -1)) {
                 selection_chunks.add(World.chunk(chunk_x, chunk_y, chunk_z));
             }
         }
@@ -53,54 +51,40 @@ public class Picker {
             if (null != selection.first) {
                 Vector3f min_c = selection.first.corners[0];
 
-                Box box;
-                Vector3f min, max;
-
-                min = new Vector3f(min_c.x, min_c.y + 1, min_c.z);
-                max = new Vector3f(min_c.x + 1, min_c.y + 1, min_c.z + 1);
-                if (-Camera.position.y >= max.y - 0.5) {
-                    box = new Box(min, max);
+                AABB box;
+                if (-Camera.position.y >= min_c.y + 1 - 0.5) {
+                    box = new AABB(min_c.x, min_c.y + 1, min_c.z, 1, 0, 1);
                     if (ray.intersect(box, picker_length, -1)) {
                         selection.second = Block.TYPE.TOP;
                     }
                 } else {
-                    min = new Vector3f(min_c.x, min_c.y, min_c.z);
-                    max = new Vector3f(min_c.x + 1, min_c.y, min_c.z + 1);
-                    box = new Box(min, max);
+                    box = new AABB(min_c.x, min_c.y, min_c.z, 1, 0, 1);
                     if (ray.intersect(box, picker_length, -1)) {
                         selection.second = Block.TYPE.BOTTOM;
                     }
                 }
                 if (null == selection.second) {
-                    min = new Vector3f(min_c.x, min_c.y, min_c.z);
-                    max = new Vector3f(min_c.x + 1, min_c.y + 1, min_c.z);
-                    if (-Camera.position.z < max.z) {
-                        box = new Box(min, max);
+                    if (-Camera.position.z < min_c.z) {
+                        box = new AABB(min_c.x, min_c.y, min_c.z, 1, 1, 0);
                         if (ray.intersect(box, picker_length, -1)) {
                             selection.second = Block.TYPE.FRONT;
                         }
                     } else {
-                        min = new Vector3f(min_c.x, min_c.y, min_c.z + 1);
-                        max = new Vector3f(min_c.x + 1, min_c.y + 1, min_c.z + 1);
-                        if (-Camera.position.z > max.z) {
-                            box = new Box(min, max);
+                        if (-Camera.position.z > min_c.z + 1) {
+                            box = new AABB(min_c.x, min_c.y, min_c.z + 1, 1, 1, 0);
                             if (ray.intersect(box, picker_length, -1)) {
                                 selection.second = Block.TYPE.BACK;
                             }
                         }
                     }
                     if (null == selection.second) {
-                        min = new Vector3f(min_c.x, min_c.y, min_c.z);
-                        max = new Vector3f(min_c.x, min_c.y + 1, min_c.z + 1);
-                        if (-Camera.position.x < max.x) {
-                            box = new Box(min, max);
+                        if (-Camera.position.x < min_c.x) {
+                            box = new AABB(min_c.x, min_c.y, min_c.z, 0, 1, 1);
                             if (ray.intersect(box, picker_length, -1)) {
                                 selection.second = Block.TYPE.RIGHT;
                             }
                         } else {
-                            min = new Vector3f(min_c.x + 1, min_c.y, min_c.z);
-                            max = new Vector3f(min_c.x + 1, min_c.y + 1, min_c.z + 1);
-                            box = new Box(min, max);
+                            box = new AABB(min_c.x + 1, min_c.y, min_c.z, 0, 1, 1);
                             if (ray.intersect(box, picker_length, -1)) {
                                 selection.second = Block.TYPE.LEFT;
                             }

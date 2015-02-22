@@ -3,7 +3,7 @@ package me.geakstr.voxel.render;
 import me.geakstr.voxel.math.Matrix4f;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.math.Vector3f;
-import me.geakstr.voxel.model.Box;
+import me.geakstr.voxel.model.AABB;
 
 public class Ray {
     public Vector3f origin;
@@ -44,7 +44,7 @@ public class Ray {
         this.sign[2] = (inv_direction.z < 0) ? 1 : 0;
     }
 
-    public boolean intersect(Box box, float t0, float t1) {
+    public boolean intersect(AABB box, float t0, float t1) {
         float tmin = (box.corners[sign[0]].x - origin.x) * inv_direction.x;
         float tmax = (box.corners[1 - sign[0]].x - origin.x) * inv_direction.x;
         float tymin = (box.corners[sign[1]].y - origin.y) * inv_direction.y;

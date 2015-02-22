@@ -15,7 +15,6 @@ import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
-@Deprecated
 public class Mesh {
     public ByteBuffer data;
     public int verts_size;

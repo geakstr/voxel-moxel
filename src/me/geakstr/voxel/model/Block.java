@@ -2,7 +2,7 @@ package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.math.Vector3f;
 
-public class Block extends Box {
+public class Block extends AABB {
     public int type;
     public Chunk chunk;
 
