@@ -12,6 +12,9 @@ import me.geakstr.voxel.render.Transform;
 import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
 
+import static org.lwjgl.opengl.GL11.glColorMask;
+import static org.lwjgl.opengl.GL11.glPolygonOffset;
+
 public class Game {
     public static boolean frustum;
 
@@ -60,6 +63,8 @@ public class Game {
     }
 
     public static void render() {
+//        glColorMask(false, false, false, false);
+//        glPolygonOffset(8.0f, 4.0f);
         current_shader = world_shader;
         current_shader.bind();
         current_shader.set_uniform("uniform_transform", world_transform.getTransform());

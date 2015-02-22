@@ -112,7 +112,7 @@ public class World {
                     int height = chunk_y == chunk_vert_size - 1 ? (int) (global_y % Chunk.height) : Chunk.height;
 
                     for (int cube_y = 0; cube_y < height; cube_y++) {
-                        chunk.set_type(1, cube_x, cube_y, cube_z);
+                        chunk.block_type(1, cube_x, cube_y, cube_z);
                     }
                 }
             }

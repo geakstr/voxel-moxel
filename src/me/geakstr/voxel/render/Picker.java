@@ -34,7 +34,7 @@ public class Picker {
                     for (int block_z = 0; block_z < Chunk.size; block_z++) {
                         for (int block_y = 0; block_y < Chunk.height; block_y++) {
                             Block block = new Block(new Vector3f(block_x, block_y, block_z), selection_chunk);
-                            if (Block.unpack_type(selection_chunk.block(block_x, block_y, block_z)) != 0 && ray.intersect(block, picker_length, -1)) {
+                            if (selection_chunk.block_type(block_x, block_y, block_z) != 0 && ray.intersect(block, picker_length, -1)) {
                                 float dist = Vector3f.dist(block.corners[0], camera_position);
                                 if (dist < min_dist) {
                                     selection.first = block;
@@ -160,9 +160,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos - 1);
-                            chunk.set_type(block_type, x, y, Chunk.size - 1);
+                            chunk.block_type(block_type, x, y, Chunk.size - 1);
                         } else {
-                            chunk.set_type(block_type, x, y, z - 1);
+                            chunk.block_type(block_type, x, y, z - 1);
                         }
                         break;
                     case BACK:
@@ -171,9 +171,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos + 1);
-                            chunk.set_type(block_type, x, y, 0);
+                            chunk.block_type(block_type, x, y, 0);
                         } else {
-                            chunk.set_type(block_type, x, y, z + 1);
+                            chunk.block_type(block_type, x, y, z + 1);
                         }
                         break;
                     case RIGHT:
@@ -182,9 +182,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos - 1, chunk.y_chunk_pos, chunk.z_chunk_pos);
-                            chunk.set_type(block_type, Chunk.size - 1, y, z);
+                            chunk.block_type(block_type, Chunk.size - 1, y, z);
                         } else {
-                            chunk.set_type(block_type, x - 1, y, z);
+                            chunk.block_type(block_type, x - 1, y, z);
                         }
                         break;
                     case LEFT:
@@ -193,9 +193,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos + 1, chunk.y_chunk_pos, chunk.z_chunk_pos);
-                            chunk.set_type(block_type, 0, y, z);
+                            chunk.block_type(block_type, 0, y, z);
                         } else {
-                            chunk.set_type(block_type, x + 1, y, z);
+                            chunk.block_type(block_type, x + 1, y, z);
                         }
                         break;
                     case BOTTOM:
@@ -204,9 +204,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos - 1, chunk.z_chunk_pos);
-                            chunk.set_type(block_type, x, Chunk.height - 1, z);
+                            chunk.block_type(block_type, x, Chunk.height - 1, z);
                         } else {
-                            chunk.set_type(block_type, x, y - 1, z);
+                            chunk.block_type(block_type, x, y - 1, z);
                         }
                         break;
                     case TOP:
@@ -215,9 +215,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos + 1, chunk.z_chunk_pos);
-                            chunk.set_type(block_type, x, 0, z);
+                            chunk.block_type(block_type, x, 0, z);
                         } else {
-                            chunk.set_type(block_type, x, y + 1, z);
+                            chunk.block_type(block_type, x, y + 1, z);
                         }
                         break;
                 }

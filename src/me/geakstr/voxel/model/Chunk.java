@@ -49,9 +49,12 @@ public class Chunk extends IndexedMesh {
         blocks[y][x + z * size] = val;
     }
 
-    public void set_type(int new_block_type, int x, int y, int z) {
-        int idx = x + z * size;
-        blocks[y][idx] = Block.pack_type(blocks[y][idx], new_block_type);
+    public void block_type(int new_block_type, int x, int y, int z) {
+        block(Block.pack_type(block(x, y, z), new_block_type), x, y, z);
+    }
+
+    public int block_type(int x, int y, int z) {
+        return Block.unpack_type(block(x, y, z));
     }
 
     public void rebuild() {
@@ -80,7 +83,7 @@ public class Chunk extends IndexedMesh {
                 boolean canDown = false;
                 int projFlag = -1;
                 for (int x = 0; x < size; x++) {
-                    if (Block.unpack_type(block(x, y, z)) == 0) {
+                    if (block_type(x, y, z) == 0) {
                         continue;
                     }
 
@@ -96,7 +99,7 @@ public class Chunk extends IndexedMesh {
                             len = 0;
                         }
                         update_coords = true;
-                    } else if (((x > 0) && (Block.unpack_type(block(x - 1, y, z)) == type) && (projFlag != x - 1))) {
+                    } else if (((x > 0) && (block_type(x - 1, y, z) == type) && (projFlag != x - 1))) {
                         mark[z][x] = mark[z][x - 1];
                         update_coords = true;
                         len++;
@@ -114,7 +117,7 @@ public class Chunk extends IndexedMesh {
                         coords_map.put(face, tmp);
                     }
 
-                    canDown = !(len > 0 && !canDown) && (z < (size - 1) && (Block.unpack_type(block(x, y, z + 1)) == type));
+                    canDown = !(len > 0 && !canDown) && (z < (size - 1) && (block_type(x, y, z + 1) == type));
 
                     if (canDown) {
                         proj[x] = mark[z][x];
@@ -182,7 +185,7 @@ public class Chunk extends IndexedMesh {
             sides[0] = true;
         } else if (z1 < size - 1) {
             for (int x = x0; x <= x1; x++) {
-                if (Block.unpack_type(block(x, y, z1 + 1)) == 0) {
+                if (block_type(x, y, z1 + 1) == 0) {
                     sides[0] = true;
                     break;
                 }
@@ -192,7 +195,7 @@ public class Chunk extends IndexedMesh {
             sides[1] = true;
         } else if (z0 > 0) {
             for (int x = x0; x <= x1; x++) {
-                if (Block.unpack_type(block(x, y, z0 - 1)) == 0) {
+                if (block_type(x, y, z0 - 1) == 0) {
                     sides[1] = true;
                     break;
                 }
@@ -203,7 +206,7 @@ public class Chunk extends IndexedMesh {
             sides[2] = true;
         } else if (x0 > 0) {
             for (int z = z0; z <= z1; z++) {
-                if (Block.unpack_type(block(x0 - 1, y, z)) == 0) {
+                if (block_type(x0 - 1, y, z) == 0) {
                     sides[2] = true;
                     break;
                 }
@@ -213,7 +216,7 @@ public class Chunk extends IndexedMesh {
             sides[3] = true;
         } else if (x1 < size - 1) {
             for (int z = z0; z <= z1; z++) {
-                if (Block.unpack_type(block(x1 + 1, y, z)) == 0) {
+                if (block_type(x1 + 1, y, z) == 0) {
                     sides[3] = true;
                     break;
                 }
@@ -225,7 +228,7 @@ public class Chunk extends IndexedMesh {
         } else if (y < height - 1) {
             for (int x = x0; x <= x1; x++) {
                 for (int z = z0; z <= z1; z++) {
-                    if (Block.unpack_type(block(x, y + 1, z)) == 0) {
+                    if (block_type(x, y + 1, z) == 0) {
                         sides[4] = true;
                         break;
                     }
@@ -237,7 +240,7 @@ public class Chunk extends IndexedMesh {
         } else if (y > 0) {
             for (int x = x0; x <= x1; x++) {
                 for (int z = z0; z <= z1; z++) {
-                    if (Block.unpack_type(block(x, y - 1, z)) == 0) {
+                    if (block_type(x, y - 1, z) == 0) {
                         sides[5] = true;
                         break;
                     }
@@ -251,7 +254,7 @@ public class Chunk extends IndexedMesh {
                 z_chunk_pos != World.size - 1) {
             sides[0] = false;
             for (int x = x0; x <= x1; x++) {
-                if (Block.unpack_type(World.chunk(x_chunk_pos, y_chunk_pos, z_chunk_pos + 1).block(x, y, 0)) == 0) {
+                if (World.chunk(x_chunk_pos, y_chunk_pos, z_chunk_pos + 1).block_type(x, y, 0) == 0) {
                     sides[0] = true;
                     break;
                 }
@@ -262,7 +265,7 @@ public class Chunk extends IndexedMesh {
                 z_chunk_pos != 0) {
             sides[1] = false;
             for (int x = x0; x <= x1; x++) {
-                if (Block.unpack_type(World.chunk(x_chunk_pos, y_chunk_pos, z_chunk_pos - 1).block(x, y, size - 1)) == 0) {
+                if (World.chunk(x_chunk_pos, y_chunk_pos, z_chunk_pos - 1).block_type(x, y, size - 1) == 0) {
                     sides[1] = true;
                     break;
                 }
@@ -274,7 +277,7 @@ public class Chunk extends IndexedMesh {
                 x_chunk_pos != 0) {
             sides[2] = false;
             for (int z = z0; z <= z1; z++) {
-                if (Block.unpack_type(World.chunk(x_chunk_pos - 1, y_chunk_pos, z_chunk_pos).block(size - 1, y, z)) == 0) {
+                if (World.chunk(x_chunk_pos - 1, y_chunk_pos, z_chunk_pos).block_type(size - 1, y, z) == 0) {
                     sides[2] = true;
                     break;
                 }
@@ -285,7 +288,7 @@ public class Chunk extends IndexedMesh {
                 x_chunk_pos != World.size - 1) {
             sides[3] = false;
             for (int z = z0; z <= z1; z++) {
-                if (Block.unpack_type(World.chunk(x_chunk_pos + 1, y_chunk_pos, z_chunk_pos).block(0, y, z)) == 0) {
+                if (World.chunk(x_chunk_pos + 1, y_chunk_pos, z_chunk_pos).block_type(0, y, z) == 0) {
                     sides[3] = true;
                     break;
                 }
@@ -298,7 +301,7 @@ public class Chunk extends IndexedMesh {
             sides[4] = false;
             for (int x = x0; x <= x1; x++) {
                 for (int z = z0; z <= z1; z++) {
-                    if (Block.unpack_type(World.chunk(x_chunk_pos, y_chunk_pos + 1, z_chunk_pos).block(x, 0, z)) == 0) {
+                    if (World.chunk(x_chunk_pos, y_chunk_pos + 1, z_chunk_pos).block_type(x, 0, z) == 0) {
                         sides[4] = true;
                         break;
                     }
@@ -311,7 +314,7 @@ public class Chunk extends IndexedMesh {
             sides[5] = false;
             for (int x = x0; x <= x1; x++) {
                 for (int z = z0; z <= z1; z++) {
-                    if (Block.unpack_type(World.chunk(x_chunk_pos, y_chunk_pos - 1, z_chunk_pos).block(x, height - 1, z)) == 0) {
+                    if (World.chunk(x_chunk_pos, y_chunk_pos - 1, z_chunk_pos).block_type(x, height - 1, z) == 0) {
                         sides[5] = true;
                         break;
                     }
