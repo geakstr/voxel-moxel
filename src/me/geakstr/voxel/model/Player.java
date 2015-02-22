@@ -89,7 +89,7 @@ public class Player extends IndexedMesh {
         };
         transform = new Transform();
         box = new AABB(x, y, z, 1, 1, 1);
-        update_gl_data(AABB.SIDE.ALL.verts(), AABB.SIDE.ALL.tex_coords(1, 1), tex_off, colors);
+        update_gl_data(AABB.SIDE.ALL.vertices_coords(), AABB.SIDE.ALL.texture_coords(1, 1), tex_off, colors);
     }
 
     public void update() {

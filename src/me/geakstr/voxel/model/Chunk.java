@@ -144,7 +144,7 @@ public class Chunk extends IndexedMesh {
                                 AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, y + y_offset, z0 + z_offset, xx, 1, zz)));
 
                         tex.addAll(ArraysUtil.copy_floats(
-                                AABB.SIDE.values[side_idx].tex_coords(xx, zz)));
+                                AABB.SIDE.values[side_idx].texture_coords(xx, zz)));
 
                         tex_off.addAll(Arrays.asList(
                                 texture.x, texture.y,
