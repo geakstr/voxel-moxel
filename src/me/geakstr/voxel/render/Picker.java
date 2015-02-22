@@ -2,8 +2,8 @@ package me.geakstr.voxel.render;
 
 import me.geakstr.voxel.helpers.Pair;
 import me.geakstr.voxel.math.Vector3f;
-import me.geakstr.voxel.model.Block;
 import me.geakstr.voxel.model.AABB;
+import me.geakstr.voxel.model.Block;
 import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.World;
 
@@ -150,6 +150,8 @@ public class Picker {
                 int y = (int) pos.y % Chunk.height;
                 int z = (int) pos.z % Chunk.size;
 
+                int block_type = 1;
+
                 chunk.changed = true;
                 switch (selection.second) {
                     case FRONT:
@@ -158,9 +160,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos - 1);
-                            chunk.block(Block.pack_type(0, 1), x, y, Chunk.size - 1);
+                            chunk.set_type(block_type, x, y, Chunk.size - 1);
                         } else {
-                            chunk.block(Block.pack_type(0, 1), x, y, z - 1);
+                            chunk.set_type(block_type, x, y, z - 1);
                         }
                         break;
                     case BACK:
@@ -169,9 +171,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos, chunk.z_chunk_pos + 1);
-                            chunk.block(Block.pack_type(0, 1), x, y, 0);
+                            chunk.set_type(block_type, x, y, 0);
                         } else {
-                            chunk.block(Block.pack_type(0, 1), x, y, z + 1);
+                            chunk.set_type(block_type, x, y, z + 1);
                         }
                         break;
                     case RIGHT:
@@ -180,9 +182,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos - 1, chunk.y_chunk_pos, chunk.z_chunk_pos);
-                            chunk.block(Block.pack_type(0, 1), Chunk.size - 1, y, z);
+                            chunk.set_type(block_type, Chunk.size - 1, y, z);
                         } else {
-                            chunk.block(Block.pack_type(0, 1), x - 1, y, z);
+                            chunk.set_type(block_type, x - 1, y, z);
                         }
                         break;
                     case LEFT:
@@ -191,9 +193,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos + 1, chunk.y_chunk_pos, chunk.z_chunk_pos);
-                            chunk.block(Block.pack_type(0, 1), 0, y, z);
+                            chunk.set_type(block_type, 0, y, z);
                         } else {
-                            chunk.block(Block.pack_type(0, 1), x + 1, y, z);
+                            chunk.set_type(block_type, x + 1, y, z);
                         }
                         break;
                     case BOTTOM:
@@ -202,9 +204,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos - 1, chunk.z_chunk_pos);
-                            chunk.block(Block.pack_type(0, 1), x, Chunk.height - 1, z);
+                            chunk.set_type(block_type, x, Chunk.height - 1, z);
                         } else {
-                            chunk.block(Block.pack_type(0, 1), x, y - 1, z);
+                            chunk.set_type(block_type, x, y - 1, z);
                         }
                         break;
                     case TOP:
@@ -213,9 +215,9 @@ public class Picker {
                                 return false;
                             }
                             chunk = World.chunk(chunk.x_chunk_pos, chunk.y_chunk_pos + 1, chunk.z_chunk_pos);
-                            chunk.block(Block.pack_type(0, 1), x, 0, z);
+                            chunk.set_type(block_type, x, 0, z);
                         } else {
-                            chunk.block(Block.pack_type(0, 1), x, y + 1, z);
+                            chunk.set_type(block_type, x, y + 1, z);
                         }
                         break;
                 }

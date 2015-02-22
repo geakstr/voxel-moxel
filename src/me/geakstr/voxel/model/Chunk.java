@@ -49,6 +49,11 @@ public class Chunk extends IndexedMesh {
         blocks[y][x + z * size] = val;
     }
 
+    public void set_type(int new_block_type, int x, int y, int z) {
+        int idx = x + z * size;
+        blocks[y][idx] = Block.pack_type(blocks[y][idx], new_block_type);
+    }
+
     public void rebuild() {
         this.updating = true;
 
@@ -126,8 +131,7 @@ public class Chunk extends IndexedMesh {
             Vector2f texture = texs.poll();
             texs.add(texture);
 
-            for (Map.Entry<Integer, int[]> e : coords_map.entrySet()) {
-                int[] coords = e.getValue();
+            for (int[] coords : coords_map.values()) {
                 int x0 = coords[0], z0 = coords[1];
                 int x1 = coords[2], z1 = coords[3];
                 int xx = x1 - x0 + 1, zz = z1 - z0 + 1;
@@ -339,13 +343,10 @@ public class Chunk extends IndexedMesh {
         if (changed || updating) {
             update();
         }
-        synchronized (this) {
-            if (!empty) {
-                draw();
-                World.chunks_in_frame++;
-                World.faces_in_frame += faces_counter;
-            }
+        if (!empty) {
+            draw();
+            World.chunks_in_frame++;
+            World.faces_in_frame += faces_counter;
         }
     }
-
 }

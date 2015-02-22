@@ -1,7 +1,13 @@
 package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.math.Vector3f;
+import me.geakstr.voxel.util.BitUtils;
 
+/**
+ * Block represented as 32 bit integer number.
+ *
+ * The first 9 bit (from left) is type of block. Possible 512 types (0..511).
+ */
 public class Block extends AABB {
     public int type;
     public Chunk chunk;
@@ -27,20 +33,12 @@ public class Block extends AABB {
         this(0, pos, chunk);
     }
 
-    public static int unpack_type(int val) {
-        return ((val >> 16) & 511);
-    }
-
     public static int pack_type(int val, int type) {
-        return val | ((type & 511) << 16);
+        return BitUtils.set_val_to_left_of_pos(BitUtils.clear_range(val, 9, 0), type, 23);
     }
 
-    public static int unpack_visibility(int val) {
-        return ((val >> 15) & 511) & 1;
+    public static int unpack_type(int val) {
+        return BitUtils.extract_range(val, 9, 23);
     }
 
-    public static int pack_visibility(int val, boolean visibility) {
-        int v = visibility ? 1 : 0;
-        return val | ((v & 511) << 15);
-    }
 }
