@@ -13,7 +13,7 @@ import java.util.Set;
 public class Picker {
     public static final int picker_length = -(Chunk.size * (World.near_chunks_radius + 1));
 
-    public static Pair<Block, Block.TYPE> select(Ray ray, boolean pick_side) {
+    public static Pair<Block, Block.SIDE> select(Ray ray, boolean pick_side) {
         final Vector3f camera_position = Camera.position.negate(null);
 
         Set<Chunk> selection_chunks = new HashSet<>();
@@ -26,7 +26,7 @@ public class Picker {
             }
         }
 
-        Pair<Block, Block.TYPE> selection = new Pair<>();
+        Pair<Block, Block.SIDE> selection = new Pair<>();
         if (selection_chunks.size() != 0) {
             float min_dist = Float.MAX_VALUE;
             for (Chunk selection_chunk : selection_chunks) {
@@ -55,25 +55,25 @@ public class Picker {
                 if (-Camera.position.y >= min_c.y + 1 - 0.5) {
                     box = new AABB(min_c.x, min_c.y + 1, min_c.z, 1, 0, 1);
                     if (ray.intersect(box, picker_length, -1)) {
-                        selection.second = Block.TYPE.TOP;
+                        selection.second = Block.SIDE.TOP;
                     }
                 } else {
                     box = new AABB(min_c.x, min_c.y, min_c.z, 1, 0, 1);
                     if (ray.intersect(box, picker_length, -1)) {
-                        selection.second = Block.TYPE.BOTTOM;
+                        selection.second = Block.SIDE.BOTTOM;
                     }
                 }
                 if (null == selection.second) {
                     if (-Camera.position.z < min_c.z) {
                         box = new AABB(min_c.x, min_c.y, min_c.z, 1, 1, 0);
                         if (ray.intersect(box, picker_length, -1)) {
-                            selection.second = Block.TYPE.FRONT;
+                            selection.second = Block.SIDE.FRONT;
                         }
                     } else {
                         if (-Camera.position.z > min_c.z + 1) {
                             box = new AABB(min_c.x, min_c.y, min_c.z + 1, 1, 1, 0);
                             if (ray.intersect(box, picker_length, -1)) {
-                                selection.second = Block.TYPE.BACK;
+                                selection.second = Block.SIDE.BACK;
                             }
                         }
                     }
@@ -81,12 +81,12 @@ public class Picker {
                         if (-Camera.position.x < min_c.x) {
                             box = new AABB(min_c.x, min_c.y, min_c.z, 0, 1, 1);
                             if (ray.intersect(box, picker_length, -1)) {
-                                selection.second = Block.TYPE.RIGHT;
+                                selection.second = Block.SIDE.RIGHT;
                             }
                         } else {
                             box = new AABB(min_c.x + 1, min_c.y, min_c.z, 0, 1, 1);
                             if (ray.intersect(box, picker_length, -1)) {
-                                selection.second = Block.TYPE.LEFT;
+                                selection.second = Block.SIDE.LEFT;
                             }
                         }
                     }
@@ -139,7 +139,7 @@ public class Picker {
     }
 
     public static boolean insert(Ray ray) {
-        Pair<Block, Block.TYPE> selection = select(ray, true);
+        Pair<Block, Block.SIDE> selection = select(ray, true);
 
         if (null != selection.first && null != selection.second) {
             Chunk chunk = selection.first.chunk;

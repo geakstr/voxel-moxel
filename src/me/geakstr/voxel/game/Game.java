@@ -71,12 +71,12 @@ public class Game {
         AbstractMesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
         World.render();
 
-        AbstractMesh.bind_texture(ResourceUtil.texture_id("axe.png"));
-        current_shader.set_uniform("uniform_texture_info", model_shader_texture_info);
-        ResourceUtil.models.get("axe").draw();
-
-        current_shader.set_uniform("uniform_transform", player.getTransform());
-        player.render();
+//        AbstractMesh.bind_texture(ResourceUtil.texture_id("axe.png"));
+//        current_shader.set_uniform("uniform_texture_info", model_shader_texture_info);
+//        ResourceUtil.models.get("axe").draw();
+//
+//        current_shader.set_uniform("uniform_transform", player.getTransform());
+//        player.render();
         current_shader.unbind();
 
         current_shader = gui_shader;

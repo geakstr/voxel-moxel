@@ -6,10 +6,6 @@ public class Block extends AABB {
     public int type;
     public Chunk chunk;
 
-    public static enum TYPE {
-        TOP, BOTTOM, FRONT, BACK, LEFT, RIGHT
-    }
-
     public Block(int type, Vector3f pos, Chunk chunk) {
         super();
 

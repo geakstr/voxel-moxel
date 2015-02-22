@@ -160,11 +160,15 @@ public class Chunk extends IndexedMesh {
             }
         }
 
-        update_gl_data(verts, tex, tex_off, colors);
-
         this.updated = true;
         this.faces_counter = verts.size() / 3;
         this.empty = faces_counter == 0;
+
+        synchronized (this) {
+            if (!empty) {
+                update_gl_data(verts, tex, tex_off, colors);
+            }
+        }
     }
 
     public boolean[] renderable_sides(int x0, int z0, int x1, int z1, int y) {
@@ -322,7 +326,11 @@ public class Chunk extends IndexedMesh {
 
         if (updated && updating) {
             updating = false;
-            update_gl_buffers();
+            synchronized (this) {
+                if (!empty) {
+                    update_gl_buffers();
+                }
+            }
         }
         changed = false;
     }
@@ -331,10 +339,12 @@ public class Chunk extends IndexedMesh {
         if (changed || updating) {
             update();
         }
-        if (!empty) {
-            draw();
-            World.chunks_in_frame++;
-            World.faces_in_frame += faces_counter;
+        synchronized (this) {
+            if (!empty) {
+                draw();
+                World.chunks_in_frame++;
+                World.faces_in_frame += faces_counter;
+            }
         }
     }
 
