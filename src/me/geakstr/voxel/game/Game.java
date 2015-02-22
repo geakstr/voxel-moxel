@@ -1,10 +1,10 @@
 package me.geakstr.voxel.game;
 
 import me.geakstr.voxel.math.Vector2f;
-import me.geakstr.voxel.model.IndexedMesh;
 import me.geakstr.voxel.model.Player;
 import me.geakstr.voxel.model.TextureAtlas;
 import me.geakstr.voxel.model.World;
+import me.geakstr.voxel.model.meshes.AbstractMesh;
 import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.render.Shader;
@@ -68,12 +68,13 @@ public class Game {
         current_shader.set_uniform("uniform_texture", 0);
         current_shader.set_uniform("uniform_texture_info", chunk_shader_texture_info);
 
-        IndexedMesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
+        AbstractMesh.bind_texture(ResourceUtil.texture_id("atlas.png"));
         World.render();
 
-        current_shader.unbind();
+        AbstractMesh.bind_texture(ResourceUtil.texture_id("axe.png"));
+        current_shader.set_uniform("uniform_texture_info", model_shader_texture_info);
+        ResourceUtil.models.get("axe").draw();
 
-        current_shader.bind();
         current_shader.set_uniform("uniform_transform", player.getTransform());
         player.render();
         current_shader.unbind();

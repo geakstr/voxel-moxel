@@ -2,6 +2,7 @@ package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector2f;
+import me.geakstr.voxel.model.meshes.IndexedMesh;
 import me.geakstr.voxel.util.ArraysUtil;
 import me.geakstr.voxel.workers.ChunkWorker;
 
@@ -162,8 +163,8 @@ public class Chunk extends IndexedMesh {
         update_gl_data(verts, tex, tex_off, colors);
 
         this.updated = true;
-        this.faces = verts.size() / 3;
-        this.empty = faces == 0;
+        this.faces_counter = verts.size() / 3;
+        this.empty = faces_counter == 0;
     }
 
     public boolean[] renderable_sides(int x0, int z0, int x1, int z1, int y) {
@@ -333,7 +334,7 @@ public class Chunk extends IndexedMesh {
         if (!empty) {
             draw();
             World.chunks_in_frame++;
-            World.faces_in_frame += faces;
+            World.faces_in_frame += faces_counter;
         }
     }
 

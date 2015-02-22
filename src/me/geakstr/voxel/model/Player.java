@@ -1,6 +1,7 @@
 package me.geakstr.voxel.model;
 
 import me.geakstr.voxel.math.Matrix4f;
+import me.geakstr.voxel.model.meshes.IndexedMesh;
 import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Transform;
 
@@ -117,7 +118,7 @@ public class Player extends IndexedMesh {
 
     public void render() {
         draw();
-        World.faces_in_frame += faces;
+        World.faces_in_frame += faces_counter;
     }
 
     public Matrix4f getTransform() {
