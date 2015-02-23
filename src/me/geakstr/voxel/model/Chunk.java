@@ -73,9 +73,9 @@ public class Chunk extends IndexedMesh {
         texs.add(TextureAtlas.get_coord("sand"));
 
         int next_color = 512;
+        int[] proj = new int[size];
         for (int y = 0; y < height; y++) {
             int[][] mark = new int[size][size];
-            int[] proj = new int[mark[0].length];
             Arrays.fill(proj, -1);
             int len = 0;
             Map<Integer, int[]> coords_map = new HashMap<>();

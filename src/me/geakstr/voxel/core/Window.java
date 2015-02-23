@@ -65,7 +65,7 @@ public class Window {
 
         GLContext.createFromCurrent();
 
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        glClearColor(1f, 1f, 1f, 1.0f);
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
