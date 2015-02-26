@@ -1,23 +1,23 @@
-uniform sampler2DShadow shadowMap;
+#version 330
 
-in vec4 projCoord;
+uniform sampler2D uniform_shadow;
 
-void main ()
-{
-	const float kTransparency = 0.3;
-	vec4 color = gl_Color;
+in vec4 out_shadow_coord;
 
-	float rValue = shadow2DProj(shadowMap, projCoord).r + kTransparency;
-	rValue = clamp(rValue, 0.0, 1.0);
+out vec4 FragColor;
 
-	vec3 coordPos  = projCoord.xyz / projCoord.w;
-
-	if(coordPos.x >= 0.0 && coordPos.y >= 0.0 && coordPos.x <= 1.0 && coordPos.y <= 1.0 )
-   	{
-		gl_FragColor = color * rValue;
-	}
-	else
-	{
-		gl_FragColor = color;
-	}
+void main()
+{	
+	vec4 shadowCoordinateWdivide = out_shadow_coord / out_shadow_coord.w ;
+	
+	shadowCoordinateWdivide.z += 0.0005;
+	
+	float distanceFromLight = texture2D(uniform_shadow, shadowCoordinateWdivide.st).z;
+	
+ 	float shadow = 1.0;
+ 	if (out_shadow_coord.w > 0.0) {
+ 		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.5 : 1.0;
+ 	}
+  	
+	FragColor =	shadow * vec4(1.0, 1.0, 1.0, 1.0);
 }

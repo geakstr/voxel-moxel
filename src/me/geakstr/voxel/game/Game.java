@@ -39,7 +39,7 @@ public class Game {
         world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color", "attr_normal");
 
         shadow_shader = new Shader("shadow").compile();
-        shadow_shader.save_attrs("attrs_pos", "attr_tex_offset", "attr_tex_coord", "attr_color", "attr_normal");
+        shadow_shader.save_attrs("attr_pos", "attr_shadow_coord");
 
         current_shader = world_shader;
         ResourceUtil.load_textures("atlas.png", "axe.png");
@@ -67,8 +67,6 @@ public class Game {
     private static void generateShadowFBO() {
         int shadowMapWidth = Window.width * 2;
         int shadowMapHeight = Window.height * 2;
-
-        int FBOstatus;
 
         // Try to use a texture depth component
         depthTextureId = glGenTextures();
@@ -98,7 +96,7 @@ public class Game {
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTextureId, 0);
 
         // check FBO status
-        FBOstatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        int FBOstatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (FBOstatus != GL_FRAMEBUFFER_COMPLETE) {
             System.out.println("GL_FRAMEBUFFER_COMPLETE_EXT failed, CANNOT use FBO\n");
         }
@@ -131,8 +129,13 @@ public class Game {
 
         current_shader.unbind();
 
-//        glColorMask(false, false, false, false);
-//        glPolygonOffset(8.0f, 4.0f);
+
+        glBindFramebuffer(GL_FRAMEBUFFER,0);
+    	Window.setup_aspect_ratio();
+    	glColorMask(true, true, true, true); 
+    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    	glCullFace(GL_BACK);
+    	
         current_shader = world_shader;
         current_shader.bind();
         current_shader.set_uniform("uniform_transform", world_transform.getTransform());

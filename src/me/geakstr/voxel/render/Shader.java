@@ -106,6 +106,10 @@ public class Shader {
         }
         return attributes.get(attr_name);
     }
+    
+    public boolean has_attr(String attr_name) {
+    	return attributes.containsKey(attr_name);
+    }
 
     private void attach_vertex_shader(String shader_name) {
         vertex_shader = glCreateShader(GL_VERTEX_SHADER);
