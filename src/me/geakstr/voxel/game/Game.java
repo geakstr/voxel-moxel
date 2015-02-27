@@ -22,7 +22,7 @@ public class Game {
 
     public static Transform world_transform;
     public static ChunksWorkersExecutorService chunks_workers_executor_service;
-    public static Shader current_shader, world_shader, gui_shader, shadow_shader;
+    public static Shader current_shader, world_shader, gui_shader;
 
     public static Player player;
 
@@ -37,9 +37,6 @@ public class Game {
 
         world_shader = new Shader("world").compile();
         world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color", "attr_normal");
-
-        shadow_shader = new Shader("shadow").compile();
-        shadow_shader.save_attrs("attr_pos", "attr_shadow_coord");
 
         current_shader = world_shader;
         ResourceUtil.load_textures("atlas.png", "axe.png");
@@ -56,55 +53,9 @@ public class Game {
 
         current_shader = gui_shader;
         GUI.init();
-
-        generateShadowFBO();
     }
 
-    private static int fboId;
-    private static int depthTextureId;
-    private static float[] p_light = new float[]{3, 20, 0};
-
-    private static void generateShadowFBO() {
-        int shadowMapWidth = Window.width * 2;
-        int shadowMapHeight = Window.height * 2;
-
-        // Try to use a texture depth component
-        depthTextureId = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, depthTextureId);
-
-        // GL_LINEAR does not make sense for depth texture. However, next tutorial shows usage of GL_LINEAR and PCF
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        // Remove artifact on the edges of the shadowmap
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-        // No need to force GL_DEPTH_COMPONENT24, drivers usually give you the max precision if available
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadowMapWidth, shadowMapHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        // create a framebuffer object
-        fboId = glGenFramebuffers();
-        glBindFramebuffer(GL_FRAMEBUFFER, fboId);
-
-        // Instruct openGL that we won't bind a color texture with the currently bound FBO
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-
-        // attach the texture to FBO depth attachment point
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTextureId, 0);
-
-        // check FBO status
-        int FBOstatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        if (FBOstatus != GL_FRAMEBUFFER_COMPLETE) {
-            System.out.println("GL_FRAMEBUFFER_COMPLETE_EXT failed, CANNOT use FBO\n");
-        }
-
-        // switch back to window-system-provided framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-
+ 
     public static void before_render() {
         if (Camera.input()) {
             Camera.update();
@@ -115,27 +66,6 @@ public class Game {
     }
 
     public static void render() {
-        glBindFramebuffer(GL_FRAMEBUFFER, fboId);
-        glUseProgramObjectARB(0);
-        glViewport(0, 0, Window.width * 2, Window.height * 2);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glColorMask(false, false, false, false);
-        glCullFace(GL_FRONT);
-        current_shader = shadow_shader;
-        current_shader.bind();
-        current_shader.set_uniform("uniform_transform", world_transform.getTransform());
-        current_shader.set_uniform("uniform_camera_projection", Camera.projection);
-        current_shader.set_uniform("uniform_camera_view", Camera.view);
-
-        current_shader.unbind();
-
-
-        glBindFramebuffer(GL_FRAMEBUFFER,0);
-    	Window.setup_aspect_ratio();
-    	glColorMask(true, true, true, true); 
-    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    	glCullFace(GL_BACK);
-    	
         current_shader = world_shader;
         current_shader.bind();
         current_shader.set_uniform("uniform_transform", world_transform.getTransform());

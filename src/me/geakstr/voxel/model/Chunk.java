@@ -9,9 +9,9 @@ import me.geakstr.voxel.workers.ChunkWorker;
 import java.util.*;
 
 public class Chunk extends IndexedMesh {
-    public static int size, height, volume;
+    public static int size, height, volume, vert_square;
 
-    private int[][] blocks; // [y][x * z]
+    private int[] blocks;
 
     public boolean changed, updating, updated, empty, waiting, visible;
 
@@ -29,7 +29,7 @@ public class Chunk extends IndexedMesh {
         this.y_offset = y_chunk_pos * height;
         this.z_offset = z_chunk_pos * size;
 
-        this.blocks = new int[height][size * size];
+        this.blocks = new int[volume];
 
         this.changed = true;
         this.waiting = false;
@@ -42,11 +42,11 @@ public class Chunk extends IndexedMesh {
     }
 
     public int block(int x, int y, int z) {
-        return blocks[y][x + z * size];
+        return blocks[vert_square * z + size * y + x];
     }
 
     public void block(int val, int x, int y, int z) {
-        blocks[y][x + z * size] = val;
+        blocks[vert_square * z + size * y + x] = val;
     }
 
     public void block_type(int new_block_type, int x, int y, int z) {

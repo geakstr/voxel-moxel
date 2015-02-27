@@ -10,7 +10,7 @@ import java.util.Random;
 import java.util.Set;
 
 public class World {
-    public static int size, height, volume;
+    public static int size, height, volume, vert_square;
 
     public static int chunks_in_frame = 0;
     public static int faces_in_frame = 0;
@@ -19,13 +19,16 @@ public class World {
 
     public static Set<Chunk> nearest_chunks = new HashSet<>();
 
-    private static Chunk[][] chunks; // [y][x * z]
+    private static Chunk[] chunks;
 
     public static void init() {
-        volume = size * size * height;
-        Chunk.volume = Chunk.size * Chunk.size * Chunk.height;
+    	vert_square = size * height;
+        volume = size * vert_square;
+        
+        Chunk.vert_square = Chunk.size * Chunk.height;
+        Chunk.volume = Chunk.size * Chunk.vert_square;
 
-        chunks = new Chunk[height][size * size];
+        chunks = new Chunk[volume];
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < size; x++) {
@@ -39,11 +42,11 @@ public class World {
     }
 
     public static Chunk chunk(int x, int y, int z) {
-        return chunks[y][x + z * World.size];
+        return chunks[vert_square * z + size * y + x];
     }
 
     public static void chunk(Chunk chunk, int x, int y, int z) {
-        chunks[y][x + z * World.size] = chunk;
+        chunks[vert_square * z + size * y + x] = chunk;
     }
 
     public static Chunk chunk_by_global_coords(int global_x, int global_y, int global_z) {
