@@ -76,7 +76,7 @@ public class Frustum {
         }
 
         int size = Chunk.size;
-        int height = Chunk.height;
+        int height = Chunk.size;
 
         int half_height = height / 2;
 

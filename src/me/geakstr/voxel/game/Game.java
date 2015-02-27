@@ -28,7 +28,12 @@ public class Game {
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
         gui_shader = new Shader("gui").save_attrs("attr_pos", "attr_color");
-        world_shader = new Shader("world").save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color", "attr_normal");
+        world_shader = new Shader("world").save_attrs(
+                "attr_pos",
+                "attr_tex_offset",
+                "attr_tex_coord",
+                "attr_color",
+                "attr_normal");
 
         current_shader = world_shader;
         ResourceUtil.load_textures("atlas.png", "axe.png");
@@ -45,9 +50,11 @@ public class Game {
 
         current_shader = gui_shader;
         GUI.init();
+
+        World.chunk(0, 0, 0).place_torch(0, 8, 0);
     }
 
- 
+
     public static void before_render() {
         if (Camera.input()) {
             Camera.update();

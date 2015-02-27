@@ -31,7 +31,6 @@ public class Configurator {
             World.size = world_sizes.get(0).asInt();
             World.height = world_sizes.get(1).asInt();
             Chunk.size = world_sizes.get(2).asInt();
-            Chunk.height = world_sizes.get(3).asInt();
 
             Game.frustum = json.get("frustum").asBoolean();
             Configurator.unsynchronized_buffering = json.get("unsynchronized_buffering").asBoolean();

@@ -1,5 +1,6 @@
 #version 330
 
+in vec3 out_pos;
 in vec2 out_tex_offset;
 in vec2 out_tex_coord;
 in vec3 out_color;

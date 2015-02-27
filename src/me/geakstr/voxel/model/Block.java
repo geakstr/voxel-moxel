@@ -5,7 +5,7 @@ import me.geakstr.voxel.util.BitUtils;
 
 /**
  * Block represented as 32 bit integer number.
- *
+ * <p>
  * The first 9 bit (from left) is type of block. Possible 512 types (0..511).
  */
 public class Block extends AABB {
@@ -16,7 +16,7 @@ public class Block extends AABB {
         super();
 
         int chunk_x = chunk.x_chunk_pos * Chunk.size;
-        int chunk_y = chunk.y_chunk_pos * Chunk.height;
+        int chunk_y = chunk.y_chunk_pos * Chunk.size;
         int chunk_z = chunk.z_chunk_pos * Chunk.size;
 
         int x = (int) pos.x + chunk_x;

@@ -9,9 +9,11 @@ import me.geakstr.voxel.workers.ChunkWorker;
 import java.util.*;
 
 public class Chunk extends IndexedMesh {
-    public static int size, height, volume, vert_square;
+    public static int size, volume, square;
 
     private int[] blocks;
+    private byte[] light_map;
+    private Queue<LightNode> light_bfs_queue;
 
     public boolean changed, updating, updated, empty, waiting, visible;
 
@@ -26,10 +28,12 @@ public class Chunk extends IndexedMesh {
         this.z_chunk_pos = z_chunk_pos;
 
         this.x_offset = x_chunk_pos * size;
-        this.y_offset = y_chunk_pos * height;
+        this.y_offset = y_chunk_pos * size;
         this.z_offset = z_chunk_pos * size;
 
         this.blocks = new int[volume];
+        this.light_map = new byte[volume];
+        this.light_bfs_queue = new LinkedList<>();
 
         this.changed = true;
         this.waiting = false;
@@ -40,13 +44,13 @@ public class Chunk extends IndexedMesh {
 
         this.empty = true;
     }
-    
+
     public int block(int x, int y, int z) {
-        return blocks[vert_square * z + size * y + x];
+        return blocks[World.idx(x, y, z, square, size)];
     }
 
     public void block(int val, int x, int y, int z) {
-        blocks[vert_square * z + size * y + x] = val;
+        blocks[World.idx(x, y, z, square, size)] = val;
     }
 
     public void block_type(int new_block_type, int x, int y, int z) {
@@ -57,13 +61,109 @@ public class Chunk extends IndexedMesh {
         return Block.unpack_type(block(x, y, z));
     }
 
+    public int sunlight(int x, int y, int z) {
+        return (light_map[World.idx(x, y, z, square, size)] >> 4) & 0xF;
+    }
+
+    public void sunlight(int val, int x, int y, int z) {
+        int idx = World.idx(x, y, z, square, size);
+        light_map[idx] = (byte) ((light_map[idx] & 0xF) | (val << 4));
+    }
+
+    public int torchlight(int x, int y, int z) {
+        return light_map[World.idx(x, y, z, square, size)] & 0xF;
+    }
+
+    public void torchlight(int val, int x, int y, int z) {
+        int idx = World.idx(x, y, z, square, size);
+        light_map[idx] = (byte) ((light_map[idx] & 0xF) | val);
+    }
+
+    private class LightNode {
+        public int idx;
+        public Chunk chunk;
+
+        public LightNode(int idx, Chunk chunk) {
+            this.idx = idx;
+            this.chunk = chunk;
+        }
+    }
+
+    public void lighting() {
+        while (!light_bfs_queue.isEmpty()) {
+            LightNode node = light_bfs_queue.poll();
+
+            int xx = node.idx % size;
+            int yy = node.idx / (size * size);
+            int zz = (node.idx % (size * size)) / size;
+
+            int light_level = node.chunk.torchlight(xx, yy, zz);
+
+            if (xx - 1 >= 0) {
+                if (node.chunk.block_type(xx - 1, yy, zz) == 0 && node.chunk.torchlight(xx - 1, yy, zz) + 2 <= light_level) {
+                    node.chunk.torchlight(light_level - 1, xx - 1, yy, zz);
+                    light_bfs_queue.add(new LightNode(World.idx(xx - 1, yy, zz, square, size), node.chunk));
+                }
+            }
+            if (xx + 1 < size) {
+                if (node.chunk.block_type(xx + 1, yy, zz) == 0 && node.chunk.torchlight(xx + 1, yy, zz) + 2 <= light_level) {
+                    node.chunk.torchlight(light_level - 1, xx + 1, yy, zz);
+                    light_bfs_queue.add(new LightNode(World.idx(xx + 1, yy, zz, square, size), node.chunk));
+                }
+            }
+
+            if (yy - 1 >= 0) {
+                if (node.chunk.block_type(xx, yy - 1, zz) == 0 && node.chunk.torchlight(xx, yy - 1, zz) + 2 <= light_level) {
+                    node.chunk.torchlight(light_level - 1, xx, yy - 1, zz);
+                    light_bfs_queue.add(new LightNode(World.idx(xx, yy - 1, zz, square, size), node.chunk));
+                }
+            }
+            if (yy + 1 < size) {
+                if (node.chunk.block_type(xx, yy + 1, zz) == 0 && node.chunk.torchlight(xx, yy + 1, zz) + 2 <= light_level) {
+                    node.chunk.torchlight(light_level - 1, xx, yy + 1, zz);
+                    light_bfs_queue.add(new LightNode(World.idx(xx, yy + 1, zz, square, size), node.chunk));
+                }
+            }
+
+            if (zz - 1 >= 0) {
+                if (node.chunk.block_type(xx, yy, zz - 1) == 0 && node.chunk.torchlight(xx, yy, zz - 1) + 2 <= light_level) {
+                    node.chunk.torchlight(light_level - 1, xx, yy, zz - 1);
+                    light_bfs_queue.add(new LightNode(World.idx(xx, yy, zz - 1, square, size), node.chunk));
+                }
+            }
+            if (zz + 1 < size) {
+                if (node.chunk.block_type(xx, yy, zz + 1) == 0 && node.chunk.torchlight(xx, yy, zz + 1) + 2 <= light_level) {
+                    node.chunk.torchlight(light_level - 1, xx, yy, zz + 1);
+                    light_bfs_queue.add(new LightNode(World.idx(xx, yy, zz + 1, square, size), node.chunk));
+                }
+            }
+        }
+    }
+
+    public void place_torch(int x, int y, int z) {
+        torchlight(15, x, y, z);
+        light_bfs_queue.add(new LightNode(World.idx(x, y, z, square, size), this));
+    }
+
     public void rebuild() {
         this.updating = true;
+
+        lighting();
+
+//        if (x_chunk_pos == 0 && y_chunk_pos == 0 && z_chunk_pos == 0) {
+//            for (int i = size - 1; i >= 0; i--) {
+//                for (int k = 0; k < size; k++) {
+//                    System.out.print(light_map[World.idx(i, 9, k, square, size)] + " ");
+//                }
+//                System.out.println();
+//            }
+//        }
 
         List<Float> verts = new ArrayList<>();
         List<Float> tex = new ArrayList<>();
         List<Float> tex_off = new ArrayList<>();
         List<Float> colors = new ArrayList<>();
+        List<Float> shadows = new ArrayList<>();
 
         Queue<Vector2f> texs = new LinkedList<>();
         texs.add(TextureAtlas.get_coord("grass"));
@@ -74,11 +174,12 @@ public class Chunk extends IndexedMesh {
 
         int next_color = 512;
         int[] proj = new int[size];
-        for (int y = 0; y < height; y++) {
+        Map<Integer, int[]> coords_map = new HashMap<>();
+        for (int y = 0; y < size; y++) {
             int[][] mark = new int[size][size];
             Arrays.fill(proj, -1);
             int len = 0;
-            Map<Integer, int[]> coords_map = new HashMap<>();
+            coords_map.clear();
             for (int z = 0; z < size; z++) {
                 boolean canDown = false;
                 int projFlag = -1;
@@ -161,9 +262,17 @@ public class Chunk extends IndexedMesh {
                             g = 0.7f;
                             b = 0.7f;
                         }
+
                         colors.addAll(Arrays.asList(r, g, b, r, g, b, r, g, b, r, g, b));
+//                        if (side_idx >= 0 && side_idx <= 3) {
+//                            colors.addAll(Arrays.asList(r, g, b, r - 0.5f, g - 0.5f, b - 0.5f, r, g, b, r - 0.5f, g - 0.5f, b - 0.5f));
+//                        } else {
+//                            colors.addAll(Arrays.asList(r - 0.5f, g - 0.5f, b - 0.5f, r, g, b, r - 0.5f, g - 0.5f, b - 0.5f, r, g, b));
+//                        }
                     }
                 }
+
+
             }
         }
 
@@ -223,9 +332,9 @@ public class Chunk extends IndexedMesh {
             }
         }
 
-        if (y == height - 1) {
+        if (y == size - 1) {
             sides[4] = true;
-        } else if (y < height - 1) {
+        } else if (y < size - 1) {
             for (int x = x0; x <= x1; x++) {
                 for (int z = z0; z <= z1; z++) {
                     if (block_type(x, y + 1, z) == 0) {
@@ -296,7 +405,7 @@ public class Chunk extends IndexedMesh {
         }
 
         if (sides[4] &&
-                y == height - 1 &&
+                y == size - 1 &&
                 y_chunk_pos != World.height - 1) {
             sides[4] = false;
             for (int x = x0; x <= x1; x++) {
@@ -314,7 +423,7 @@ public class Chunk extends IndexedMesh {
             sides[5] = false;
             for (int x = x0; x <= x1; x++) {
                 for (int z = z0; z <= z1; z++) {
-                    if (World.chunk(x_chunk_pos, y_chunk_pos - 1, z_chunk_pos).block_type(x, height - 1, z) == 0) {
+                    if (World.chunk(x_chunk_pos, y_chunk_pos - 1, z_chunk_pos).block_type(x, size - 1, z) == 0) {
                         sides[5] = true;
                         break;
                     }

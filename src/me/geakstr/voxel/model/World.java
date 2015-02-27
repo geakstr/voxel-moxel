@@ -10,7 +10,7 @@ import java.util.Random;
 import java.util.Set;
 
 public class World {
-    public static int size, height, volume, vert_square;
+    public static int size, height, volume, vertical_square;
 
     public static int chunks_in_frame = 0;
     public static int faces_in_frame = 0;
@@ -22,11 +22,11 @@ public class World {
     private static Chunk[] chunks;
 
     public static void init() {
-    	vert_square = size * height;
-        volume = size * vert_square;
-        
-        Chunk.vert_square = Chunk.size * Chunk.height;
-        Chunk.volume = Chunk.size * Chunk.vert_square;
+        vertical_square = size * height;
+        volume = size * vertical_square;
+
+        Chunk.square = Chunk.size * Chunk.size;
+        Chunk.volume = Chunk.size * Chunk.square;
 
         chunks = new Chunk[volume];
 
@@ -41,23 +41,27 @@ public class World {
         gen();
     }
 
+    public static int idx(int x, int y, int z, int height, int size) {
+        return x + height * y + z * size;
+    }
+
     public static Chunk chunk(int x, int y, int z) {
-        return chunks[vert_square * z + size * y + x];
+        return chunks[idx(x, y, z, vertical_square, size)];
     }
 
     public static void chunk(Chunk chunk, int x, int y, int z) {
-        chunks[vert_square * z + size * y + x] = chunk;
+        chunks[idx(x, y, z, vertical_square, size)] = chunk;
     }
 
     public static Chunk chunk_by_global_coords(int global_x, int global_y, int global_z) {
         if (global_x < 0 || global_x >= World.size * Chunk.size ||
-                global_y < 0 || global_y >= World.height * Chunk.height ||
+                global_y < 0 || global_y >= World.height * Chunk.size ||
                 global_z < 0 || global_z >= World.size * Chunk.size) {
             return null;
         }
 
         int chunk_x = global_x / (Chunk.size);
-        int chunk_y = global_y / (Chunk.height);
+        int chunk_y = global_y / (Chunk.size);
         int chunk_z = global_z / (Chunk.size);
 
         return chunk(chunk_x, chunk_y, chunk_z);
@@ -71,9 +75,10 @@ public class World {
         chunks_in_frame = 0;
         faces_in_frame = 0;
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < size; x++) {
-                for (int z = 0; z < size; z++) {
+        int x, y, z;
+        for (y = 0; y < height; y++) {
+            for (x = 0; x < size; x++) {
+                for (z = 0; z < size; z++) {
                     if (!Game.frustum || Frustum.chunkInFrustum(x, y, z)) {
                         chunk(x, y, z).render();
                     }
@@ -100,7 +105,7 @@ public class World {
 
         for (int global_x = 0; global_x < size * Chunk.size; global_x++) {
             for (int global_z = 0; global_z < size * Chunk.size; global_z++) {
-                double global_y = ((noise.eval(global_x / 256.0f, global_z / 256.0f, 1.0) + 1)) * height * Chunk.height / 2;
+                double global_y = ((noise.eval(global_x / 256.0f, global_z / 256.0f, 1.0) + 1)) * height * Chunk.size / 2;
 
                 int chunk_x = global_x / (Chunk.size);
                 int chunk_z = global_z / (Chunk.size);
@@ -108,11 +113,11 @@ public class World {
                 int cube_x = global_x % Chunk.size;
                 int cube_z = global_z % Chunk.size;
 
-                int chunk_vert_size = (int) (Math.ceil(global_y / Chunk.height));
+                int chunk_vert_size = (int) (Math.ceil(global_y / Chunk.size));
                 for (int chunk_y = 0; chunk_y < chunk_vert_size; chunk_y++) {
                     Chunk chunk = chunk(chunk_x, chunk_y, chunk_z);
 
-                    int height = chunk_y == chunk_vert_size - 1 ? (int) (global_y % Chunk.height) : Chunk.height;
+                    int height = chunk_y == chunk_vert_size - 1 ? (int) (global_y % Chunk.size) : Chunk.size;
 
                     for (int cube_y = 0; cube_y < height; cube_y++) {
                         chunk.block_type(1, cube_x, cube_y, cube_z);
