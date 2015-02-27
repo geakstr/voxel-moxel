@@ -40,7 +40,7 @@ public class Chunk extends IndexedMesh {
 
         this.empty = true;
     }
-
+    
     public int block(int x, int y, int z) {
         return blocks[vert_square * z + size * y + x];
     }

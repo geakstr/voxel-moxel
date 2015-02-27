@@ -1,6 +1,5 @@
 package me.geakstr.voxel.game;
 
-import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.model.Player;
 import me.geakstr.voxel.model.TextureAtlas;
@@ -12,10 +11,6 @@ import me.geakstr.voxel.render.Shader;
 import me.geakstr.voxel.render.Transform;
 import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
-
-import static org.lwjgl.opengl.ARBShaderObjects.glUseProgramObjectARB;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL30.*;
 
 public class Game {
     public static boolean frustum;
@@ -32,11 +27,8 @@ public class Game {
     public static void init() {
         chunks_workers_executor_service = new ChunksWorkersExecutorService();
 
-        gui_shader = new Shader("gui").compile();
-        gui_shader.save_attrs("attr_pos", "attr_color");
-
-        world_shader = new Shader("world").compile();
-        world_shader.save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color", "attr_normal");
+        gui_shader = new Shader("gui").save_attrs("attr_pos", "attr_color");
+        world_shader = new Shader("world").save_attrs("attr_pos", "attr_tex_offset", "attr_tex_coord", "attr_color", "attr_normal");
 
         current_shader = world_shader;
         ResourceUtil.load_textures("atlas.png", "axe.png");

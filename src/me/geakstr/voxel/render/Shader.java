@@ -26,6 +26,8 @@ public class Shader {
 
         attach_vertex_shader(shader_name + ".vs");
         attach_fragment_shader(shader_name + ".fs");
+        
+        compile();
     }
 
     public Shader compile() {

@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Picker {
-    public static final int picker_length = -(Chunk.size * (World.near_chunks_radius + 1));
+    public static final int picker_length = -6;
 
     public static Pair<Block, Block.SIDE> select(Ray ray, boolean pick_side) {
         final Vector3f camera_position = Camera.position.negate(null);
@@ -108,8 +108,8 @@ public class Picker {
                 int x = (int) pos.x % Chunk.size;
                 int y = (int) pos.y % Chunk.height;
                 int z = (int) pos.z % Chunk.size;
-                chunk.block(0, x, y, z);
-
+                
+                chunk.block_type(0, x, y, z);
                 chunk.changed = true;
 
                 if (x == 0 && chunk.x_chunk_pos != 0) {
