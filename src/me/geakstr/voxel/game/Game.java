@@ -1,5 +1,6 @@
 package me.geakstr.voxel.game;
 
+import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.model.Player;
 import me.geakstr.voxel.model.TextureAtlas;
@@ -11,6 +12,10 @@ import me.geakstr.voxel.render.Shader;
 import me.geakstr.voxel.render.Transform;
 import me.geakstr.voxel.util.ResourceUtil;
 import me.geakstr.voxel.workers.ChunksWorkersExecutorService;
+
+import static org.lwjgl.opengl.ARBShaderObjects.glUseProgramObjectARB;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.*;
 
 public class Game {
     public static boolean frustum;
@@ -50,6 +55,7 @@ public class Game {
         GUI.init();
     }
 
+ 
     public static void before_render() {
         if (Camera.input()) {
             Camera.update();

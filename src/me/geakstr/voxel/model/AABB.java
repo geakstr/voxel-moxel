@@ -12,13 +12,13 @@ Box represents as vertices with {x,y,z} coords in OpenGL coordinate system:
               |
               |
               |
-     5 {0,1,0}+-------+6 {1,1,0}
+     4 {0,1,0}+-------+5 {1,1,0}
            .' |     .'|
- 1 {0,1,1}+-------+'4 {1,1,1}
+ 0 {0,1,1}+-------+'3 {1,1,1}
           |   |   |   |
-     8 {0,0,0}+---|---+7 {1,0,0}-------------→ X
+     7 {0,0,0}+---|---+6 {1,0,0}-------------→ X
           | .'    | .'
- 2 {0,0,1}+-------+'3 {1,0,1}
+ 1 {0,0,1}+-------+'2 {1,0,1}
        .'
      .'
    .'
@@ -332,6 +332,15 @@ public class AABB {
     }
 
     public static enum VERTEX {
+        V0 {
+            public float[] coords() {
+                return Arrays.copyOf(v0_vertex_coords, 3);
+            }
+
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
+                return AABB.translate(coords(), x_pos, y_pos, z_pos);
+            }
+        },
         V1 {
             public float[] coords() {
                 return Arrays.copyOf(v1_vertex_coords, 3);
@@ -395,15 +404,6 @@ public class AABB {
                 return AABB.translate(coords(), x_pos, y_pos, z_pos);
             }
         },
-        V8 {
-            public float[] coords() {
-                return Arrays.copyOf(v8_vertex_coords, 3);
-            }
-
-            public float[] translate(int x_pos, int y_pos, int z_pos) {
-                return AABB.translate(coords(), x_pos, y_pos, z_pos);
-            }
-        },
         ALL {
             public float[] coords() {
                 return Arrays.copyOf(all_vertices_coords, 18);
@@ -435,124 +435,148 @@ public class AABB {
 
     private static final float[] all_sides_vertices_coords = new float[]{
             // front
-            0, 0, 1, // v2
-            1, 0, 1, // v3
-            0, 1, 1, // v1
-            1, 1, 1, // v4
+            0, 0, 1, // v1
+            1, 0, 1, // v2
+            0, 1, 1, // v0
+            1, 1, 1, // v3
 
             // back
-            1, 0, 0, // v7
-            0, 0, 0, // v8
-            1, 1, 0, // v6
-            0, 1, 0, // v5
+            1, 0, 0, // v6
+            0, 0, 0, // v7
+            1, 1, 0, // v5
+            0, 1, 0, // v4
 
             // left
-            0, 0, 0, // v8
-            0, 0, 1, // v2
-            0, 1, 0, // v5
-            0, 1, 1, // v1
+            0, 0, 0, // v7
+            0, 0, 1, // v1
+            0, 1, 0, // v4
+            0, 1, 1, // v0
 
             // right
-            1, 0, 1, // v3
-            1, 0, 0, // v7
-            1, 1, 1, // v4
-            1, 1, 0, // v6
+            1, 0, 1, // v2
+            1, 0, 0, // v6
+            1, 1, 1, // v3
+            1, 1, 0, // v5
 
             // top
-            0, 1, 1, // v1
-            1, 1, 1, // v4
-            0, 1, 0, // v5
-            1, 1, 0, // v6
+            0, 1, 1, // v0
+            1, 1, 1, // v3
+            0, 1, 0, // v4
+            1, 1, 0, // v5
 
             // bottom
-            0, 0, 0, // v8
-            1, 0, 0, // v7
-            0, 0, 1, // v2
-            1, 0, 1, // v3
+            0, 0, 0, // v7
+            1, 0, 0, // v6
+            0, 0, 1, // v1
+            1, 0, 1, // v2
     };
 
     private static final float[] front_side_vertices_coords = new float[]{
-            0, 0, 1, // v2
-            1, 0, 1, // v3
-            0, 1, 1, // v1
-            1, 1, 1, // v4
+            0, 0, 1, // v1
+            1, 0, 1, // v2
+            0, 1, 1, // v0
+            1, 1, 1, // v3
+    };
+
+    private static final int[] front_side_vertices_idx = new int[]{
+            1, 2, 0, 3
     };
 
     private static final float[] back_side_vertices_coords = new float[]{
-            1, 0, 0, // v7
-            0, 0, 0, // v8
-            1, 1, 0, // v6
-            0, 1, 0, // v5
+            1, 0, 0, // v6
+            0, 0, 0, // v7
+            1, 1, 0, // v5
+            0, 1, 0, // v4
+    };
+
+    private static final int[] back_side_vertices_idx = new int[]{
+            6, 7, 5, 4
     };
 
     private static final float[] left_side_vertices_coords = new float[]{
-            0, 0, 0, // v8
-            0, 0, 1, // v2
-            0, 1, 0, // v5
-            0, 1, 1, // v1
+            0, 0, 0, // v7
+            0, 0, 1, // v1
+            0, 1, 0, // v4
+            0, 1, 1, // v0
+    };
+
+    private static final int[] left_side_vertices_idx = new int[]{
+            7, 1, 4, 0
     };
 
     private static final float[] right_side_vertices_coords = new float[]{
-            1, 0, 1, // v3
-            1, 0, 0, // v7
-            1, 1, 1, // v4
-            1, 1, 0, // v6
+            1, 0, 1, // v2
+            1, 0, 0, // v6
+            1, 1, 1, // v3
+            1, 1, 0, // v5
+    };
+
+    private static final int[] right_side_vertices_idx = new int[]{
+            2, 6, 3, 5
     };
 
     private static final float[] top_side_vertices_coords = new float[]{
-            0, 1, 1, // v1
-            1, 1, 1, // v4
-            0, 1, 0, // v5
-            1, 1, 0, // v6
+            0, 1, 1, // v0
+            1, 1, 1, // v3
+            0, 1, 0, // v4
+            1, 1, 0, // v5
+    };
+
+    private static final int[] top_side_vertices_idx = new int[]{
+            0, 3, 4, 5
     };
 
     private static final float[] bottom_side_vertices_coords = new float[]{
-            0, 0, 0, // v8
-            1, 0, 0, // v7
-            0, 0, 1, // v2
-            1, 0, 1, // v3
+            0, 0, 0, // v7
+            1, 0, 0, // v6
+            0, 0, 1, // v1
+            1, 0, 1, // v2
+    };
+
+    private static final int[] bottom_side_vertices_idx = new int[]{
+            7, 6, 1, 2
     };
 
     private static final float[] all_vertices_coords = new float[]{
-            0, 1, 1, // v1
-            0, 0, 1, // v2
-            1, 0, 1, // v3
-            1, 1, 1, // v4
-            0, 1, 0, // v5
-            1, 1, 0, // v6
-            1, 0, 0, // v7
-            0, 0, 0, // v8
+            0, 1, 1, // v0
+            0, 0, 1, // v1
+            1, 0, 1, // v2
+            1, 1, 1, // v3
+            0, 1, 0, // v4
+            1, 1, 0, // v5
+            1, 0, 0, // v6
+            0, 0, 0, // v7
+    };
+
+    private static final float[] v0_vertex_coords = new float[]{
+            0, 1, 1, // v0
     };
 
     private static final float[] v1_vertex_coords = new float[]{
-            0, 1, 1, // v1
+            0, 0, 1, // v1
     };
 
     private static final float[] v2_vertex_coords = new float[]{
-            0, 0, 1, // v2
+            1, 0, 1, // v2
     };
 
     private static final float[] v3_vertex_coords = new float[]{
-            1, 0, 1, // v3
+            1, 1, 1, // v3
     };
 
     private static final float[] v4_vertex_coords = new float[]{
-            1, 1, 1, // v4
+            0, 1, 0, // v4
     };
 
     private static final float[] v5_vertex_coords = new float[]{
-            0, 1, 0, // v5
+            1, 1, 0, // v5
     };
 
     private static final float[] v6_vertex_coords = new float[]{
-            1, 1, 0, // v6
+            1, 0, 0, // v6
     };
 
     private static final float[] v7_vertex_coords = new float[]{
-            1, 0, 0, // v7
-    };
-
-    private static final float[] v8_vertex_coords = new float[]{
-            0, 0, 0, // v8
+            0, 0, 0, // v7
     };
 }

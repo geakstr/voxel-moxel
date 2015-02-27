@@ -111,14 +111,42 @@ public abstract class AbstractMesh {
     protected void init_vao() {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-        glEnableVertexAttribArray(Game.current_shader.attr("attr_pos"));
-        glEnableVertexAttribArray(Game.current_shader.attr("attr_tex_coord"));
-        glEnableVertexAttribArray(Game.current_shader.attr("attr_tex_offset"));
-        glEnableVertexAttribArray(Game.current_shader.attr("attr_color"));
+        int bytes = 0;
+        if (Game.current_shader.has_attr("attr_pos")) {
+	        glEnableVertexAttribArray(Game.current_shader.attr("attr_pos"));
+	        bytes += 12;
+        }
+        if (Game.current_shader.has_attr("attr_tex_coord")) {
+        	glEnableVertexAttribArray(Game.current_shader.attr("attr_tex_coord"));
+        	bytes += 8;
+        }
+        if (Game.current_shader.has_attr("attr_tex_offset")) {
+        	glEnableVertexAttribArray(Game.current_shader.attr("attr_tex_offset"));
+        	bytes += 8;
+        }
+        if (Game.current_shader.has_attr("attr_color")) {
+        	glEnableVertexAttribArray(Game.current_shader.attr("attr_color"));
+        	bytes += 12;
+        }
 
-        glVertexAttribPointer(Game.current_shader.attr("attr_pos"), 3, GL_FLOAT, false, 40, 0);
-        glVertexAttribPointer(Game.current_shader.attr("attr_tex_coord"), 2, GL_FLOAT, false, 40, 12);
-        glVertexAttribPointer(Game.current_shader.attr("attr_tex_offset"), 2, GL_FLOAT, false, 40, 20);
-        glVertexAttribPointer(Game.current_shader.attr("attr_color"), 3, GL_FLOAT, false, 40, 28);
+        int bytes_offset = 0;
+        if (Game.current_shader.has_attr("attr_pos")) {
+        	glVertexAttribPointer(Game.current_shader.attr("attr_pos"), 3, GL_FLOAT, false, bytes, bytes_offset);
+        	bytes_offset += 12;
+        }
+        if (Game.current_shader.has_attr("attr_tex_coord")) {
+        	glVertexAttribPointer(Game.current_shader.attr("attr_tex_coord"), 2, GL_FLOAT, false, bytes, bytes_offset);
+        	bytes_offset += 8;
+        }
+        if (Game.current_shader.has_attr("attr_tex_offset")) {
+        	glVertexAttribPointer(Game.current_shader.attr("attr_tex_offset"), 2, GL_FLOAT, false, bytes, bytes_offset);
+        	bytes_offset += 8;
+        }
+        if (Game.current_shader.has_attr("attr_color")) {
+        	glVertexAttribPointer(Game.current_shader.attr("attr_color"), 3, GL_FLOAT, false, bytes, bytes_offset);
+        	bytes_offset += 12;
+        }
+        
+        
     }
 }

@@ -65,13 +65,17 @@ public class Window {
 
         GLContext.createFromCurrent();
 
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(1f, 1f, 1f, 1.0f);
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-        
+
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        glEnable(GL_COLOR_MATERIAL);
+
         glViewport(0, 0, Math.max(Window.width, Window.height), Math.max(Window.width, Window.height));
 
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
