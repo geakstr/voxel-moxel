@@ -75,11 +75,7 @@ public class Window {
         glCullFace(GL_BACK);
         glEnable(GL_CULL_FACE);
 
-        //glEnable(GL_SMOOTH);
-//glHint(GL_POLYGON_SMOOTH, GL_NICEST);
-//glEnable(GL_POLYGON_SMOOTH);
-//        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-//        glEnable(GL_MULTISAMPLE_ARB);
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         glViewport(0, 0, Math.max(Window.width, Window.height), Math.max(Window.width, Window.height));
 

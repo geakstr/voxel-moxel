@@ -10,11 +10,12 @@ uniform sampler2D uniform_texture;
 
 out vec4 FragColor;
 
-float snoise(vec2 co) {
+float snoise(vec2 co){
     return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
 
-void main() {
+void main()
+{
     vec2 tex_coord = out_tex_coord.xy;
     vec4 tex_color, color;
 

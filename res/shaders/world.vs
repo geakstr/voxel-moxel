@@ -25,5 +25,5 @@ void main()
 
 	out_texture_info = uniform_texture_info;
 
-    gl_Position = uniform_camera_projection * uniform_camera_view * uniform_transform * vec4(attr_pos, 1.0);
+    gl_Position = uniform_camera_projection * uniform_camera_view * uniform_transform * vec4(attr_pos, 1);
 }

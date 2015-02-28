@@ -46,12 +46,12 @@ public class IndexedMesh extends AbstractMesh {
         glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
     }
 
-    public void update_gl_data(float[] vertices, float[] tex_coords, float[] tex_coords_offsets, float[] colors) {
+    public void update_gl_data(int[] vertices, int[] tex_coords, float[] tex_coords_offsets, float[] colors) {
         super.update_gl_data(vertices, tex_coords, tex_coords_offsets, colors);
         this.update_ibo(vertices.length / 2);
     }
 
-    public void update_gl_data(List<Float> vertices, List<Float> tex_coords, List<Float> tex_coords_offsets, List<Float> colors) {
+    public void update_gl_data(List<Integer> vertices, List<Integer> tex_coords, List<Float> tex_coords_offsets, List<Float> colors) {
         super.update_gl_data(vertices, tex_coords, tex_coords_offsets, colors);
         this.update_ibo(vertices.size() / 2);
     }

@@ -159,8 +159,8 @@ public class Chunk extends IndexedMesh {
             }
         }
 
-        List<Float> verts = new ArrayList<>();
-        List<Float> tex = new ArrayList<>();
+        List<Integer> verts = new ArrayList<>();
+        List<Integer> tex = new ArrayList<>();
         List<Float> tex_off = new ArrayList<>();
         List<Float> colors = new ArrayList<>();
 
@@ -244,10 +244,10 @@ public class Chunk extends IndexedMesh {
 
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        verts.addAll(ArraysUtil.copy_floats(
+                        verts.addAll(ArraysUtil.copy_ints(
                                 AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, y + y_offset, z0 + z_offset, xx, 1, zz)));
 
-                        tex.addAll(ArraysUtil.copy_floats(
+                        tex.addAll(ArraysUtil.copy_ints(
                                 AABB.SIDE.values[side_idx].texture_coords(xx, zz)));
 
                         tex_off.addAll(Arrays.asList(
@@ -265,9 +265,7 @@ public class Chunk extends IndexedMesh {
 
                         for (int xxx = x0; xxx <= x1; xxx++) {
                             for (int zzz = z0; zzz <= z1; zzz++) {
-                                float light = light_map[World.idx(xxx, y, zzz, square, size)];
-
-                                light = light / 15.0f;
+                                float light = light_map[World.idx(xxx, y, zzz, square, size)] / 15.0f;
 
                                 r *= light;
                                 g *= light;
