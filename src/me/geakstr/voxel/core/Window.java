@@ -14,6 +14,7 @@ import static org.lwjgl.glfw.Callbacks.errorCallbackPrint;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.lwjgl.opengl.ARBMultisample.GL_MULTISAMPLE_ARB;
 
 public class Window {
     public static int width = 800;
@@ -69,12 +70,16 @@ public class Window {
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
 
-        glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
-        glEnable(GL_COLOR_MATERIAL);
+        glFrontFace(GL_CCW);
+        glCullFace(GL_BACK);
+        glEnable(GL_CULL_FACE);
+
+        //glEnable(GL_SMOOTH);
+//glHint(GL_POLYGON_SMOOTH, GL_NICEST);
+//glEnable(GL_POLYGON_SMOOTH);
+//        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+//        glEnable(GL_MULTISAMPLE_ARB);
 
         glViewport(0, 0, Math.max(Window.width, Window.height), Math.max(Window.width, Window.height));
 
