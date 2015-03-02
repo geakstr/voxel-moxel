@@ -1,12 +1,19 @@
 package me.geakstr.voxel.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+
 import me.geakstr.voxel.game.Game;
+import me.geakstr.voxel.helpers.BidirectionalMap;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.model.meshes.IndexedMesh;
 import me.geakstr.voxel.util.ArraysUtil;
 import me.geakstr.voxel.workers.ChunkWorker;
-
-import java.util.*;
 
 public class Chunk extends IndexedMesh {
     public static int size, volume, square;
@@ -150,15 +157,6 @@ public class Chunk extends IndexedMesh {
 
         lighting();
 
-        if (x_chunk_pos == 0 && y_chunk_pos == 0 && z_chunk_pos == 0) {
-            for (int i = size - 1; i >= 0; i--) {
-                for (int k = 0; k < size; k++) {
-                    System.out.print(light_map[World.idx(i, 8, k, square, size)] + " ");
-                }
-                System.out.println();
-            }
-        }
-
         List<Integer> verts = new ArrayList<>();
         List<Integer> tex = new ArrayList<>();
         List<Float> tex_off = new ArrayList<>();
@@ -170,6 +168,10 @@ public class Chunk extends IndexedMesh {
         texs.add(TextureAtlas.get_coord("stone"));
         texs.add(TextureAtlas.get_coord("wood_0"));
         texs.add(TextureAtlas.get_coord("sand"));
+        
+        BidirectionalMap<Vertex, Integer> vertex2index = new BidirectionalMap<>();
+        List<Integer> indices = new ArrayList<>();
+        int cur_vertex_idx = 0;
 
         int next_color = 512;
         int[] proj = new int[size];
@@ -183,11 +185,11 @@ public class Chunk extends IndexedMesh {
                 boolean canDown = false;
                 int projFlag = -1;
                 for (int x = 0; x < size; x++) {
-                    if (block_type(x, y, z) == 0) {
+                	int type = block_type(x, y, z);
+                    if (type == 0) {
                         continue;
                     }
-
-                    int type = 1;
+                    
                     int light = torchlight(x, y, z);
                     boolean update_coords = false;
 
@@ -244,11 +246,11 @@ public class Chunk extends IndexedMesh {
 
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                        verts.addAll(ArraysUtil.copy_ints(
-                                AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, y + y_offset, z0 + z_offset, xx, 1, zz)));
+                    	int[] vertices = AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, y + y_offset, z0 + z_offset, xx, 1, zz);
+                        verts.addAll(ArraysUtil.copy_ints(vertices));
 
-                        tex.addAll(ArraysUtil.copy_ints(
-                                AABB.SIDE.values[side_idx].texture_coords(xx, zz)));
+                        int[] tex_coords = AABB.SIDE.values[side_idx].texture_coords(xx, zz);
+                        tex.addAll(ArraysUtil.copy_ints(tex_coords));
 
                         tex_off.addAll(Arrays.asList(
                                 texture.x, texture.y,
@@ -267,16 +269,83 @@ public class Chunk extends IndexedMesh {
                             for (int zzz = z0; zzz <= z1; zzz++) {
                                 float light = light_map[World.idx(xxx, y, zzz, square, size)] / 15.0f;
 
-                                r *= light;
-                                g *= light;
-                                b *= light;
+//                                r *= light;
+//                                g *= light;
+//                                b *= light;
                             }
                         }
                         colors.addAll(Arrays.asList(r, g, b, r, g, b, r, g, b, r, g, b));
+                        
+                        Vertex vertex;
+                        Integer index; 
+                        
+                        vertex = new Vertex(vertices[0], vertices[1], vertices[2],
+ 							   tex_coords[0], tex_coords[1],
+ 							   texture.x, texture.y,
+ 							   r, g, b);
+					 	index = vertex2index.get(vertex);
+					 	if (index == null) {
+					 		index = cur_vertex_idx++;
+					 		vertex2index.put(vertex, index);
+					 	}
+					 	indices.add(index);
+					 	
+					 	vertex = new Vertex(vertices[3], vertices[4], vertices[5],
+	 							   tex_coords[2], tex_coords[3],
+	 							   texture.x, texture.y,
+	 							   r, g, b);
+					 	index = vertex2index.get(vertex);
+					 	if (index == null) {
+					 		index = cur_vertex_idx++;
+					 		vertex2index.put(vertex, index);
+					 	}
+					 	indices.add(index);
+					 	
+					 	vertex = new Vertex(vertices[6], vertices[7], vertices[8],
+	 							   tex_coords[4], tex_coords[5],
+	 							   texture.x, texture.y,
+	 							   r, g, b);
+					 	index = vertex2index.get(vertex);
+					 	if (index == null) {
+					 		index = cur_vertex_idx++;
+					 		vertex2index.put(vertex, index);
+					 	}
+					 	indices.add(index);
+					 	
+					 	vertex = new Vertex(vertices[3], vertices[4], vertices[5],
+	 							   tex_coords[2], tex_coords[3],
+	 							   texture.x, texture.y,
+	 							   r, g, b);
+					 	index = vertex2index.get(vertex);
+					 	if (index == null) {
+					 		index = cur_vertex_idx++;
+					 		vertex2index.put(vertex, index);
+					 	}
+					 	indices.add(index);
+					 	
+					 	vertex = new Vertex(vertices[9], vertices[10], vertices[11],
+	 							   tex_coords[6], tex_coords[7],
+	 							   texture.x, texture.y,
+	 							   r, g, b);
+					 	index = vertex2index.get(vertex);
+					 	if (index == null) {
+					 		index = cur_vertex_idx++;
+					 		vertex2index.put(vertex, index);
+					 	}
+					 	indices.add(index);
+					 	
+					 	vertex = new Vertex(vertices[6], vertices[7], vertices[8],
+	 							   tex_coords[4], tex_coords[5],
+	 							   texture.x, texture.y,
+	 							   r, g, b);
+					 	index = vertex2index.get(vertex);
+					 	if (index == null) {
+					 		index = cur_vertex_idx++;
+					 		vertex2index.put(vertex, index);
+					 	}
+					 	indices.add(index);
                     }
                 }
-
-
             }
         }
 
@@ -285,8 +354,13 @@ public class Chunk extends IndexedMesh {
         this.empty = faces_counter == 0;
 
         synchronized (this) {
+        	for (int index : indices) {
+        		Vertex vertex = vertex2index.getKey(index);
+            	System.err.println(index + " | " + vertex.pos_x + " " + vertex.pos_y + " " + vertex.pos_z);
+            }
             if (!empty) {
-                update_gl_data(verts, tex, tex_off, colors);
+                //update_gl_data(verts, tex, tex_off, colors);
+            	update_gl_data(vertex2index, indices);
             }
         }
     }

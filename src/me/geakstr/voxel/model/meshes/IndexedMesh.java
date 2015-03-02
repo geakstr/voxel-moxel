@@ -1,5 +1,8 @@
 package me.geakstr.voxel.model.meshes;
 
+import me.geakstr.voxel.helpers.BidirectionalMap;
+import me.geakstr.voxel.model.Vertex;
+
 import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
@@ -54,6 +57,24 @@ public class IndexedMesh extends AbstractMesh {
     public void update_gl_data(List<Integer> vertices, List<Integer> tex_coords, List<Float> tex_coords_offsets, List<Float> colors) {
         super.update_gl_data(vertices, tex_coords, tex_coords_offsets, colors);
         this.update_ibo(vertices.size() / 2);
+    }
+    
+    public void update_gl_data(BidirectionalMap<Vertex, Integer> vertex2index, List<Integer> indices) {
+		this.indices_counter = indices.size();
+		this.ibo_data = BufferUtils.createByteBuffer(indices_counter * 4);
+		this.vbo_data = BufferUtils.createByteBuffer(indices_counter * 40);
+		for (int index : indices) {
+			Vertex vertex = vertex2index.getKey(index);
+			
+			ibo_data.putInt(index);
+			
+			vbo_data.putInt(vertex.pos_x).putInt(vertex.pos_y).putInt(vertex.pos_z);
+			vbo_data.putInt(vertex.tex_coord_x).putInt(vertex.tex_coord_y);
+			vbo_data.putFloat(vertex.tex_coord_offset_x).putFloat(vertex.tex_coord_offset_y);
+			vbo_data.putFloat(vertex.color_r).putFloat(vertex.color_g).putFloat(vertex.color_b);
+		}
+		vbo_data.flip();
+		ibo_data.flip();
     }
 
     public void draw() {

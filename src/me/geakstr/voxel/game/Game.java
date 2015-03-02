@@ -51,7 +51,7 @@ public class Game {
         current_shader = gui_shader;
         GUI.init();
 
-        World.chunk(0, 0, 0).place_torch(0, 8, 0);
+       // World.chunk(0, 0, 0).place_torch(0, 8, 0);
     }
 
 
