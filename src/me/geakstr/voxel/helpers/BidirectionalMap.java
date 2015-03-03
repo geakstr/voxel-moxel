@@ -1,24 +1,25 @@
 package me.geakstr.voxel.helpers;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 public class BidirectionalMap<KeyType, ValueType> {
-    private Map<KeyType, ValueType> keyToValueMap = new ConcurrentHashMap<KeyType, ValueType>();
-    private Map<ValueType, KeyType> valueToKeyMap = new ConcurrentHashMap<ValueType, KeyType>();
+    private Map<KeyType, ValueType> keyToValueMap = new LinkedHashMap<KeyType, ValueType>();
+    private Map<ValueType, KeyType> valueToKeyMap = new LinkedHashMap<ValueType, KeyType>();
 
-    synchronized public void put(KeyType key, ValueType value){
+    public void put(KeyType key, ValueType value){
         keyToValueMap.put(key, value);
         valueToKeyMap.put(value, key);
     }
 
-    synchronized public ValueType removeByKey(KeyType key){
+    public ValueType removeByKey(KeyType key){
         ValueType removedValue = keyToValueMap.remove(key);
         valueToKeyMap.remove(removedValue);
         return removedValue;
     }
 
-    synchronized public KeyType removeByValue(ValueType value){
+    public KeyType removeByValue(ValueType value){
         KeyType removedKey = valueToKeyMap.remove(value);
         keyToValueMap.remove(removedKey);
         return removedKey;
@@ -38,6 +39,10 @@ public class BidirectionalMap<KeyType, ValueType> {
 
     public ValueType get(KeyType key){
         return keyToValueMap.get(key);
+    }
+    
+    public Set<Map.Entry<KeyType, ValueType>> keyToValueEntrySet() {
+    	return keyToValueMap.entrySet();
     }
     
     public int size() {

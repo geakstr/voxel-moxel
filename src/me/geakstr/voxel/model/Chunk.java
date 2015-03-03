@@ -176,6 +176,8 @@ public class Chunk extends IndexedMesh {
         int next_color = 512;
         int[] proj = new int[size];
         Map<Integer, int[]> coords_map = new HashMap<>();
+        
+        this.faces_counter = 0;
         for (int y = 0; y < size; y++) {
             int[][] mark = new int[size][size];
             Arrays.fill(proj, -1);
@@ -247,34 +249,34 @@ public class Chunk extends IndexedMesh {
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
                     	int[] vertices = AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, y + y_offset, z0 + z_offset, xx, 1, zz);
-                        verts.addAll(ArraysUtil.copy_ints(vertices));
+//                        verts.addAll(ArraysUtil.copy_ints(vertices));
 
                         int[] tex_coords = AABB.SIDE.values[side_idx].texture_coords(xx, zz);
-                        tex.addAll(ArraysUtil.copy_ints(tex_coords));
-
-                        tex_off.addAll(Arrays.asList(
-                                texture.x, texture.y,
-                                texture.x, texture.y,
-                                texture.x, texture.y,
-                                texture.x, texture.y));
+//                        tex.addAll(ArraysUtil.copy_ints(tex_coords));
+//
+//                        tex_off.addAll(Arrays.asList(
+//                                texture.x, texture.y,
+//                                texture.x, texture.y,
+//                                texture.x, texture.y,
+//                                texture.x, texture.y));
 
                         float r = 1.0f, g = 1.0f, b = 1.0f;
                         if (side_idx >= 0 && side_idx <= 3) {
-                            r = 0.7f;
-                            g = 0.7f;
-                            b = 0.7f;
+//                            r = 0.7f;
+//                            g = 0.7f;
+//                            b = 0.7f;
                         }
 
-                        for (int xxx = x0; xxx <= x1; xxx++) {
-                            for (int zzz = z0; zzz <= z1; zzz++) {
-                                float light = light_map[World.idx(xxx, y, zzz, square, size)] / 15.0f;
-
+//                        for (int xxx = x0; xxx <= x1; xxx++) {
+//                            for (int zzz = z0; zzz <= z1; zzz++) {
+//                                float light = light_map[World.idx(xxx, y, zzz, square, size)] / 15.0f;
+//
 //                                r *= light;
 //                                g *= light;
 //                                b *= light;
-                            }
-                        }
-                        colors.addAll(Arrays.asList(r, g, b, r, g, b, r, g, b, r, g, b));
+//                            }
+//                        }
+//                        colors.addAll(Arrays.asList(r, g, b, r, g, b, r, g, b, r, g, b));
                         
                         Vertex vertex;
                         Integer index; 
@@ -344,25 +346,22 @@ public class Chunk extends IndexedMesh {
 					 		vertex2index.put(vertex, index);
 					 	}
 					 	indices.add(index);
+					 	
+					 	this.faces_counter += 2;
                     }
                 }
             }
         }
 
         this.updated = true;
-        this.faces_counter = verts.size() / 3;
         this.empty = faces_counter == 0;
 
-        synchronized (this) {
-        	for (int index : indices) {
-        		Vertex vertex = vertex2index.getKey(index);
-            	System.err.println(index + " | " + vertex.pos_x + " " + vertex.pos_y + " " + vertex.pos_z);
-            }
-            if (!empty) {
+        //synchronized (this) {
+           if (!empty) {
                 //update_gl_data(verts, tex, tex_off, colors);
             	update_gl_data(vertex2index, indices);
-            }
-        }
+           }
+        //}
     }
 
     public boolean[] renderable_sides(int x0, int z0, int x1, int z1, int y) {
@@ -515,15 +514,14 @@ public class Chunk extends IndexedMesh {
     public void update() {
         if (changed && !updating && updated) {
             updated = false;
-            Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
+            //Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
+            rebuild();
         }
 
         if (updated && updating) {
             updating = false;
-            synchronized (this) {
-                if (!empty) {
-                    update_gl_buffers();
-                }
+            if (!empty) {
+                update_gl_buffers();
             }
         }
         changed = false;

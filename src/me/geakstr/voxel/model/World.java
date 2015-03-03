@@ -38,7 +38,7 @@ public class World {
             }
         }
 
-        gen2();
+        gen();
     }
 
     public static int idx(int x, int y, int z, int height, int size) {

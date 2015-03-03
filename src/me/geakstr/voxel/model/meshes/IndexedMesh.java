@@ -7,6 +7,7 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -62,19 +63,19 @@ public class IndexedMesh extends AbstractMesh {
     public void update_gl_data(BidirectionalMap<Vertex, Integer> vertex2index, List<Integer> indices) {
 		this.indices_counter = indices.size();
 		this.ibo_data = BufferUtils.createByteBuffer(indices_counter * 4);
-		this.vbo_data = BufferUtils.createByteBuffer(indices_counter * 40);
+		this.vbo_data = BufferUtils.createByteBuffer(vertex2index.size() * 40);
 		for (int index : indices) {
-			Vertex vertex = vertex2index.getKey(index);
-			
 			ibo_data.putInt(index);
-			
-			vbo_data.putInt(vertex.pos_x).putInt(vertex.pos_y).putInt(vertex.pos_z);
-			vbo_data.putInt(vertex.tex_coord_x).putInt(vertex.tex_coord_y);
-			vbo_data.putFloat(vertex.tex_coord_offset_x).putFloat(vertex.tex_coord_offset_y);
-			vbo_data.putFloat(vertex.color_r).putFloat(vertex.color_g).putFloat(vertex.color_b);
+		}
+		ibo_data.flip();
+		
+		for (Map.Entry<Vertex, Integer> vertex_entry : vertex2index.keyToValueEntrySet()) {
+			vbo_data.putInt(vertex_entry.getKey().pos_x).putInt(vertex_entry.getKey().pos_y).putInt(vertex_entry.getKey().pos_z);
+			vbo_data.putInt(vertex_entry.getKey().tex_coord_x).putInt(vertex_entry.getKey().tex_coord_y);
+			vbo_data.putFloat(vertex_entry.getKey().tex_coord_offset_x).putFloat(vertex_entry.getKey().tex_coord_offset_y);
+			vbo_data.putFloat(vertex_entry.getKey().color_r).putFloat(vertex_entry.getKey().color_g).putFloat(vertex_entry.getKey().color_b);
 		}
 		vbo_data.flip();
-		ibo_data.flip();
     }
 
     public void draw() {
