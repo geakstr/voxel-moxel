@@ -356,12 +356,12 @@ public class Chunk extends IndexedMesh {
         this.updated = true;
         this.empty = faces_counter == 0;
 
-        //synchronized (this) {
+        synchronized (this) {
            if (!empty) {
                 //update_gl_data(verts, tex, tex_off, colors);
             	update_gl_data(vertex2index, indices);
            }
-        //}
+        }
     }
 
     public boolean[] renderable_sides(int x0, int z0, int x1, int z1, int y) {
@@ -514,14 +514,15 @@ public class Chunk extends IndexedMesh {
     public void update() {
         if (changed && !updating && updated) {
             updated = false;
-            //Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
-            rebuild();
+            Game.chunks_workers_executor_service.add_worker(new ChunkWorker(this));
         }
 
         if (updated && updating) {
             updating = false;
-            if (!empty) {
-                update_gl_buffers();
+            synchronized (this) {
+	            if (!empty) {
+	                update_gl_buffers();
+	            }
             }
         }
         changed = false;
