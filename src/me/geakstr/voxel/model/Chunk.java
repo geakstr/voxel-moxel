@@ -3,13 +3,13 @@ package me.geakstr.voxel.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
 import me.geakstr.voxel.game.Game;
-import me.geakstr.voxel.helpers.BidirectionalMap;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.model.meshes.IndexedMesh;
 import me.geakstr.voxel.util.ArraysUtil;
@@ -157,11 +157,6 @@ public class Chunk extends IndexedMesh {
 
         lighting();
 
-        List<Integer> verts = new ArrayList<>();
-        List<Integer> tex = new ArrayList<>();
-        List<Float> tex_off = new ArrayList<>();
-        List<Float> colors = new ArrayList<>();
-
         Queue<Vector2f> texs = new LinkedList<>();
         texs.add(TextureAtlas.get_coord("grass"));
         texs.add(TextureAtlas.get_coord("moss_stone"));
@@ -169,7 +164,7 @@ public class Chunk extends IndexedMesh {
         texs.add(TextureAtlas.get_coord("wood_0"));
         texs.add(TextureAtlas.get_coord("sand"));
         
-        BidirectionalMap<Vertex, Integer> vertex2index = new BidirectionalMap<>();
+        Map<Vertex, Integer> vertex2index = new LinkedHashMap<>();
         List<Integer> indices = new ArrayList<>();
         int cur_vertex_idx = 0;
 
@@ -248,24 +243,15 @@ public class Chunk extends IndexedMesh {
 
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                    	int[] vertices = AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, y + y_offset, z0 + z_offset, xx, 1, zz);
-//                        verts.addAll(ArraysUtil.copy_ints(vertices));
-
+                    	int[] vertices   = AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, y + y_offset, z0 + z_offset, xx, 1, zz);
                         int[] tex_coords = AABB.SIDE.values[side_idx].texture_coords(xx, zz);
-//                        tex.addAll(ArraysUtil.copy_ints(tex_coords));
-//
-//                        tex_off.addAll(Arrays.asList(
-//                                texture.x, texture.y,
-//                                texture.x, texture.y,
-//                                texture.x, texture.y,
-//                                texture.x, texture.y));
 
                         float r = 1.0f, g = 1.0f, b = 1.0f;
-                        if (side_idx >= 0 && side_idx <= 3) {
+//                        if (side_idx >= 0 && side_idx <= 3) {
 //                            r = 0.7f;
 //                            g = 0.7f;
 //                            b = 0.7f;
-                        }
+//                        }
 
 //                        for (int xxx = x0; xxx <= x1; xxx++) {
 //                            for (int zzz = z0; zzz <= z1; zzz++) {
@@ -276,13 +262,13 @@ public class Chunk extends IndexedMesh {
 //                                b *= light;
 //                            }
 //                        }
-//                        colors.addAll(Arrays.asList(r, g, b, r, g, b, r, g, b, r, g, b));
                         
                         Vertex vertex;
                         Integer index; 
                         
+                        // 0
                         vertex = new Vertex(vertices[0], vertices[1], vertices[2],
- 							   tex_coords[0], tex_coords[1],
+ 							   0, 0,
  							   texture.x, texture.y,
  							   r, g, b);
 					 	index = vertex2index.get(vertex);
@@ -292,8 +278,9 @@ public class Chunk extends IndexedMesh {
 					 	}
 					 	indices.add(index);
 					 	
+					 	// 1
 					 	vertex = new Vertex(vertices[3], vertices[4], vertices[5],
-	 							   tex_coords[2], tex_coords[3],
+	 							   1, 0,
 	 							   texture.x, texture.y,
 	 							   r, g, b);
 					 	index = vertex2index.get(vertex);
@@ -303,8 +290,9 @@ public class Chunk extends IndexedMesh {
 					 	}
 					 	indices.add(index);
 					 	
+					 	// 2
 					 	vertex = new Vertex(vertices[6], vertices[7], vertices[8],
-	 							   tex_coords[4], tex_coords[5],
+	 							   0, 1,
 	 							   texture.x, texture.y,
 	 							   r, g, b);
 					 	index = vertex2index.get(vertex);
@@ -314,8 +302,9 @@ public class Chunk extends IndexedMesh {
 					 	}
 					 	indices.add(index);
 					 	
+					 	// 1
 					 	vertex = new Vertex(vertices[3], vertices[4], vertices[5],
-	 							   tex_coords[2], tex_coords[3],
+	 							   1, 0,
 	 							   texture.x, texture.y,
 	 							   r, g, b);
 					 	index = vertex2index.get(vertex);
@@ -325,8 +314,9 @@ public class Chunk extends IndexedMesh {
 					 	}
 					 	indices.add(index);
 					 	
+					 	// 3
 					 	vertex = new Vertex(vertices[9], vertices[10], vertices[11],
-	 							   tex_coords[6], tex_coords[7],
+	 							   1, 1,
 	 							   texture.x, texture.y,
 	 							   r, g, b);
 					 	index = vertex2index.get(vertex);
@@ -336,8 +326,9 @@ public class Chunk extends IndexedMesh {
 					 	}
 					 	indices.add(index);
 					 	
+					 	// 2
 					 	vertex = new Vertex(vertices[6], vertices[7], vertices[8],
-	 							   tex_coords[4], tex_coords[5],
+	 							   0, 1,
 	 							   texture.x, texture.y,
 	 							   r, g, b);
 					 	index = vertex2index.get(vertex);

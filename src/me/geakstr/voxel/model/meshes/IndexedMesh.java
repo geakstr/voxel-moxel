@@ -1,11 +1,11 @@
 package me.geakstr.voxel.model.meshes;
 
-import me.geakstr.voxel.helpers.BidirectionalMap;
 import me.geakstr.voxel.model.Vertex;
 
 import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +60,7 @@ public class IndexedMesh extends AbstractMesh {
         this.update_ibo(vertices.size() / 2);
     }
     
-    public void update_gl_data(BidirectionalMap<Vertex, Integer> vertex2index, List<Integer> indices) {
+    public void update_gl_data(Map<Vertex, Integer> vertex2index, List<Integer> indices) {
 		this.indices_counter = indices.size();
 		this.ibo_data = BufferUtils.createByteBuffer(indices_counter * 4);
 		this.vbo_data = BufferUtils.createByteBuffer(vertex2index.size() * 40);
@@ -69,7 +69,7 @@ public class IndexedMesh extends AbstractMesh {
 		}
 		ibo_data.flip();
 		
-		for (Map.Entry<Vertex, Integer> vertex_entry : vertex2index.keyToValueEntrySet()) {
+		for (Map.Entry<Vertex, Integer> vertex_entry : vertex2index.entrySet()) {
 			vbo_data.putInt(vertex_entry.getKey().pos_x).putInt(vertex_entry.getKey().pos_y).putInt(vertex_entry.getKey().pos_z);
 			vbo_data.putInt(vertex_entry.getKey().tex_coord_x).putInt(vertex_entry.getKey().tex_coord_y);
 			vbo_data.putFloat(vertex_entry.getKey().tex_coord_offset_x).putFloat(vertex_entry.getKey().tex_coord_offset_y);
