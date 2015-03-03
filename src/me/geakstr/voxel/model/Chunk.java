@@ -268,7 +268,7 @@ public class Chunk extends IndexedMesh {
                         
                         // 0
                         vertex = new Vertex(vertices[0], vertices[1], vertices[2],
- 							   0, 0,
+ 							   tex_coords[0], tex_coords[1],
  							   texture.x, texture.y,
  							   r, g, b);
 					 	index = vertex2index.get(vertex);
@@ -280,7 +280,7 @@ public class Chunk extends IndexedMesh {
 					 	
 					 	// 1
 					 	vertex = new Vertex(vertices[3], vertices[4], vertices[5],
-	 							   1, 0,
+	 							   tex_coords[2], tex_coords[3],
 	 							   texture.x, texture.y,
 	 							   r, g, b);
 					 	index = vertex2index.get(vertex);
@@ -292,7 +292,7 @@ public class Chunk extends IndexedMesh {
 					 	
 					 	// 2
 					 	vertex = new Vertex(vertices[6], vertices[7], vertices[8],
-	 							   0, 1,
+	 							   tex_coords[4], tex_coords[5],
 	 							   texture.x, texture.y,
 	 							   r, g, b);
 					 	index = vertex2index.get(vertex);
@@ -304,7 +304,7 @@ public class Chunk extends IndexedMesh {
 					 	
 					 	// 1
 					 	vertex = new Vertex(vertices[3], vertices[4], vertices[5],
-	 							   1, 0,
+	 							   tex_coords[2], tex_coords[3],
 	 							   texture.x, texture.y,
 	 							   r, g, b);
 					 	index = vertex2index.get(vertex);
@@ -316,7 +316,7 @@ public class Chunk extends IndexedMesh {
 					 	
 					 	// 3
 					 	vertex = new Vertex(vertices[9], vertices[10], vertices[11],
-	 							   1, 1,
+	 							   tex_coords[6], tex_coords[7],
 	 							   texture.x, texture.y,
 	 							   r, g, b);
 					 	index = vertex2index.get(vertex);
@@ -325,10 +325,9 @@ public class Chunk extends IndexedMesh {
 					 		vertex2index.put(vertex, index);
 					 	}
 					 	indices.add(index);
-					 	
-					 	// 2
+					 	 
 					 	vertex = new Vertex(vertices[6], vertices[7], vertices[8],
-	 							   0, 1,
+	 							   tex_coords[4], tex_coords[5],
 	 							   texture.x, texture.y,
 	 							   r, g, b);
 					 	index = vertex2index.get(vertex);
@@ -350,7 +349,7 @@ public class Chunk extends IndexedMesh {
         synchronized (this) {
            if (!empty) {
                 //update_gl_data(verts, tex, tex_off, colors);
-            	update_gl_data(vertex2index, indices);
+            	update_gl_data(vertex2index.keySet(), indices);
            }
         }
     }

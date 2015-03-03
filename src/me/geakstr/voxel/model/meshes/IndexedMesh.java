@@ -1,18 +1,25 @@
 package me.geakstr.voxel.model.meshes;
 
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL15.glUnmapBuffer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glMapBufferRange;
+
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Set;
+
 import me.geakstr.voxel.model.Vertex;
 
 import org.lwjgl.BufferUtils;
-
-import java.nio.ByteBuffer;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glMapBufferRange;
 
 public class IndexedMesh extends AbstractMesh {
     public int indices_counter;
@@ -60,20 +67,20 @@ public class IndexedMesh extends AbstractMesh {
         this.update_ibo(vertices.size() / 2);
     }
     
-    public void update_gl_data(Map<Vertex, Integer> vertex2index, List<Integer> indices) {
+    public void update_gl_data(Set<Vertex> vertices, List<Integer> indices) {
 		this.indices_counter = indices.size();
 		this.ibo_data = BufferUtils.createByteBuffer(indices_counter * 4);
-		this.vbo_data = BufferUtils.createByteBuffer(vertex2index.size() * 40);
+		this.vbo_data = BufferUtils.createByteBuffer(vertices.size() * 40);
 		for (int index : indices) {
 			ibo_data.putInt(index);
 		}
 		ibo_data.flip();
 		
-		for (Map.Entry<Vertex, Integer> vertex_entry : vertex2index.entrySet()) {
-			vbo_data.putInt(vertex_entry.getKey().pos_x).putInt(vertex_entry.getKey().pos_y).putInt(vertex_entry.getKey().pos_z);
-			vbo_data.putInt(vertex_entry.getKey().tex_coord_x).putInt(vertex_entry.getKey().tex_coord_y);
-			vbo_data.putFloat(vertex_entry.getKey().tex_coord_offset_x).putFloat(vertex_entry.getKey().tex_coord_offset_y);
-			vbo_data.putFloat(vertex_entry.getKey().color_r).putFloat(vertex_entry.getKey().color_g).putFloat(vertex_entry.getKey().color_b);
+		for (Vertex vertex : vertices) {
+			vbo_data.putInt(vertex.pos_x).putInt(vertex.pos_y).putInt(vertex.pos_z);
+			vbo_data.putInt(vertex.tex_coord_x).putInt(vertex.tex_coord_y);
+			vbo_data.putFloat(vertex.tex_coord_offset_x).putFloat(vertex.tex_coord_offset_y);
+			vbo_data.putFloat(vertex.color_r).putFloat(vertex.color_g).putFloat(vertex.color_b);
 		}
 		vbo_data.flip();
     }
