@@ -57,12 +57,12 @@ public class IndexedMesh extends AbstractMesh {
         glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
     }
 
-    public void update_gl_data(int[] vertices, int[] tex_coords, float[] tex_coords_offsets, float[] colors) {
+    public void update_gl_data(float[] vertices, float[] tex_coords, float[] tex_coords_offsets, float[] colors) {
         super.update_gl_data(vertices, tex_coords, tex_coords_offsets, colors);
         this.update_ibo(vertices.length / 2);
     }
 
-    public void update_gl_data(List<Integer> vertices, List<Integer> tex_coords, List<Float> tex_coords_offsets, List<Float> colors) {
+    public void update_gl_data(List<Float> vertices, List<Float> tex_coords, List<Float> tex_coords_offsets, List<Float> colors) {
         super.update_gl_data(vertices, tex_coords, tex_coords_offsets, colors);
         this.update_ibo(vertices.size() / 2);
     }
@@ -77,8 +77,8 @@ public class IndexedMesh extends AbstractMesh {
 		ibo_data.flip();
 		
 		for (Vertex vertex : vertices) {
-			vbo_data.putInt(vertex.pos_x).putInt(vertex.pos_y).putInt(vertex.pos_z);
-			vbo_data.putInt(vertex.tex_coord_x).putInt(vertex.tex_coord_y);
+			vbo_data.putFloat(vertex.pos_x).putFloat(vertex.pos_y).putFloat(vertex.pos_z);
+			vbo_data.putFloat(vertex.tex_coord_x).putFloat(vertex.tex_coord_y);
 			vbo_data.putFloat(vertex.tex_coord_offset_x).putFloat(vertex.tex_coord_offset_y);
 			vbo_data.putFloat(vertex.color_r).putFloat(vertex.color_g).putFloat(vertex.color_b);
 		}

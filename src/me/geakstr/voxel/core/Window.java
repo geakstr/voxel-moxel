@@ -19,6 +19,7 @@ import static org.lwjgl.opengl.ARBMultisample.GL_MULTISAMPLE_ARB;
 public class Window {
     public static int width = 800;
     public static int height = 800;
+    public static float one_pixel_size = 2.0f / Math.min(width, height);
     public static boolean vsync = false;
 
     public static long window;

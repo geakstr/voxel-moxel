@@ -1,8 +1,9 @@
 package me.geakstr.voxel.model;
 
-import me.geakstr.voxel.math.Vector3f;
-
 import java.util.Arrays;
+
+import me.geakstr.voxel.core.Window;
+import me.geakstr.voxel.math.Vector3f;
 
 /*
 Box represents as vertices with {x,y,z} coords in OpenGL coordinate system:
@@ -30,6 +31,8 @@ All works in CCW order
 public class AABB {
     public static final int side_vertices_size = 12, side_tex_coords_size = 8, sides_vertices_size = 72;
 
+    public static float block_size = 1.0f + Window.one_pixel_size;
+    
     public Vector3f[] corners;
 
     public AABB(float x, float y, float z, float width, float height, float length) {
@@ -45,23 +48,23 @@ public class AABB {
 
     public static enum SIDE {
         FRONT {
-            public int[] vertices_coords() {
+            public float[] vertices_coords() {
                 return Arrays.copyOf(front_side_vertices_coords, side_vertices_size);
             }
 
-            public int[] texture_coords(int u, int v) {
-                return new int[]{0, 1, u, 1, 0, 0, u, 0};
+            public float[] texture_coords(int u, int v) {
+                return new float[]{0, 1, u, 1, 0, 0, u, 0};
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public int[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
-                int[] side = translate(x_pos, y_pos, z_pos);
+                float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[3] += x_expand;
                 side[9] += x_expand;
@@ -78,23 +81,23 @@ public class AABB {
             }
         },
         BACK {
-            public int[] vertices_coords() {
+            public float[] vertices_coords() {
                 return Arrays.copyOf(back_side_vertices_coords, side_vertices_size);
             }
 
-            public int[] texture_coords(int u, int v) {
-                return new int[]{0, 1, u, 1, 0, 0, u, 0};
+            public float[] texture_coords(int u, int v) {
+                return new float[]{0, 1, u, 1, 0, 0, u, 0};
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public int[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
-                int[] side = translate(x_pos, y_pos, z_pos);
+                float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[0] += x_expand;
                 side[6] += x_expand;
@@ -106,23 +109,23 @@ public class AABB {
             }
         },
         LEFT {
-            public int[] vertices_coords() {
+            public float[] vertices_coords() {
                 return Arrays.copyOf(left_side_vertices_coords, side_vertices_size);
             }
 
-            public int[] texture_coords(int u, int v) {
-                return new int[]{v, 1, 0, 1, v, 0, 0, 0};
+            public float[] texture_coords(int u, int v) {
+                return new float[]{v, 1, 0, 1, v, 0, 0, 0};
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public int[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
-                int[] side = translate(x_pos, y_pos, z_pos);
+                float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[7] += y_expand;
                 side[10] += y_expand;
@@ -134,23 +137,23 @@ public class AABB {
             }
         },
         RIGHT {
-            public int[] vertices_coords() {
+            public float[] vertices_coords() {
                 return Arrays.copyOf(right_side_vertices_coords, side_vertices_size);
             }
 
-            public int[] texture_coords(int u, int v) {
-                return new int[]{v, 1, 0, 1, v, 0, 0, 0};
+            public float[] texture_coords(int u, int v) {
+                return new float[]{v, 1, 0, 1, v, 0, 0, 0};
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public int[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
-                int[] side = translate(x_pos, y_pos, z_pos);
+                float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[0] += x_expand;
                 side[3] += x_expand;
@@ -167,23 +170,23 @@ public class AABB {
             }
         },
         TOP {
-            public int[] vertices_coords() {
+            public float[] vertices_coords() {
                 return Arrays.copyOf(top_side_vertices_coords, side_vertices_size);
             }
 
-            public int[] texture_coords(int u, int v) {
-                return new int[]{0, v, u, v, 0, 0, u, 0};
+            public float[] texture_coords(int u, int v) {
+                return new float[]{0, v, u, v, 0, 0, u, 0};
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public int[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
-                int[] side = translate(x_pos, y_pos, z_pos);
+                float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[3] += x_expand;
                 side[9] += x_expand;
@@ -200,23 +203,23 @@ public class AABB {
             }
         },
         BOTTOM {
-            public int[] vertices_coords() {
+            public float[] vertices_coords() {
                 return Arrays.copyOf(bottom_side_vertices_coords, side_vertices_size);
             }
 
-            public int[] texture_coords(int u, int v) {
-                return new int[]{0, v, u, v, 0, 0, u, 0};
+            public float[] texture_coords(int u, int v) {
+                return new float[]{0, v, u, v, 0, 0, u, 0};
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public int[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
-                int[] side = translate(x_pos, y_pos, z_pos);
+                float[] side = translate(x_pos, y_pos, z_pos);
 
                 side[3] += x_expand;
                 side[9] += x_expand;
@@ -228,12 +231,12 @@ public class AABB {
             }
         },
         ALL {
-            public int[] vertices_coords() {
+            public float[] vertices_coords() {
                 return Arrays.copyOf(all_sides_vertices_coords, sides_vertices_size);
             }
 
-            public int[] texture_coords(int u, int v) {
-                return new int[]{
+            public float[] texture_coords(int u, int v) {
+                return new float[]{
                         // front
                         0, 1, u, 1, 0, 0, u, 0,
                         // back
@@ -249,15 +252,15 @@ public class AABB {
                 };
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public int[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
-                int[] side = translate(x_pos, y_pos, z_pos);
+                float[] side = translate(x_pos, y_pos, z_pos);
 
                 // front
                 side[3] += x_expand;
@@ -320,108 +323,108 @@ public class AABB {
             }
         };
 
-        public abstract int[] vertices_coords();
+        public abstract float[] vertices_coords();
 
-        public abstract int[] texture_coords(int u, int v);
+        public abstract float[] texture_coords(int u, int v);
 
-        public abstract int[] translate(int x_pos, int y_pos, int z_pos);
+        public abstract float[] translate(int x_pos, int y_pos, int z_pos);
 
-        public abstract int[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand);
+        public abstract float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand);
 
         public static final SIDE[] values = values();
     }
 
     public static enum VERTEX {
         V0 {
-            public int[] coords() {
+            public float[] coords() {
                 return Arrays.copyOf(v0_vertex_coords, 3);
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(coords(), x_pos, y_pos, z_pos);
             }
         },
         V1 {
-            public int[] coords() {
+            public float[] coords() {
                 return Arrays.copyOf(v1_vertex_coords, 3);
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(coords(), x_pos, y_pos, z_pos);
             }
         },
         V2 {
-            public int[] coords() {
+            public float[] coords() {
                 return Arrays.copyOf(v2_vertex_coords, 3);
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(coords(), x_pos, y_pos, z_pos);
             }
         },
         V3 {
-            public int[] coords() {
+            public float[] coords() {
                 return Arrays.copyOf(v3_vertex_coords, 3);
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(coords(), x_pos, y_pos, z_pos);
             }
         },
         V4 {
-            public int[] coords() {
+            public float[] coords() {
                 return Arrays.copyOf(v4_vertex_coords, 3);
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(coords(), x_pos, y_pos, z_pos);
             }
         },
         V5 {
-            public int[] coords() {
+            public float[] coords() {
                 return Arrays.copyOf(v5_vertex_coords, 3);
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(coords(), x_pos, y_pos, z_pos);
             }
         },
         V6 {
-            public int[] coords() {
+            public float[] coords() {
                 return Arrays.copyOf(v6_vertex_coords, 3);
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(coords(), x_pos, y_pos, z_pos);
             }
         },
         V7 {
-            public int[] coords() {
+            public float[] coords() {
                 return Arrays.copyOf(v7_vertex_coords, 3);
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(coords(), x_pos, y_pos, z_pos);
             }
         },
         ALL {
-            public int[] coords() {
+            public float[] coords() {
                 return Arrays.copyOf(all_vertices_coords, 18);
             }
 
-            public int[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(int x_pos, int y_pos, int z_pos) {
                 return AABB.translate(coords(), x_pos, y_pos, z_pos);
             }
         };
 
-        public abstract int[] coords();
+        public abstract float[] coords();
 
-        public abstract int[] translate(int x_pos, int y_pos, int z_pos);
+        public abstract float[] translate(int x_pos, int y_pos, int z_pos);
 
         public static final VERTEX[] values = values();
     }
 
-    private static int[] translate(int[] vertices_coords, int x_pos, int y_pos, int z_pos) {
+    private static float[] translate(float[] vertices_coords, int x_pos, int y_pos, int z_pos) {
         int size = vertices_coords.length;
 
         for (int i = 0; i < size; i += 3) {
@@ -433,150 +436,150 @@ public class AABB {
         return vertices_coords;
     }
 
-    private static final int[] all_sides_vertices_coords = new int[]{
+    private static final float[] all_sides_vertices_coords = new float[]{
             // front
-            0, 0, 1, // v1
-            1, 0, 1, // v2
-            0, 1, 1, // v0
-            1, 1, 1, // v3
+            0, 0, block_size, // v1
+            block_size, 0, block_size, // v2
+            0, block_size, block_size, // v0
+            block_size, block_size, block_size, // v3
 
             // back
-            1, 0, 0, // v6
+            block_size, 0, 0, // v6
             0, 0, 0, // v7
-            1, 1, 0, // v5
-            0, 1, 0, // v4
+            block_size, block_size, 0, // v5
+            0, block_size, 0, // v4
 
             // left
             0, 0, 0, // v7
-            0, 0, 1, // v1
-            0, 1, 0, // v4
-            0, 1, 1, // v0
+            0, 0, block_size, // v1
+            0, block_size, 0, // v4
+            0, block_size, block_size, // v0
 
             // right
-            1, 0, 1, // v2
-            1, 0, 0, // v6
-            1, 1, 1, // v3
-            1, 1, 0, // v5
+            block_size, 0, block_size, // v2
+            block_size, 0, 0, // v6
+            block_size, block_size, block_size, // v3
+            block_size, block_size, 0, // v5
 
             // top
-            0, 1, 1, // v0
-            1, 1, 1, // v3
-            0, 1, 0, // v4
-            1, 1, 0, // v5
+            0, block_size, block_size, // v0
+            block_size, block_size, block_size, // v3
+            0, block_size, 0, // v4
+            block_size, block_size, 0, // v5
 
             // bottom
             0, 0, 0, // v7
-            1, 0, 0, // v6
-            0, 0, 1, // v1
-            1, 0, 1, // v2
+            block_size, 0, 0, // v6
+            0, 0, block_size, // v1
+            block_size, 0, block_size, // v2
     };
 
-    private static final int[] front_side_vertices_coords = new int[]{
-            0, 0, 1, // v1
-            1, 0, 1, // v2
-            0, 1, 1, // v0
-            1, 1, 1, // v3
+    private static final float[] front_side_vertices_coords = new float[]{
+            0, 0, block_size, // v1
+            block_size, 0, block_size, // v2
+            0, block_size, block_size, // v0
+            block_size, block_size, block_size, // v3
     };
 
     private static final int[] front_side_vertices_idx = new int[]{
             1, 2, 0, 3
     };
 
-    private static final int[] back_side_vertices_coords = new int[]{
-            1, 0, 0, // v6
+    private static final float[] back_side_vertices_coords = new float[]{
+            block_size, 0, 0, // v6
             0, 0, 0, // v7
-            1, 1, 0, // v5
-            0, 1, 0, // v4
+            block_size, block_size, 0, // v5
+            0, block_size, 0, // v4
     };
 
     private static final int[] back_side_vertices_idx = new int[]{
             6, 7, 5, 4
     };
 
-    private static final int[] left_side_vertices_coords = new int[]{
+    private static final float[] left_side_vertices_coords = new float[]{
             0, 0, 0, // v7
-            0, 0, 1, // v1
-            0, 1, 0, // v4
-            0, 1, 1, // v0
+            0, 0, block_size, // v1
+            0, block_size, 0, // v4
+            0, block_size, block_size, // v0
     };
 
     private static final int[] left_side_vertices_idx = new int[]{
             7, 1, 4, 0
     };
 
-    private static final int[] right_side_vertices_coords = new int[]{
-            1, 0, 1, // v2
-            1, 0, 0, // v6
-            1, 1, 1, // v3
-            1, 1, 0, // v5
+    private static final float[] right_side_vertices_coords = new float[]{
+            block_size, 0, block_size, // v2
+            block_size, 0, 0, // v6
+            block_size, block_size, block_size, // v3
+            block_size, block_size, 0, // v5
     };
 
     private static final int[] right_side_vertices_idx = new int[]{
             2, 6, 3, 5
     };
 
-    private static final int[] top_side_vertices_coords = new int[]{
-            0, 1, 1, // v0
-            1, 1, 1, // v3
-            0, 1, 0, // v4
-            1, 1, 0, // v5
+    private static final float[] top_side_vertices_coords = new float[]{
+            0, block_size, block_size, // v0
+            block_size, block_size, block_size, // v3
+            0, block_size, 0, // v4
+            block_size, block_size, 0, // v5
     };
 
     private static final int[] top_side_vertices_idx = new int[]{
             0, 3, 4, 5
     };
 
-    private static final int[] bottom_side_vertices_coords = new int[]{
+    private static final float[] bottom_side_vertices_coords = new float[]{
             0, 0, 0, // v7
-            1, 0, 0, // v6
-            0, 0, 1, // v1
-            1, 0, 1, // v2
+            block_size, 0, 0, // v6
+            0, 0, block_size, // v1
+            block_size, 0, block_size, // v2
     };
 
     private static final int[] bottom_side_vertices_idx = new int[]{
             7, 6, 1, 2
     };
 
-    private static final int[] all_vertices_coords = new int[]{
-            0, 1, 1, // v0
-            0, 0, 1, // v1
-            1, 0, 1, // v2
-            1, 1, 1, // v3
-            0, 1, 0, // v4
-            1, 1, 0, // v5
-            1, 0, 0, // v6
+    private static final float[] all_vertices_coords = new float[]{
+            0, block_size, block_size, // v0
+            0, 0, block_size, // v1
+            block_size, 0, block_size, // v2
+            block_size, block_size, block_size, // v3
+            0, block_size, 0, // v4
+            block_size, block_size, 0, // v5
+            block_size, 0, 0, // v6
             0, 0, 0, // v7
     };
 
-    private static final int[] v0_vertex_coords = new int[]{
-            0, 1, 1, // v0
+    private static final float[] v0_vertex_coords = new float[]{
+            0, block_size, block_size, // v0
     };
 
-    private static final int[] v1_vertex_coords = new int[]{
-            0, 0, 1, // v1
+    private static final float[] v1_vertex_coords = new float[]{
+            0, 0, block_size, // v1
     };
 
-    private static final int[] v2_vertex_coords = new int[]{
-            1, 0, 1, // v2
+    private static final float[] v2_vertex_coords = new float[]{
+            block_size, 0, block_size, // v2
     };
 
-    private static final int[] v3_vertex_coords = new int[]{
-            1, 1, 1, // v3
+    private static final float[] v3_vertex_coords = new float[]{
+            block_size, block_size, block_size, // v3
     };
 
-    private static final int[] v4_vertex_coords = new int[]{
-            0, 1, 0, // v4
+    private static final float[] v4_vertex_coords = new float[]{
+            0, block_size, 0, // v4
     };
 
-    private static final int[] v5_vertex_coords = new int[]{
-            1, 1, 0, // v5
+    private static final float[] v5_vertex_coords = new float[]{
+            block_size, block_size, 0, // v5
     };
 
-    private static final int[] v6_vertex_coords = new int[]{
-            1, 0, 0, // v6
+    private static final float[] v6_vertex_coords = new float[]{
+            block_size, 0, 0, // v6
     };
 
-    private static final int[] v7_vertex_coords = new int[]{
+    private static final float[] v7_vertex_coords = new float[]{
             0, 0, 0, // v7
     };
 }

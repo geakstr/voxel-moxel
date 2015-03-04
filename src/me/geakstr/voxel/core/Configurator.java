@@ -1,15 +1,17 @@
 package me.geakstr.voxel.core;
 
-import com.eclipsesource.json.JsonArray;
-import com.eclipsesource.json.JsonObject;
+import java.io.FileReader;
+import java.io.IOException;
+
 import me.geakstr.voxel.game.Game;
+import me.geakstr.voxel.model.AABB;
 import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.TextureAtlas;
 import me.geakstr.voxel.model.World;
 import me.geakstr.voxel.render.Camera;
 
-import java.io.FileReader;
-import java.io.IOException;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 
 public class Configurator {
     public static boolean unsynchronized_buffering = true;
@@ -22,6 +24,8 @@ public class Configurator {
             JsonArray screen_resolution = json.get("screen_resolution").asArray();
             Window.width = screen_resolution.get(0).asInt();
             Window.height = screen_resolution.get(1).asInt();
+            Window.one_pixel_size = 2.0f / Math.min(Window.width, Window.height);
+            AABB.block_size = 1.0f + Window.one_pixel_size;
             Window.vsync = json.get("vsync").asBoolean();
 
             Camera.fov = json.get("camera_fov").asFloat();

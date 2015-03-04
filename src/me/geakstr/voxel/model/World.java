@@ -42,7 +42,7 @@ public class World {
     }
 
     public static int idx(int x, int y, int z, int height, int size) {
-        return x * height + y * size + z;
+        return x + y * size + z * height;
     }
 
     public static Chunk chunk(int x, int y, int z) {

@@ -1,6 +1,7 @@
 package me.geakstr.voxel.game;
 
 import me.geakstr.voxel.math.Vector2f;
+import me.geakstr.voxel.model.Chunk;
 import me.geakstr.voxel.model.Player;
 import me.geakstr.voxel.model.TextureAtlas;
 import me.geakstr.voxel.model.World;
@@ -51,7 +52,7 @@ public class Game {
         current_shader = gui_shader;
         GUI.init();
 
-       // World.chunk(0, 0, 0).place_torch(0, 8, 0);
+        World.chunk(0, 0, 0).place_torch(0, 8, 0);
     }
 
 
