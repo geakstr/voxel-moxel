@@ -31,7 +31,7 @@ All works in CCW order
 public class AABB {
     public static final int side_vertices_size = 12, side_tex_coords_size = 8, sides_vertices_size = 72;
 
-    public static float block_size = 1.0f;
+    public static float block_size = 1.0f + Window.one_pixel_size;
     
     public Vector3f[] corners;
 

@@ -55,7 +55,7 @@ public class Game {
         GUI.init();
 
 //        World.chunk(0, 0, 0).place_torch(0, 8, 0);
-//        
+//
 //        Random rnd = new Random();
 //        for (int i = 0; i < 100; i++) {
 //        	World.chunk(rnd.nextInt(World.size), rnd.nextInt(World.height), rnd.nextInt(World.size))

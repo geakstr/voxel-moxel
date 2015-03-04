@@ -9,6 +9,6 @@ public class Light {
 	}
 	
 	public static int brightness(int r, int g, int b) {
-		return r * 299 + g * 587 + b * 114 / 1000;
+		return ((r * 299) + (g * 587) + (b * 114)) / 1000;
 	}
 }
