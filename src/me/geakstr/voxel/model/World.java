@@ -42,7 +42,7 @@ public class World {
     }
 
     public static int idx(int x, int y, int z, int height, int size) {
-        return x + height * y + z * size;
+        return x + y * size + z * height;
     }
 
     public static Chunk chunk(int x, int y, int z) {
@@ -121,6 +121,25 @@ public class World {
 
                     for (int cube_y = 0; cube_y < height; cube_y++) {
                         chunk.block_type(1, cube_x, cube_y, cube_z);
+                    }
+                }
+            }
+        }
+    }
+    
+    public static void gen2() {
+        Random rnd = new Random();
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                for (int k = 0; k < height; k++) {
+                    Chunk chunk = chunk(i, k, j);
+
+                    for (int y = 0; y < Chunk.size; y++) {
+                        for (int x = 0; x < Chunk.size; x++) {
+                            for (int z = 0; z < Chunk.size; z++) {
+                                chunk.block_type(1, x, y, z);
+                            }
+                        }
                     }
                 }
             }

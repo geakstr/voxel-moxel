@@ -5,7 +5,7 @@
   "camera_fov" : 70,
   "camera_z_far" : 512,
 
-  "world_sizes" : [32, 4, 32, 64],
+  "world_sizes" : [32, 4, 32],
 
   "frustum" : true,
   "unsynchronized_buffering" : true,
