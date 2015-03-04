@@ -31,7 +31,7 @@ All works in CCW order
 public class AABB {
     public static final int side_vertices_size = 12, side_tex_coords_size = 8, sides_vertices_size = 72;
 
-    public static float block_size = 1.0f + Window.one_pixel_size;
+    public static float block_size = 1.0f;
     
     public Vector3f[] corners;
 
@@ -56,11 +56,11 @@ public class AABB {
                 return new float[]{0, 1, u, 1, 0, 0, u, 0};
             }
 
-            public float[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(float x_pos, float y_pos, float z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(float x_pos, float y_pos, float z_pos, float x_expand, float y_expand, float z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
@@ -89,11 +89,11 @@ public class AABB {
                 return new float[]{0, 1, u, 1, 0, 0, u, 0};
             }
 
-            public float[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(float x_pos, float y_pos, float z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(float x_pos, float y_pos, float z_pos, float x_expand, float y_expand, float z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
@@ -117,11 +117,11 @@ public class AABB {
                 return new float[]{v, 1, 0, 1, v, 0, 0, 0};
             }
 
-            public float[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(float x_pos, float y_pos, float z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(float x_pos, float y_pos, float z_pos, float x_expand, float y_expand, float z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
@@ -145,11 +145,11 @@ public class AABB {
                 return new float[]{v, 1, 0, 1, v, 0, 0, 0};
             }
 
-            public float[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(float x_pos, float y_pos, float z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(float x_pos, float y_pos, float z_pos, float x_expand, float y_expand, float z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
@@ -178,11 +178,11 @@ public class AABB {
                 return new float[]{0, v, u, v, 0, 0, u, 0};
             }
 
-            public float[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(float x_pos, float y_pos, float z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(float x_pos, float y_pos, float z_pos, float x_expand, float y_expand, float z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
@@ -211,11 +211,11 @@ public class AABB {
                 return new float[]{0, v, u, v, 0, 0, u, 0};
             }
 
-            public float[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(float x_pos, float y_pos, float z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(float x_pos, float y_pos, float z_pos, float x_expand, float y_expand, float z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
@@ -252,11 +252,11 @@ public class AABB {
                 };
             }
 
-            public float[] translate(int x_pos, int y_pos, int z_pos) {
+            public float[] translate(float x_pos, float y_pos, float z_pos) {
                 return AABB.translate(vertices_coords(), x_pos, y_pos, z_pos);
             }
 
-            public float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand) {
+            public float[] translate_and_expand(float x_pos, float y_pos, float z_pos, float x_expand, float y_expand, float z_expand) {
                 x_expand--;
                 y_expand--;
                 z_expand--;
@@ -327,9 +327,9 @@ public class AABB {
 
         public abstract float[] texture_coords(int u, int v);
 
-        public abstract float[] translate(int x_pos, int y_pos, int z_pos);
+        public abstract float[] translate(float x_pos, float y_pos, float z_pos);
 
-        public abstract float[] translate_and_expand(int x_pos, int y_pos, int z_pos, int x_expand, int y_expand, int z_expand);
+        public abstract float[] translate_and_expand(float x_pos, float y_pos, float z_pos, float x_expand, float y_expand, float z_expand);
 
         public static final SIDE[] values = values();
     }
@@ -424,7 +424,7 @@ public class AABB {
         public static final VERTEX[] values = values();
     }
 
-    private static float[] translate(float[] vertices_coords, int x_pos, int y_pos, int z_pos) {
+    private static float[] translate(float[] vertices_coords, float x_pos, float y_pos, float z_pos) {
         int size = vertices_coords.length;
 
         for (int i = 0; i < size; i += 3) {

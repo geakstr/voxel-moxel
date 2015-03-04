@@ -2,6 +2,8 @@ package me.geakstr.voxel.game;
 
 import me.geakstr.voxel.core.Configurator;
 import me.geakstr.voxel.core.Window;
+import me.geakstr.voxel.model.Light;
+
 import org.lwjgl.BufferUtils;
 
 import java.awt.*;
@@ -76,8 +78,6 @@ public class GUI {
         IntBuffer p = BufferUtils.createIntBuffer(1);
         glReadPixels(Window.width / 2, Window.height / 2, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, p);
 
-        Color c = new Color(p.get(0));
-        int yiq = ((c.getRed() * 299) + (c.getGreen() * 587) + (c.getBlue() * 114)) / 1000;
-        return yiq >= 128 ? Color.black : Color.white;
+        return Light.brightness(new Color(p.get(0))) >= 128 ? Color.black : Color.white;
     }
 }

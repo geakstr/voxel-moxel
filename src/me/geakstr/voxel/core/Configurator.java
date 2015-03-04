@@ -25,7 +25,6 @@ public class Configurator {
             Window.width = screen_resolution.get(0).asInt();
             Window.height = screen_resolution.get(1).asInt();
             Window.one_pixel_size = 2.0f / Math.min(Window.width, Window.height);
-            AABB.block_size = 1.0f + Window.one_pixel_size;
             Window.vsync = json.get("vsync").asBoolean();
 
             Camera.fov = json.get("camera_fov").asFloat();

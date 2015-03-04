@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.model.meshes.IndexedMesh;
@@ -236,16 +237,13 @@ public class Chunk extends IndexedMesh {
             for (int[] coords : coords_map.values()) {
                 int x0 = coords[0], z0 = coords[1];
                 int x1 = coords[2], z1 = coords[3];
-                int xx = x1 - x0 + 1, zz = z1 - z0 + 1;
+                int xx = x1 - x0 + 1, zz = z1 - z0 + 1, yy = 1;
 
                 boolean[] renderable_sides = renderable_sides(x0, z0, x1, z1, y);
 
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                    	float[] vertices   = AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, y + y_offset, z0 + z_offset, xx, 1, zz);
-                    	float[] tex_coords = AABB.SIDE.values[side_idx].texture_coords(xx, zz);
-
-                        float r = 1.0f, g = 1.0f, b = 1.0f;
+                    	float r = 1.0f, g = 1.0f, b = 1.0f;
                         if (side_idx >= 0 && side_idx <= 3) {
                             r = 0.7f;
                             g = 0.7f;
@@ -266,6 +264,10 @@ public class Chunk extends IndexedMesh {
 //                        	g = 0.02f;
 //                        	b = 0.02f;
 //                        }
+                    	
+                    	float[] vertices   = AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, y + y_offset, z0 + z_offset, xx, yy, zz);
+                    	float[] tex_coords = AABB.SIDE.values[side_idx].texture_coords(xx, zz);
+
                         Integer index; 
                         
                         // 0
