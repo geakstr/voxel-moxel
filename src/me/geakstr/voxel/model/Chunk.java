@@ -12,7 +12,6 @@ import java.util.Queue;
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.model.meshes.IndexedMesh;
-import me.geakstr.voxel.util.ArraysUtil;
 import me.geakstr.voxel.workers.ChunkWorker;
 
 public class Chunk extends IndexedMesh {
@@ -253,20 +252,20 @@ public class Chunk extends IndexedMesh {
                             b = 0.7f;
                         }
 
-                        for (int xxx = x0; xxx <= x1; xxx++) {
-                            for (int zzz = z0; zzz <= z1; zzz++) {
-                                float light = light_map[World.idx(xxx, y, zzz, square, size)] / 15.0f;
-
-                                r *= light;
-                                g *= light;
-                                b *= light;
-                            }
-                        }
-                        if (r < 0.02f && g < 0.02f && b < 0.02f) {
-                        	r = 0.02f;
-                        	g = 0.02f;
-                        	b = 0.02f;
-                        }
+//                        for (int xxx = x0; xxx <= x1; xxx++) {
+//                            for (int zzz = z0; zzz <= z1; zzz++) {
+//                                float light = light_map[World.idx(xxx, y, zzz, square, size)] / 15.0f;
+//
+//                                r *= light;
+//                                g *= light;
+//                                b *= light;
+//                            }
+//                        }
+//                        if (r < 0.02f && g < 0.02f && b < 0.02f) {
+//                        	r = 0.02f;
+//                        	g = 0.02f;
+//                        	b = 0.02f;
+//                        }
                         Integer index; 
                         
                         // 0

@@ -8,7 +8,7 @@ import me.geakstr.voxel.math.Vector3f;
 /*
 Box represents as vertices with {x,y,z} coords in OpenGL coordinate system:
 
-              ↑ Y
+                   ↑ Y
               |
               |
               |
