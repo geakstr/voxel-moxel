@@ -5,9 +5,7 @@ import me.geakstr.voxel.render.Camera;
 import me.geakstr.voxel.render.Frustum;
 import me.geakstr.voxel.util.OpenSimplexNoise;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class World {
     public static int size, height, volume, vertical_square;
@@ -20,6 +18,7 @@ public class World {
     public static Set<Chunk> nearest_chunks = new HashSet<>();
 
     private static Chunk[] chunks;
+    public static Queue<LightNode> light_bfs_queue;
 
     public static void init() {
         vertical_square = size * height;
@@ -29,6 +28,7 @@ public class World {
         Chunk.volume = Chunk.size * Chunk.square;
 
         chunks = new Chunk[volume];
+        light_bfs_queue = new LinkedList<>();
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < size; x++) {
@@ -39,6 +39,75 @@ public class World {
         }
 
         gen();
+        lighting();
+    }
+
+    public static class LightNode {
+        public int idx;
+        public Chunk chunk;
+
+        public LightNode(int idx, Chunk chunk) {
+            this.idx = idx;
+            this.chunk = chunk;
+        }
+    }
+
+    private static void lighting(int x, int y, int z, Chunk chunk, int light_level) {
+        if (chunk.block_type(x, y, z) != 0 && chunk.torchlight(x, y, z) + 2 <= light_level) {
+            chunk.torchlight(light_level - 1, x, y, z);
+            light_bfs_queue.add(new LightNode(World.idx(x, y, z, Chunk.square, size), chunk));
+        }
+    }
+
+    private static void lighting() {
+        while (!light_bfs_queue.isEmpty()) {
+            LightNode node = light_bfs_queue.poll();
+
+            int xx = node.idx % size;
+            int yy = (node.idx % (size * size)) / size;
+            int zz = node.idx / (size * size);
+
+            int light_level = node.chunk.torchlight(xx, yy, zz);
+
+            if (xx - 1 >= 0) {
+                lighting(xx - 1, yy, zz, node.chunk, light_level);
+            } else if (node.chunk.x_chunk_pos > 0) {
+                Chunk chunk = World.chunk(node.chunk.x_chunk_pos - 1, node.chunk.y_chunk_pos, node.chunk.z_chunk_pos);
+                lighting(Chunk.size - 1, yy, zz, chunk, light_level);
+            }
+            if (xx + 1 < size) {
+                lighting(xx + 1, yy, zz, node.chunk, light_level);
+            } else if (node.chunk.x_chunk_pos < World.size - 1) {
+                Chunk chunk = World.chunk(node.chunk.x_chunk_pos + 1, node.chunk.y_chunk_pos, node.chunk.z_chunk_pos);
+                lighting(0, yy, zz, chunk, light_level);
+            }
+
+            if (yy - 1 >= 0) {
+                lighting(xx, yy - 1, zz, node.chunk, light_level);
+            } else if (node.chunk.y_chunk_pos > 0) {
+                Chunk chunk = World.chunk(node.chunk.x_chunk_pos, node.chunk.y_chunk_pos - 1, node.chunk.z_chunk_pos);
+                //lighting(xx, Chunk.size - 1, zz, chunk, light_level);
+            }
+            if (yy + 1 < size) {
+                lighting(xx, yy + 1, zz, node.chunk, light_level);
+            } else if (node.chunk.y_chunk_pos < World.height - 1) {
+                Chunk chunk = World.chunk(node.chunk.x_chunk_pos, node.chunk.y_chunk_pos + 1, node.chunk.z_chunk_pos);
+                //lighting(xx, 0, zz, chunk, light_level);
+            }
+
+            if (zz - 1 >= 0) {
+                lighting(xx, yy, zz - 1, node.chunk, light_level);
+            } else if (node.chunk.z_chunk_pos > 0) {
+                Chunk chunk = World.chunk(node.chunk.x_chunk_pos, node.chunk.y_chunk_pos, node.chunk.z_chunk_pos - 1);
+                lighting(xx, yy, Chunk.size - 1, chunk, light_level);
+            }
+            if (zz + 1 < size) {
+                lighting(xx, yy, zz + 1, node.chunk, light_level);
+            } else if (node.chunk.z_chunk_pos < World.size - 1) {
+                Chunk chunk = World.chunk(node.chunk.x_chunk_pos, node.chunk.y_chunk_pos, node.chunk.z_chunk_pos + 1);
+                lighting(xx, yy, 0, chunk, light_level);
+            }
+        }
     }
 
     public static int idx(int x, int y, int z, int height, int size) {

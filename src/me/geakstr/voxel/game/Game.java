@@ -54,13 +54,13 @@ public class Game {
         current_shader = gui_shader;
         GUI.init();
 
-//        World.chunk(0, 0, 0).place_torch(0, 8, 0);
-//
-//        Random rnd = new Random();
-//        for (int i = 0; i < 100; i++) {
-//        	World.chunk(rnd.nextInt(World.size), rnd.nextInt(World.height), rnd.nextInt(World.size))
-//        	.place_torch(rnd.nextInt(Chunk.size), rnd.nextInt(Chunk.size / 3) + Chunk.size / 3 * 2, rnd.nextInt(Chunk.size));
-//        }
+        World.chunk(0, 0, 0).place_torch(0, 8, 0);
+
+        Random rnd = new Random();
+        for (int i = 0; i < 100; i++) {
+        	World.chunk(rnd.nextInt(World.size), rnd.nextInt(World.height), rnd.nextInt(World.size))
+        	.place_torch(rnd.nextInt(Chunk.size), rnd.nextInt(Chunk.size / 3) + Chunk.size / 3 * 2, rnd.nextInt(Chunk.size));
+        }
     }
 
 

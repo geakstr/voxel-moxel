@@ -1,26 +1,17 @@
 package me.geakstr.voxel.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-
-import me.geakstr.voxel.core.Window;
 import me.geakstr.voxel.game.Game;
 import me.geakstr.voxel.math.Vector2f;
 import me.geakstr.voxel.model.meshes.IndexedMesh;
 import me.geakstr.voxel.workers.ChunkWorker;
+
+import java.util.*;
 
 public class Chunk extends IndexedMesh {
     public static int size, volume, square;
 
     private int[] blocks;
     private byte[] light_map;
-    private Queue<LightNode> light_bfs_queue;
 
     public boolean changed, updating, updated, empty, waiting, visible;
 
@@ -40,7 +31,6 @@ public class Chunk extends IndexedMesh {
 
         this.blocks = new int[volume];
         this.light_map = new byte[volume];
-        this.light_bfs_queue = new LinkedList<>();
 
         this.changed = true;
         this.waiting = false;
@@ -86,76 +76,15 @@ public class Chunk extends IndexedMesh {
         light_map[idx] = (byte) ((light_map[idx] & 0xF) | val);
     }
 
-    private class LightNode {
-        public int idx;
-        public Chunk chunk;
-
-        public LightNode(int idx, Chunk chunk) {
-            this.idx = idx;
-            this.chunk = chunk;
-        }
-    }
-
-    public void lighting() {
-        while (!light_bfs_queue.isEmpty()) {
-            LightNode node = light_bfs_queue.poll();
-
-            int xx = node.idx % size;
-            int yy = (node.idx % (size * size)) / size;
-            int zz = node.idx / (size * size);
-
-            int light_level = node.chunk.torchlight(xx, yy, zz);
-
-            if (xx - 1 >= 0) {
-                if (node.chunk.block_type(xx - 1, yy, zz) != 0 && node.chunk.torchlight(xx - 1, yy, zz) + 2 <= light_level) {
-                    node.chunk.torchlight(light_level - 1, xx - 1, yy, zz);
-                    light_bfs_queue.add(new LightNode(World.idx(xx - 1, yy, zz, square, size), node.chunk));
-                }
-            }
-            if (xx + 1 < size) {
-                if (node.chunk.block_type(xx + 1, yy, zz) != 0 && node.chunk.torchlight(xx + 1, yy, zz) + 2 <= light_level) {
-                    node.chunk.torchlight(light_level - 1, xx + 1, yy, zz);
-                    light_bfs_queue.add(new LightNode(World.idx(xx + 1, yy, zz, square, size), node.chunk));
-                }
-            }
-
-            if (yy - 1 >= 0) {
-                if (node.chunk.block_type(xx, yy - 1, zz) != 0 && node.chunk.torchlight(xx, yy - 1, zz) + 2 <= light_level) {
-                    node.chunk.torchlight(light_level - 1, xx, yy - 1, zz);
-                    light_bfs_queue.add(new LightNode(World.idx(xx, yy - 1, zz, square, size), node.chunk));
-                }
-            }
-            if (yy + 1 < size) {
-                if (node.chunk.block_type(xx, yy + 1, zz) != 0 && node.chunk.torchlight(xx, yy + 1, zz) + 2 <= light_level) {
-                    node.chunk.torchlight(light_level - 1, xx, yy + 1, zz);
-                    light_bfs_queue.add(new LightNode(World.idx(xx, yy + 1, zz, square, size), node.chunk));
-                }
-            }
-
-            if (zz - 1 >= 0) {
-                if (node.chunk.block_type(xx, yy, zz - 1) != 0 && node.chunk.torchlight(xx, yy, zz - 1) + 2 <= light_level) {
-                    node.chunk.torchlight(light_level - 1, xx, yy, zz - 1);
-                    light_bfs_queue.add(new LightNode(World.idx(xx, yy, zz - 1, square, size), node.chunk));
-                }
-            }
-            if (zz + 1 < size) {
-                if (node.chunk.block_type(xx, yy, zz + 1) != 0 && node.chunk.torchlight(xx, yy, zz + 1) + 2 <= light_level) {
-                    node.chunk.torchlight(light_level - 1, xx, yy, zz + 1);
-                    light_bfs_queue.add(new LightNode(World.idx(xx, yy, zz + 1, square, size), node.chunk));
-                }
-            }
-        }
-    }
-
     public void place_torch(int x, int y, int z) {
         torchlight(15, x, y, z);
-        light_bfs_queue.add(new LightNode(World.idx(x, y, z, square, size), this));
+        World.light_bfs_queue.add(new World.LightNode(World.idx(x, y, z, square, size), this));
     }
 
     public void rebuild() {
         this.updating = true;
 
-        lighting();
+//        lighting();
 
         Queue<Vector2f> texs = new LinkedList<>();
         texs.add(TextureAtlas.get_coord("grass"));
@@ -163,7 +92,7 @@ public class Chunk extends IndexedMesh {
         texs.add(TextureAtlas.get_coord("stone"));
         texs.add(TextureAtlas.get_coord("wood_0"));
         texs.add(TextureAtlas.get_coord("sand"));
-        
+
         Map<Vertex, Integer> vertex2index = new LinkedHashMap<>();
         List<Integer> indices = new ArrayList<>();
         int cur_vertex_idx = 0;
@@ -171,7 +100,7 @@ public class Chunk extends IndexedMesh {
         int next_color = 512;
         int[] proj = new int[size];
         Map<Integer, int[]> coords_map = new HashMap<>();
-        
+
         this.faces_counter = 0;
         for (int y = 0; y < size; y++) {
             int[][] mark = new int[size][size];
@@ -182,11 +111,11 @@ public class Chunk extends IndexedMesh {
                 boolean canDown = false;
                 int projFlag = -1;
                 for (int x = 0; x < size; x++) {
-                	int type = block_type(x, y, z);
+                    int type = block_type(x, y, z);
                     if (type == 0) {
                         continue;
                     }
-                    
+
                     int light = torchlight(x, y, z);
                     boolean update_coords = false;
 
@@ -243,88 +172,88 @@ public class Chunk extends IndexedMesh {
 
                 for (int side_idx = 0; side_idx < 6; side_idx++) {
                     if (renderable_sides[side_idx]) {
-                    	float r = 1.0f, g = 1.0f, b = 1.0f;
+                        float r = 1.0f, g = 1.0f, b = 1.0f;
                         if (side_idx >= 0 && side_idx <= 3) {
                             r = 0.7f;
                             g = 0.7f;
                             b = 0.7f;
                         }
 
-//                        for (int xxx = x0; xxx <= x1; xxx++) {
-//                            for (int zzz = z0; zzz <= z1; zzz++) {
-//                                float light = light_map[World.idx(xxx, y, zzz, square, size)] / 15.0f;
-//
-//                                r *= light;
-//                                g *= light;
-//                                b *= light;
-//                            }
-//                        }
-//                        if (r < 0.02f && g < 0.02f && b < 0.02f) {
-//                        	r = 0.02f;
-//                        	g = 0.02f;
-//                        	b = 0.02f;
-//                        }
-                    	
-                    	float[] vertices   = AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, y + y_offset, z0 + z_offset, xx, yy, zz);
-                    	float[] tex_coords = AABB.SIDE.values[side_idx].texture_coords(xx, zz);
+                        for (int xxx = x0; xxx <= x1; xxx++) {
+                            for (int zzz = z0; zzz <= z1; zzz++) {
+                                float light = light_map[World.idx(xxx, y, zzz, square, size)] / 15.0f;
 
-                        Integer index; 
-                        
+                                r *= light;
+                                g *= light;
+                                b *= light;
+                            }
+                        }
+                        if (r < 0.02f && g < 0.02f && b < 0.02f) {
+                        	r = 0.02f;
+                        	g = 0.02f;
+                        	b = 0.02f;
+                        }
+
+                        float[] vertices = AABB.SIDE.values[side_idx].translate_and_expand(x0 + x_offset, y + y_offset, z0 + z_offset, xx, yy, zz);
+                        float[] tex_coords = AABB.SIDE.values[side_idx].texture_coords(xx, zz);
+
+                        Integer index;
+
                         // 0
                         Vertex vertex0 = new Vertex(vertices[0], vertices[1], vertices[2],
- 							   tex_coords[0], tex_coords[1],
- 							   texture.x, texture.y,
- 							   r, g, b);
-					 	index = vertex2index.get(vertex0);
-					 	if (index == null) {
-					 		index = cur_vertex_idx++;
-					 		vertex2index.put(vertex0, index);
-					 	}
-					 	indices.add(index);
-					 	
-					 	// 1
-					 	Vertex vertex1 = new Vertex(vertices[3], vertices[4], vertices[5],
-	 							   tex_coords[2], tex_coords[3],
-	 							   texture.x, texture.y,
-	 							   r, g, b);
-					 	index = vertex2index.get(vertex1);
-					 	if (index == null) {
-					 		index = cur_vertex_idx++;
-					 		vertex2index.put(vertex1, index);
-					 	}
-					 	indices.add(index);
-					 	
-					 	// 2
-					 	Vertex vertex2 = new Vertex(vertices[6], vertices[7], vertices[8],
-	 							   tex_coords[4], tex_coords[5],
-	 							   texture.x, texture.y,
-	 							   r, g, b);
-					 	index = vertex2index.get(vertex2);
-					 	if (index == null) {
-					 		index = cur_vertex_idx++;
-					 		vertex2index.put(vertex2, index);
-					 	}
-					 	indices.add(index);
-					 	
-					 	// 1
-					 	indices.add(vertex2index.get(vertex1));
-					 	
-					 	// 3
-					 	Vertex vertex3 = new Vertex(vertices[9], vertices[10], vertices[11],
-	 							   tex_coords[6], tex_coords[7],
-	 							   texture.x, texture.y,
-	 							   r, g, b);
-					 	index = vertex2index.get(vertex3);
-					 	if (index == null) {
-					 		index = cur_vertex_idx++;
-					 		vertex2index.put(vertex3, index);
-					 	}
-					 	indices.add(index);
-					 	 
-					 	// 2
-					 	indices.add(vertex2index.get(vertex2));
-					 	
-					 	this.faces_counter += 2;
+                                tex_coords[0], tex_coords[1],
+                                texture.x, texture.y,
+                                r, g, b);
+                        index = vertex2index.get(vertex0);
+                        if (index == null) {
+                            index = cur_vertex_idx++;
+                            vertex2index.put(vertex0, index);
+                        }
+                        indices.add(index);
+
+                        // 1
+                        Vertex vertex1 = new Vertex(vertices[3], vertices[4], vertices[5],
+                                tex_coords[2], tex_coords[3],
+                                texture.x, texture.y,
+                                r, g, b);
+                        index = vertex2index.get(vertex1);
+                        if (index == null) {
+                            index = cur_vertex_idx++;
+                            vertex2index.put(vertex1, index);
+                        }
+                        indices.add(index);
+
+                        // 2
+                        Vertex vertex2 = new Vertex(vertices[6], vertices[7], vertices[8],
+                                tex_coords[4], tex_coords[5],
+                                texture.x, texture.y,
+                                r, g, b);
+                        index = vertex2index.get(vertex2);
+                        if (index == null) {
+                            index = cur_vertex_idx++;
+                            vertex2index.put(vertex2, index);
+                        }
+                        indices.add(index);
+
+                        // 1
+                        indices.add(vertex2index.get(vertex1));
+
+                        // 3
+                        Vertex vertex3 = new Vertex(vertices[9], vertices[10], vertices[11],
+                                tex_coords[6], tex_coords[7],
+                                texture.x, texture.y,
+                                r, g, b);
+                        index = vertex2index.get(vertex3);
+                        if (index == null) {
+                            index = cur_vertex_idx++;
+                            vertex2index.put(vertex3, index);
+                        }
+                        indices.add(index);
+
+                        // 2
+                        indices.add(vertex2index.get(vertex2));
+
+                        this.faces_counter += 2;
                     }
                 }
             }
@@ -332,11 +261,11 @@ public class Chunk extends IndexedMesh {
 
         this.updated = true;
         this.empty = faces_counter == 0;
-        
+
         synchronized (this) {
-           if (!empty) {
-            	update_gl_data(vertex2index.keySet(), indices);
-           }
+            if (!empty) {
+                update_gl_data(vertex2index.keySet(), indices);
+            }
         }
     }
 
@@ -496,9 +425,9 @@ public class Chunk extends IndexedMesh {
         if (updated && updating) {
             updating = false;
             synchronized (this) {
-	            if (!empty) {
-	                update_gl_buffers();
-	            }
+                if (!empty) {
+                    update_gl_buffers();
+                }
             }
         }
         changed = false;
