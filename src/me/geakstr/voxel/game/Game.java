@@ -61,6 +61,8 @@ public class Game {
         	World.chunk(rnd.nextInt(World.size), rnd.nextInt(World.height), rnd.nextInt(World.size))
         	.place_torch(rnd.nextInt(Chunk.size), rnd.nextInt(Chunk.size / 3) + Chunk.size / 3 * 2, rnd.nextInt(Chunk.size));
         }
+
+        World.lighting();
     }
 
 

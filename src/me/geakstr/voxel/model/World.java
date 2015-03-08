@@ -39,7 +39,6 @@ public class World {
         }
 
         gen();
-        lighting();
     }
 
     public static class LightNode {
@@ -59,7 +58,7 @@ public class World {
         }
     }
 
-    private static void lighting() {
+    public static void lighting() {
         while (!light_bfs_queue.isEmpty()) {
             LightNode node = light_bfs_queue.poll();
 
